@@ -39,50 +39,53 @@ class _MyHomePageState extends State<MyHomePage> {
       mainAxisSize: MainAxisSize.min,
       children: [
       SizedBox(
-        height: 500,
+        height: 550,
       ),
       SizedBox(
-      width: 300,
-      height: 50,
-      child: RaisedButton(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-        onPressed: () {
-          Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) =>  MetaMask()),
-          );
-        },
-        color: Colors.orange,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30))),
-        child: Text(
-          "MetaMask",
-          style: TextStyle(color: Colors.black, fontSize: 18),
-
-        ),
-      ),
+      width: 330,
+      height: 40,
+      child: ElevatedButton.icon(
+          icon: Icon(
+            Icons.format_textdirection_l_to_r,
+            color: Colors.black,
+            size: 30.0,
+          ),
+          label: Text('METAMASK'),
+            style: ElevatedButton.styleFrom(
+              primary: Color.fromARGB(255, 255, 255, 255),
+              onPrimary: Color.fromARGB(255, 0, 0, 0),
+              shadowColor: Color.fromARGB(68, 0, 0, 0),
+              side: BorderSide(width: 1.5, color: Color.fromARGB(75, 0, 0, 0)),
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              minimumSize: Size(100, 40), //////// HERE
+            ),
+            onPressed: () {},
+          )
     ),
     SizedBox(
       height: 16,
     ),
     SizedBox(
-      width: 300,
-      height: 50,
-      child: RaisedButton(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-      onPressed: (){
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) =>  Guest()),
-        );
-      },
-    color: Colors.blue,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(30))),
-      child: Text(
-        "Guest",
-        style: TextStyle(color: Colors.white, fontSize: 18),
-     ),),),
+      width: 330,
+      height: 40,
+      child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.black,
+              onPrimary: Colors.white,
+              shadowColor: Color.fromARGB(255, 65, 65, 65),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              minimumSize: Size(100, 40), //////// HERE
+            ),
+            onPressed: () {
+              //code on press
+            },
+            child: Text('GUEST'),
+          )
+      ,),
     ],)));
   }
 }
