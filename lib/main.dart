@@ -2,6 +2,7 @@ import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:flutter/material.dart';
 import 'Guest.dart';
 import 'MetaMask.dart';
+import 'navigation pages/main_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      //home: MyHomePage(),
+      home: MainPage(),
     );
   }
 }
@@ -49,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
           icon: Icon(
             CustomIcon.account_balance_wallet,
             size: 24,
-            color: Color.fromARGB(255,220, 47, 2),
+            color: Color.fromARGB(255,66, 165, 245),
             ),
           label: Text('METAMASK'),
             style: ElevatedButton.styleFrom(
@@ -82,7 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
               minimumSize: Size(100, 40), //////// HERE
             ),
             onPressed: () {
-              //code on press
+              Navigator.push(context,
+              MaterialPageRoute(builder: (context) =>  Guest()),
+              );
             },
             child: Text('GUEST'),
           )
