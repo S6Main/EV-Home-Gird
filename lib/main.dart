@@ -1,9 +1,10 @@
 import 'package:ev_homegrid/icons/custom_icon.dart';
+import 'package:ev_homegrid/navigation%20pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'Guest.dart';
 import 'MetaMask.dart';
 import 'navigation pages/main_page.dart';
-
+import 'navigation pages/pop_pages/side_page.dart';
 void main() {
   runApp(MyApp());
 }
