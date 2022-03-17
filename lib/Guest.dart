@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 
 class Guest extends StatefulWidget {
-  Guest({Key key, this.title}) : super(key: key);
-  final String title;
 
   @override
   _GuestState createState() => _GuestState();

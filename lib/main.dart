@@ -1,3 +1,4 @@
+import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:flutter/material.dart';
 import 'Guest.dart';
 import 'MetaMask.dart';
@@ -46,10 +47,10 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 40,
       child: ElevatedButton.icon(
           icon: Icon(
-            Icons.format_textdirection_l_to_r,
-            color: Colors.black,
-            size: 30.0,
-          ),
+            CustomIcon.account_balance_wallet,
+            size: 24,
+            color: Color.fromARGB(255,220, 47, 2),
+            ),
           label: Text('METAMASK'),
             style: ElevatedButton.styleFrom(
               primary: Color.fromARGB(255, 255, 255, 255),
