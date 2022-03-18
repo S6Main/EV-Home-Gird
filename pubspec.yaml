@@ -23,6 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  search_page: ^2.0.0+1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -30,7 +31,9 @@ dependencies:
   cupertino_icons: ^1.0.0
   flutter_web3: ^2.1.9
   flutter_svg: ^1.0.3
-  google_maps_flutter:
+  google_maps_flutter: ^2.1.2
+  flutter_polyline_points: ^1.0.0
+  dio: ^4.0.4
 
 
 dev_dependencies:
