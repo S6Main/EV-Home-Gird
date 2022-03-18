@@ -1,14 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.ev_homegrid">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    //<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:label="ev_homegrid"
         android:icon="@mipmap/ic_launcher">
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAE6LUZ4hY53RCmGaliUc4Jz3H-Gpr-SpE"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCeCEAAdBUCtWGltF2RM_YpukKhK4Wf17Y"/>
 
         <activity
             android:name=".MainActivity"
@@ -28,7 +29,8 @@
 
 
             <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyDuS-ObN6akaV--z8nfZh5CY_UnU7TRvcw"/>
+              android:value="AIzaSyAw_PucbqwZaifxOEYdb4arh37smm2kVSc"
+               />
 
 
             <!-- Displays an Android View that continues showing the launch screen
