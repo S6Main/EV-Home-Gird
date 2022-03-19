@@ -17,7 +17,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
+  GoogleMapController? _googleMapController;
 
+  @override
+  void dispose() {
+    _googleMapController?.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +32,17 @@ class _HomePageState extends State<HomePage> {
        myLocationButtonEnabled: false,
        zoomControlsEnabled: false,
        initialCameraPosition: _initialPosition,
+       onMapCreated: (controller) => _googleMapController = controller,
      ),
+
+     floatingActionButton: FloatingActionButton(
+       backgroundColor: Theme.of(context).primaryColor,
+       foregroundColor: Colors.black,
+       onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
+
+       child: const Icon(Icons.center_focus_strong),
+     ),
+     
      /* 
        Column(
         children: [

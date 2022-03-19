@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'EV Home Grid',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.white,
       ),
       home: MyHomePage(),
       //home: MainPage(),
