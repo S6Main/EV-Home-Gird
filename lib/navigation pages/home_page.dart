@@ -19,16 +19,19 @@ class _HomePageState extends State<HomePage> {
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
 
-  //markers
-  late Marker _origin;
-  late Marker _destination;
-
+  
   @override
   void dispose() {
     _googleMapController?.dispose();
     super.dispose();
   }
 
+  static final Marker _kGooglePlexMarker = Marker(
+      markerId : MarkerId('_kGooglePlex'),
+      infoWindow: InfoWindow(title: 'Google Plex'),
+      icon: BitmapDescriptor.defaultMarker,
+      position: LatLng(37.42796133580664, -122.085749655962)
+      );
   
 
   @override
@@ -37,6 +40,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       //backgroundColor: Color.fromARGB(255, 155, 95, 95),
      body: GoogleMap(
+       mapType: MapType.normal,
        myLocationButtonEnabled: false,
        zoomControlsEnabled: false,
        initialCameraPosition: _initialPosition,
@@ -44,11 +48,9 @@ class _HomePageState extends State<HomePage> {
        onMapCreated: (controller) {
          _googleMapController = controller;
        },
-       markers: {
-        if (_origin != null) _origin,
-        if (_destination != null) _destination,
-       },
-       onLongPress: addMarker,
+        markers: {
+          _kGooglePlexMarker,
+        },
      ),
 
      floatingActionButton: FloatingActionButton(
@@ -63,34 +65,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
   // ignore: dead_code
-    void addMarker(LatLng pos){
-      if(_origin == null || (_origin != null && _destination != null)){
-        //orgin is not set OR orgin/destination are both set
-        //set origin
-        setState(() {
-          _origin = Marker(
-            markerId:const MarkerId('origin'),
-            infoWindow: const InfoWindow(title: 'Origin'),
-            position: pos,
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          );
-          //Reset destination
-          //_destination = null; 
-        });
-      }
-      else{
-        setState(() {
-          _destination = Marker(
-            markerId:const MarkerId('destination'),
-            infoWindow: const InfoWindow(title: 'Destination'),
-            position: pos,
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          );
-        });
-        //orgin is already set
-        //set destination
-      }
-    }
+    
 }
 
 
