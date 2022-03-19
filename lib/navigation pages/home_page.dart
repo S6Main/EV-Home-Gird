@@ -19,20 +19,36 @@ class _HomePageState extends State<HomePage> {
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
 
+  //markers
+  late Marker _origin;
+  late Marker _destination;
+
   @override
   void dispose() {
     _googleMapController?.dispose();
     super.dispose();
   }
+
+  
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       //backgroundColor: Color.fromARGB(255, 155, 95, 95),
      body: GoogleMap(
        myLocationButtonEnabled: false,
        zoomControlsEnabled: false,
        initialCameraPosition: _initialPosition,
-       onMapCreated: (controller) => _googleMapController = controller,
+       //onMapCreated: (controller) => _googleMapController = controller,
+       onMapCreated: (controller) {
+         _googleMapController = controller;
+       },
+       markers: {
+        if (_origin != null) _origin,
+        if (_destination != null) _destination,
+       },
+       onLongPress: addMarker,
      ),
 
      floatingActionButton: FloatingActionButton(
@@ -43,120 +59,38 @@ class _HomePageState extends State<HomePage> {
        child: const Icon(Icons.center_focus_strong),
      ),
      
-     /* 
-       Column(
-        children: [
-          Container(
-
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.05),
-                    offset: Offset(0.0, 1.0), //(x,y)
-                    blurRadius: 6.0,
-                  ),]
-            ),
-            padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 15),
-            
-            child: Row(
-              children: [
-                Icon(Icons.menu, size: 25, color: Colors.black54,),
-                Expanded(child: Container(
-                  alignment: Alignment.center,
-                  child: Text('New Berlin, WI 53151, USA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: Colors.black26),),
-                )),
-                IconButton(
-                  icon: Icon(Icons.search, size: 25, color: Colors.black54,),
-                  onPressed: () {
-                    //showSearch(context: context, delegate: CustomSearchDeligate());
-                    
-                  },
-                ),
-              ],
-            ),
-            
-          ),
-          
-          
-        ],
-      ), */ 
+    
     );
   }
-}
-
-class CustomSearchDeligate extends SearchDelegate{
-  List<String> searchTerms = [
-    //search terms
-    'New York',
-    'New York City',
-    'New York State',
-  ];
-
-  
-
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-        ),
-        
-    ];
-  }
-
-  @override
-  Widget? buildLeading(BuildContext context) {
-    
-    return IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    
-    List<String> matchQuery = [];
-    for(var term in searchTerms){
-      if(term.toLowerCase().contains(query.toLowerCase())){
-        matchQuery.add(term);
+  // ignore: dead_code
+    void addMarker(LatLng pos){
+      if(_origin == null || (_origin != null && _destination != null)){
+        //orgin is not set OR orgin/destination are both set
+        //set origin
+        setState(() {
+          _origin = Marker(
+            markerId:const MarkerId('origin'),
+            infoWindow: const InfoWindow(title: 'Origin'),
+            position: pos,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          );
+          //Reset destination
+          //_destination = null; 
+        });
+      }
+      else{
+        setState(() {
+          _destination = Marker(
+            markerId:const MarkerId('destination'),
+            infoWindow: const InfoWindow(title: 'Destination'),
+            position: pos,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          );
+        });
+        //orgin is already set
+        //set destination
       }
     }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index){
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-
-      for(var term in searchTerms){
-      if(term.toLowerCase().contains(query.toLowerCase())){
-        matchQuery.add(term);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index){
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
-      },
-    );
-  }
 }
+
+
