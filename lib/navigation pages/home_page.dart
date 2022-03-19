@@ -16,11 +16,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-     body:
+      //backgroundColor: Color.fromARGB(255, 155, 95, 95),
+     body: GoogleMap(
+       myLocationButtonEnabled: false,
+       zoomControlsEnabled: false,
+       initialCameraPosition: _initialPosition,
+     ),
+     /* 
        Column(
         children: [
           Container(
@@ -57,7 +64,7 @@ class _HomePageState extends State<HomePage> {
           
           
         ],
-      ), 
+      ), */ 
     );
   }
 }
