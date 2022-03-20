@@ -44,6 +44,51 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text('Google Maps',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+        actions: [
+          if(_origin.markerId.value != '_origin') 
+          TextButton(onPressed: () => _googleMapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: _origin.position,
+                zoom: 14.5,
+              ),
+            ),
+          ),
+          style: TextButton.styleFrom(
+            primary: Colors.green,
+            textStyle: const TextStyle(fontWeight: FontWeight.w600)
+          ),
+          child: const Text('ORIGIN'),
+          ),
+
+           if(_destination.markerId.value != '_destination')
+          TextButton(onPressed: () => _googleMapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: _destination.position,
+                zoom: 14.5,
+              ),
+            ),
+          ),
+          style: TextButton.styleFrom(
+            primary: Colors.green,
+            textStyle: const TextStyle(fontWeight: FontWeight.w600)
+          ),
+          child: const Text('DEST'),
+          ),
+        ],
+      ),
       //backgroundColor: Color.fromARGB(255, 155, 95, 95),
      body: GoogleMap(
        myLocationButtonEnabled: false,
