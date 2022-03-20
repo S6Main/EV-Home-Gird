@@ -5,6 +5,7 @@ import 'Guest.dart';
 import 'MetaMask.dart';
 import 'navigation pages/main_page.dart';
 import 'navigation pages/pop_pages/side_page.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 void main() {
   runApp(MyApp());
 }
@@ -18,8 +19,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      //home: MyHomePage(),
-      home: MainPage(),
+      home: MyHomePage(),
+      //home: MainPage(),
     );
   }
 }
@@ -48,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       SizedBox(
       width: 330,
       height: 40,
-      child: ElevatedButton.icon(
+      child:ElevatedButton.icon(
           icon: Icon(
             CustomIcon.account_balance_wallet,
             size: 24,

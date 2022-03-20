@@ -21,13 +21,13 @@ class _HomePageState extends State<HomePage> {
 
   //markers
   static Marker _origin = Marker(
-      markerId : MarkerId('origin'),
+      markerId : MarkerId('_origin'),
       infoWindow: InfoWindow(title: 'Origin Location'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       );
 
   static Marker _destination = Marker(
-      markerId : MarkerId('destination'),
+      markerId : MarkerId('_destination'),
       infoWindow: InfoWindow(title: 'Destination Location'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       );
@@ -54,8 +54,8 @@ class _HomePageState extends State<HomePage> {
          _googleMapController = controller;
        },
        markers: {
-        if (_origin != null) _origin,
-        if (_destination != null) _destination,
+        if (_origin.markerId != '_origin') _origin,
+        if (_destination != '_destination') _destination,
        },
        onLongPress: addMarker,
      ),
@@ -73,10 +73,14 @@ class _HomePageState extends State<HomePage> {
   }
   // ignore: dead_code
     void addMarker(LatLng pos){
-      if(_origin == null || (_origin != null && _destination != null)){
+        print(_origin.markerId.value);
+        print(_destination.markerId.value);
+      if(_origin.markerId.value == '_origin' || (_destination.markerId.value != '_destination' && _origin.markerId.value != '_origin')){
         //orgin is not set OR orgin/destination are both set
         //set origin
         setState(() {
+          print("Marking Green");
+          
           _origin = Marker(
             markerId:const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
@@ -85,14 +89,24 @@ class _HomePageState extends State<HomePage> {
           );
           //Reset destination
           //_destination = null; 
+          
         });
+        _destination = Marker(
+            markerId:const MarkerId('_destination'),
+            infoWindow: const InfoWindow(title: 'Destination'),
+            position: pos,
+            alpha: 0.0,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          );
       }
       else{
         setState(() {
+          print("Marking Blue");
           _destination = Marker(
             markerId:const MarkerId('destination'),
             infoWindow: const InfoWindow(title: 'Destination'),
             position: pos,
+            alpha: 1.0,
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           );
         });
