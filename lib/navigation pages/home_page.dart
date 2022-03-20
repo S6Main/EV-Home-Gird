@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:ev_homegrid/maps/directions_model.dart';
+import 'package:ev_homegrid/maps/directions_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pop_pages/side_page.dart';
@@ -18,6 +20,7 @@ class _HomePageState extends State<HomePage> {
 
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
+  Directions? _info;
 
   //markers
   static Marker _origin = Marker(
@@ -117,9 +120,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
   // ignore: dead_code
-    void addMarker(LatLng pos){
-        print(_origin.markerId.value);
-        print(_destination.markerId.value);
+    void addMarker(LatLng pos)async{
       if(_origin.markerId.value == '_origin' || (_destination.markerId.value != '_destination' && _origin.markerId.value != '_origin')){
         //orgin is not set OR orgin/destination are both set
         //set origin
@@ -157,6 +158,13 @@ class _HomePageState extends State<HomePage> {
         });
         //orgin is already set
         //set destination
+
+        //get directions
+        final directions = await DirectionsRepository()
+        .getDirections(origin: _origin.position, destination: _destination.position);
+        setState(() {
+          _info = directions;
+        });
       }
     }
 }
