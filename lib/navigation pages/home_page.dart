@@ -1,10 +1,7 @@
 import 'dart:ffi';
 
-import 'package:ev_homegrid/maps/directions_model.dart';
-import 'package:ev_homegrid/maps/directions_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'pop_pages/side_page.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,13 +18,12 @@ class _HomePageState extends State<HomePage> {
 
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
-  Directions? _info;
 
   //markers
   static Marker _origin = Marker(
       markerId : MarkerId('_origin'),
       infoWindow: InfoWindow(title: 'Origin Location'),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       );
 
   static Marker _destination = Marker(
@@ -42,6 +38,16 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  static final Polyline _polyline = Polyline(
+    polylineId: PolylineId('_polyline'),
+    points: [
+      //LatLng(37.42796133580664, -122.085749655962),
+      //LatLng(37.43296265331129, -122.08832357078792),
+      _origin.position,
+      _destination.position
+    ],
+    width: 3,
+    );
   
 
   @override
@@ -94,74 +100,29 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       //backgroundColor: Color.fromARGB(255, 155, 95, 95),
-     body: Stack(
-       alignment: Alignment.center,
-       children: [
-              GoogleMap(
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            initialCameraPosition: _initialPosition,
-            //onMapCreated: (controller) => _googleMapController = controller,
-            onMapCreated: (controller) {
-              _googleMapController = controller;
-            },
-            markers: {
-              if (_origin.markerId != '_origin') _origin,
-              if (_destination != '_destination') _destination,
-            },
-            polylines: {
-              if (_info != null) 
-                Polyline(
-                  polylineId: const PolylineId('overview_polyline'),
-                  color: Colors.red,
-                  width: 5,
-                  points: _info!.polyLinePoints!.map((e) => LatLng(e.latitude, e.longitude)).toList(),
-                ),
-            },
-            onLongPress: addMarker,
-          ),
-          if(_info != null)
-          Positioned(
-            top: 20.0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 6.0,
-                horizontal: 12.0
-              ),
-              decoration: BoxDecoration(
-                color: Colors.yellowAccent,
-                borderRadius: BorderRadius.circular(20.0),
-                boxShadow: const[
-                  BoxShadow(
-                    color: Colors.black26,
-                    offset:Offset(0, 2),
-                    blurRadius: 6.0
-                  )
-                ]
-              ),
-              child: Text(
-                '${_info?.totalDistance},${_info?.totalDuration}',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black
-                ),
-              ),
-            ),
-          ),
-       ],
+     body: 
+     GoogleMap(
+       myLocationButtonEnabled: false,
+       zoomControlsEnabled: false,
+       initialCameraPosition: _initialPosition,
+       //onMapCreated: (controller) => _googleMapController = controller,
+       onMapCreated: (controller) {
+         _googleMapController = controller;
+       },
+       markers: {
+        if (_origin.markerId != '_origin') _origin,
+        if (_destination != '_destination') _destination,
+       },
+       polylines: {
+         if(_destination.markerId.value != '_destination' && _origin.markerId.value != '_origin') _polyline,
+       },
+       onLongPress: addMarker,
      ),
-     
 
      floatingActionButton: FloatingActionButton(
        backgroundColor: Theme.of(context).primaryColor,
        foregroundColor: Colors.black,
-       /* onPressed: () => _googleMapController?.animateCamera(
-          _info != null 
-            ? CameraUpdate.newLatLngBounds(_info.bounds, 100.0)
-            : CameraUpdate.newCameraPosition(_initialPosition), 
-       ), */
-        onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
+       onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
 
        child: const Icon(Icons.center_focus_strong),
      ),
@@ -170,13 +131,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
   // ignore: dead_code
-    void addMarker(LatLng pos)async{
+    void addMarker(LatLng pos){
+        print(_origin.markerId.value);
+        print(_destination.markerId.value);
       if(_origin.markerId.value == '_origin' || (_destination.markerId.value != '_destination' && _origin.markerId.value != '_origin')){
         //orgin is not set OR orgin/destination are both set
         //set origin
         setState(() {
           print("Marking Green");
-          
+          Map().clear();
           _origin = Marker(
             markerId:const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
@@ -186,7 +149,6 @@ class _HomePageState extends State<HomePage> {
           //Reset destination
           //_destination = null; 
           
-          _info = null;
         });
         _destination = Marker(
             markerId:const MarkerId('_destination'),
@@ -209,13 +171,6 @@ class _HomePageState extends State<HomePage> {
         });
         //orgin is already set
         //set destination
-
-        //get directions
-        final directions = await DirectionsRepository()
-        .getDirections(origin: _origin.position, destination: _destination.position);
-        setState(() {
-          _info = directions;
-        });
       }
     }
 }
