@@ -38,11 +38,9 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  static final Polyline _polyline = Polyline(
+  static Polyline _polyline = Polyline(
     polylineId: PolylineId('_polyline'),
     points: [
-      //LatLng(37.42796133580664, -122.085749655962),
-      //LatLng(37.43296265331129, -122.08832357078792),
       _origin.position,
       _destination.position
     ],
@@ -139,7 +137,7 @@ class _HomePageState extends State<HomePage> {
         //set origin
         setState(() {
           print("Marking Green");
-          Map().clear();
+          
           _origin = Marker(
             markerId:const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
@@ -157,6 +155,7 @@ class _HomePageState extends State<HomePage> {
             alpha: 0.0,
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           );
+          
       }
       else{
         setState(() {
@@ -172,6 +171,14 @@ class _HomePageState extends State<HomePage> {
         //orgin is already set
         //set destination
       }
+      _polyline = Polyline(
+    polylineId: PolylineId('_polyline'),
+    points: [
+      _origin.position,
+      _destination.position
+    ],
+    width: 3,
+    );
     }
 }
 
