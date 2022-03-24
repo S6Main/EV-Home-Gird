@@ -47,34 +47,34 @@ class _MyHomePageState extends State<MyHomePage> {
         height: 550,
       ),
       SizedBox(
-      width: 330,
-      height: 40,
-      child:ElevatedButton.icon(
+      width: 338,
+      height: 45,
+      child: ElevatedButton.icon(
           icon: Icon(
             CustomIcon.account_balance_wallet,
             size: 24,
-            color: Color.fromARGB(255,66, 165, 245),
+            color: Color.fromARGB(255, 0, 0, 0),
             ),
-          label: Text('METAMASK'),
+          label: Text('CONNCET WALLET'),
             style: ElevatedButton.styleFrom(
               primary: Color.fromARGB(255, 255, 255, 255),
               onPrimary: Color.fromARGB(255, 0, 0, 0),
               shadowColor: Color.fromARGB(68, 0, 0, 0),
-              side: BorderSide(width: 1.5, color: Color.fromARGB(75, 0, 0, 0)),
+              side: BorderSide(width: 1.5, color: Color.fromARGB(20, 0, 0, 0)),
               elevation: 1,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(10)),
               minimumSize: Size(100, 40), //////// HERE
             ),
             onPressed: () {},
-          )
+          ) 
     ),
     SizedBox(
       height: 16,
     ),
     SizedBox(
-      width: 330,
-      height: 40,
+      width: 338,
+      height: 45,
       child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               primary: Colors.black,
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               shadowColor: Color.fromARGB(255, 65, 65, 65),
               elevation: 2,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(10)),
               minimumSize: Size(100, 40), //////// HERE
             ),
             onPressed: () {
