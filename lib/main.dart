@@ -5,7 +5,6 @@ import 'Guest.dart';
 import 'MetaMask.dart';
 import 'navigation pages/main_page.dart';
 import 'navigation pages/pop_pages/side_page.dart';
-import 'package:rounded_loading_button/rounded_loading_button.dart';
 void main() {
   runApp(MyApp());
 }
