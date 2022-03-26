@@ -56,7 +56,11 @@ class _MyHomePageState extends State<MyHomePage> {
             size: 24,
             color: Color.fromARGB(255, 0, 0, 0),
             ),
-          label: Text('CONNCET WALLET'),
+          label: Text('CONNCET WALLET',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16
+          ),),
             style: ElevatedButton.styleFrom(
               primary: Color.fromARGB(255, 255, 255, 255),
               onPrimary: Color.fromARGB(255, 0, 0, 0),
@@ -91,7 +95,11 @@ class _MyHomePageState extends State<MyHomePage> {
               MaterialPageRoute(builder: (context) =>  MainPage()),
               );
             },
-            child: Text('GUEST'),
+            child: Text('GUEST',
+            style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16
+          ),),
           )
       ,),
     ],)));

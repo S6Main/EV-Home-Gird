@@ -34,8 +34,12 @@ dependencies:
   google_maps_flutter: ^2.1.2
   flutter_polyline_points: ^1.0.0
   dio: ^4.0.4
+<<<<<<< HEAD
   google_maps_routes: ^1.1.2
   google_maps_widget: ^1.0.1
+=======
+  http: ^0.13.4
+>>>>>>> dc29862dcb4c2630393ccd84a9c10d5a2b955545
 
 
 dev_dependencies:
@@ -61,6 +65,8 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/light.json
+    - assets/images/src.png
+    - assets/images/dst.png
   fonts:
     - family: CustomIcon
       fonts:
