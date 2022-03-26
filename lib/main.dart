@@ -1,11 +1,11 @@
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/navigation%20pages/home_page.dart';
+import 'package:ev_homegrid/temp.dart';
 import 'package:flutter/material.dart';
 import 'Guest.dart';
 import 'MetaMask.dart';
 import 'navigation pages/main_page.dart';
 import 'navigation pages/pop_pages/side_page.dart';
-import 'package:rounded_loading_button/rounded_loading_button.dart';
 void main() {
   runApp(MyApp());
 }
@@ -19,8 +19,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: MyHomePage(),
+      //home: MyHomePage(),
       //home: MainPage(),
+      home: mainApp()
     );
   }
 }
