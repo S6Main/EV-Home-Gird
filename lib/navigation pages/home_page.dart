@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'pop_pages/side_page.dart';
-
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_routes/google_maps_routes.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -17,19 +17,33 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
+  static const _initialPosition = CameraPosition(target: LatLng(45.82917150748776, 14.63705454546316),zoom: 14.4746);
   GoogleMapController? _googleMapController;
+
+  List<LatLng> points = [
+    LatLng(45.82917150748776, 14.63705454546316),
+    LatLng(45.833828635680355, 14.636544256202207),
+    LatLng(45.851254420031296, 14.624331708344428),
+    LatLng(45.84794984187217, 14.605434384742317)
+  ];
+
+  MapsRoutes route = new MapsRoutes();
+  DistanceCalculator distanceCalculator = new DistanceCalculator();
+  String googleApiKey = 'AIzaSyAw_PucbqwZaifxOEYdb4arh37smm2kVSc';
+  String totalDistance = 'No route';
 
   //markers
   static Marker _origin = Marker(
       markerId : MarkerId('_origin'),
       infoWindow: InfoWindow(title: 'Origin Location'),
+      alpha: 0,
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       );
 
   static Marker _destination = Marker(
       markerId : MarkerId('_destination'),
       infoWindow: InfoWindow(title: 'Destination Location'),
+      alpha: 0,
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       );
 
@@ -128,22 +142,27 @@ class _HomePageState extends State<HomePage> {
         if (_origin.markerId != '_origin') _origin,
         if (_destination != '_destination') _destination,
        },
-       polylines: {
+       /* polylines: {
          if(_destination.markerId.value != '_destination' && _origin.markerId.value != '_origin') _polyline,
-       },
+       }, */
+       polylines: route.routes,
        onLongPress: addMarker,
      ),
 
      floatingActionButton: FloatingActionButton(
        backgroundColor: Theme.of(context).primaryColor,
        foregroundColor: Colors.black,
-       onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
+       onPressed: () async{
+         await route.drawRoute(points, 'Test routes',
+              Color.fromRGBO(130, 78, 210, 1.0), googleApiKey,
+              travelMode: TravelModes.driving);
 
-       child: const Icon(Icons.center_focus_strong),
-     ),
-     
-    
-    );
+         setState(() {
+            totalDistance =
+                distanceCalculator.calculateRouteDistance(points, decimals: 1);
+          });
+        },
+        child: const Icon(Icons.center_focus_strong),),);
   }
   // ignore: dead_code
     void addMarker(LatLng pos){
@@ -159,6 +178,7 @@ class _HomePageState extends State<HomePage> {
             markerId:const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
             position: pos,
+            alpha: 0,
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
           );
           //Reset destination
