@@ -1,11 +1,11 @@
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/navigation%20pages/home_page.dart';
+import 'package:ev_homegrid/temp.dart';
 import 'package:flutter/material.dart';
 import 'Guest.dart';
 import 'MetaMask.dart';
 import 'navigation pages/main_page.dart';
 import 'navigation pages/pop_pages/side_page.dart';
-import 'package:rounded_loading_button/rounded_loading_button.dart';
 void main() {
   runApp(MyApp());
 }
@@ -19,8 +19,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: MyHomePage(),
+      //home: MyHomePage(),
       //home: MainPage(),
+      home: mainApp()
     );
   }
 }
@@ -55,7 +56,11 @@ class _MyHomePageState extends State<MyHomePage> {
             size: 24,
             color: Color.fromARGB(255, 0, 0, 0),
             ),
-          label: Text('CONNCET WALLET'),
+          label: Text('CONNCET WALLET',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16
+          ),),
             style: ElevatedButton.styleFrom(
               primary: Color.fromARGB(255, 255, 255, 255),
               onPrimary: Color.fromARGB(255, 0, 0, 0),
@@ -90,7 +95,11 @@ class _MyHomePageState extends State<MyHomePage> {
               MaterialPageRoute(builder: (context) =>  MainPage()),
               );
             },
-            child: Text('GUEST'),
+            child: Text('GUEST',
+            style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16
+          ),),
           )
       ,),
     ],)));

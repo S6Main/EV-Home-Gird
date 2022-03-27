@@ -29,25 +29,36 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        unselectedFontSize: 0,
-        selectedFontSize: 0,
-        type: BottomNavigationBarType.shifting,
-        backgroundColor: Colors.white,
-        iconSize: 21,
-        onTap: onTap,
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.black54,
-        unselectedItemColor: Colors.grey.withOpacity(0.5),
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        elevation: 0,
-        items: [
-        BottomNavigationBarItem(icon: Icon(Icons.apps),label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart_sharp),label: 'Owner'),
-        BottomNavigationBarItem(icon: Icon(Icons.history),label: 'History'),
-        BottomNavigationBarItem(icon: Icon(Icons.person),label: 'Profile')
-      ]),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Color.fromARGB(30, 0, 0, 0),
+              blurRadius: 12,
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          unselectedFontSize: 0,
+          selectedFontSize: 0,
+          type: BottomNavigationBarType.shifting,
+          backgroundColor: Colors.white,
+          iconSize: 21,
+          onTap: onTap,
+          currentIndex: _currentIndex,
+          selectedItemColor: Colors.black87,
+          unselectedItemColor: Colors.grey.withOpacity(0.5),
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          elevation: 0,
+          
+          items: [
+          BottomNavigationBarItem(icon: Icon(Icons.apps),label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_sharp),label: 'Owner'),
+          BottomNavigationBarItem(icon: Icon(Icons.history),label: 'History'),
+          BottomNavigationBarItem(icon: Icon(Icons.person),label: 'Profile')
+        ]),
+      ),
     );
   }
 }
