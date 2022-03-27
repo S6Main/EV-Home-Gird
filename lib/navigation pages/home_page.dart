@@ -2,9 +2,14 @@ import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'pop_pages/side_page.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_routes/google_maps_routes.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:custom_map_markers/custom_map_markers.dart';
+
+
 
 
 class HomePage extends StatefulWidget {
@@ -16,35 +21,31 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  static const _initialPosition = CameraPosition(target: LatLng(45.82917150748776, 14.63705454546316),zoom: 14.4746);
+  static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
-
-  List<LatLng> points = [
-    LatLng(45.82917150748776, 14.63705454546316),
-    LatLng(45.833828635680355, 14.636544256202207),
-    LatLng(45.851254420031296, 14.624331708344428),
-    LatLng(45.84794984187217, 14.605434384742317)
-  ];
-
-  MapsRoutes route = new MapsRoutes();
-  DistanceCalculator distanceCalculator = new DistanceCalculator();
-  String googleApiKey = 'AIzaSyAw_PucbqwZaifxOEYdb4arh37smm2kVSc';
-  String totalDistance = 'No route';
 
   //markers
   static Marker _origin = Marker(
       markerId : MarkerId('_origin'),
       infoWindow: InfoWindow(title: 'Origin Location'),
-      alpha: 0,
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       );
 
   static Marker _destination = Marker(
       markerId : MarkerId('_destination'),
       infoWindow: InfoWindow(title: 'Destination Location'),
-      alpha: 0,
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       );
+
+  final locations = const [
+    LatLng(37.42796133580664, -122.085749655962),
+    LatLng(37.41796133580664, -122.085749655962),
+    LatLng(37.43796133580664, -122.085749655962),
+    LatLng(37.42796133580664, -122.095749655962),
+    LatLng(37.42796133580664, -122.075749655962),
+  ];
+
+  
 
   @override
   void dispose() {
@@ -60,6 +61,21 @@ class _HomePageState extends State<HomePage> {
     ],
     width: 3,
     );
+
+  changeMapMode(){
+    getJsonFile("assets/light.json").then(setMapStyle);
+  }
+
+  Future<String> getJsonFile(String path) async{
+    String val =  await rootBundle.loadString(path);
+    return val;
+    //get json file path
+  }
+  void setMapStyle(String mapStyle) {
+    _googleMapController?.setMapStyle(mapStyle);
+    print("set style");
+  }
+
   
 
   @override
@@ -113,40 +129,87 @@ class _HomePageState extends State<HomePage> {
       ),
       //backgroundColor: Color.fromARGB(255, 155, 95, 95),
      body: 
-     GoogleMap(
+      CustomGoogleMapMarkerBuilder(
+        //screenshotDelay: const Duration(seconds: 4),
+        customMarkers: [
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-1'), position: locations[0]),
+              child: _customMarkerDest(Color.fromARGB(255,182, 225,16))),
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-5'), position: locations[4]),
+              child: _customMarker('A', Colors.black)),
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-2'), position: locations[1]),
+              child: _customMarker('B', Color.fromARGB(255, 0, 0, 0))),
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-3'), position: locations[2]),
+              child: _customMarker('C', Color.fromARGB(255, 0, 0, 0))),
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-4'), position: locations[3]),
+              child: _customMarkerOrigin(Color.fromARGB(255,182, 225,16))),
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-5'), position: locations[4]),
+              child: _customMarker('A', Color.fromARGB(255, 0, 0, 0))),
+        ],
+        builder: (BuildContext context, Set<Marker>? markers) {
+          if (markers == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return GoogleMap(
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            initialCameraPosition: _initialPosition,
+            //onMapCreated: (controller) => _googleMapController = controller,
+            onMapCreated: (controller) {
+              _googleMapController = controller;
+              changeMapMode();
+            },
+            markers: markers,
+            onLongPress: addMarker,
+            
+           
+          );
+        },
+      ),
+
+     /* GoogleMap(
        myLocationButtonEnabled: false,
        zoomControlsEnabled: false,
        initialCameraPosition: _initialPosition,
        //onMapCreated: (controller) => _googleMapController = controller,
        onMapCreated: (controller) {
          _googleMapController = controller;
+         changeMapMode();
        },
        markers: {
         if (_origin.markerId != '_origin') _origin,
         if (_destination != '_destination') _destination,
        },
-       /* polylines: {
+       polylines: {
          if(_destination.markerId.value != '_destination' && _origin.markerId.value != '_origin') _polyline,
-       }, */
-       polylines: route.routes,
+       },
        onLongPress: addMarker,
-     ),
+     ), */
 
      floatingActionButton: FloatingActionButton(
        backgroundColor: Theme.of(context).primaryColor,
        foregroundColor: Colors.black,
-       onPressed: () async{
-         await route.drawRoute(points, 'Test routes',
-              Color.fromRGBO(130, 78, 210, 1.0), googleApiKey,
-              travelMode: TravelModes.driving);
+       onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
 
-         setState(() {
-            totalDistance =
-                distanceCalculator.calculateRouteDistance(points, decimals: 1);
-          });
-        },
-        child: const Icon(Icons.center_focus_strong),),);
+       //child: const Icon(Icons.center_focus_strong),
+       child: const Icon(Icons.my_location),
+     ),
+     
+    
+    );
   }
+  
   // ignore: dead_code
     void addMarker(LatLng pos){
         print(_origin.markerId.value);
@@ -161,8 +224,8 @@ class _HomePageState extends State<HomePage> {
             markerId:const MarkerId('origin'),
             infoWindow: const InfoWindow(title: 'Origin'),
             position: pos,
-            alpha: 0,
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            //icon: CustomM
           );
           //Reset destination
           //_destination = null; 
@@ -200,6 +263,81 @@ class _HomePageState extends State<HomePage> {
     width: 3,
     );
     }
+
+    _customMarker(String text, Color color) {
+    return Container(
+      child: /* ImageIcon(
+        AssetImage('assets/images/charging.png'),
+        color: color,
+        size: 40,
+      ), */
+      Icon(
+        Icons.location_on,
+        color: color,
+        size: 40,
+      ),
+    );
+  }
+
+  _customMarkerOrigin(Color color) {
+    return Container(
+      margin: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+          color: color, borderRadius: BorderRadius.circular(50),boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 2,
+                offset: Offset(0, 2))
+          ]),
+      child: 
+      Icon(
+        LineAwesomeIcons.location_arrow,
+        color: Colors.white,
+        size: 30,
+      ),
+    );
+    
+    /*  Container(
+      child: ImageIcon(
+        AssetImage('assets/images/src.png'),
+        color: color,
+        size: 40,
+      ),
+     
+    ); */
+  }
+
+  _customMarkerDest(Color color) {
+    
+    return Container(
+      margin: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+          color: color, borderRadius: BorderRadius.circular(50),boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 2,
+                offset: Offset(0, 2))
+          ]),
+      child: 
+      Icon(
+        LineAwesomeIcons.location_arrow,
+        color: Colors.white,
+        size: 30,
+      ),
+    );
+    
+    /*  Container(
+      child: ImageIcon(
+        AssetImage('assets/images/src.png'),
+        color: color,
+        size: 40,
+      ),
+     
+    ); */
+  }
 }
+
 
 

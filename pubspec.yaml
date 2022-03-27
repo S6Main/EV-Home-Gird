@@ -34,6 +34,8 @@ dependencies:
   google_maps_flutter: ^2.1.2
   flutter_polyline_points: ^1.0.0
   dio: ^4.0.4
+  custom_map_markers: ^0.0.1 #used for google maps marker
+  line_awesome_flutter: ^2.0.0 #used for line icons
 
 
 dev_dependencies:
@@ -59,6 +61,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/light.json
+    - assets/images/charging.png
   fonts:
     - family: CustomIcon
       fonts:

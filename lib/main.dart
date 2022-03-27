@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       //home: MyHomePage(),
-      //home: MainPage(),
-      home: mainApp()
+      home: MainPage(),
+      //home: mainApp()
     );
   }
 }

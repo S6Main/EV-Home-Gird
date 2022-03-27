@@ -169,6 +169,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  custom_map_markers:
+    dependency: "direct main"
+    description:
+      name: custom_map_markers
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   dart_style:
     dependency: transitive
     description:
@@ -270,20 +277,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.5"
-  google_maps_routes:
-    dependency: "direct main"
-    description:
-      name: google_maps_routes
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.2"
-  google_maps_widget:
-    dependency: "direct main"
-    description:
-      name: google_maps_widget
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   graphs:
     dependency: transitive
     description:
@@ -292,7 +285,7 @@ packages:
     source: hosted
     version: "1.0.0"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -340,6 +333,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.4.0"
+  line_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: line_awesome_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   logging:
     dependency: transitive
     description:
@@ -506,6 +506,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0+2"
   term_glyph:
     dependency: transitive
     description:
