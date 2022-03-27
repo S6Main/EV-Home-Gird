@@ -2,7 +2,6 @@ import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'pop_pages/side_page.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -47,21 +46,6 @@ class _HomePageState extends State<HomePage> {
     ],
     width: 3,
     );
-
-  changeMapMode(){
-    getJsonFile("assets/light.json").then(setMapStyle);
-  }
-
-  Future<String> getJsonFile(String path) async{
-    String val =  await rootBundle.loadString(path);
-    return val;
-    //get json file path
-  }
-  void setMapStyle(String mapStyle) {
-    _googleMapController?.setMapStyle(mapStyle);
-    print("set style");
-  }
-
   
 
   @override
@@ -122,7 +106,6 @@ class _HomePageState extends State<HomePage> {
        //onMapCreated: (controller) => _googleMapController = controller,
        onMapCreated: (controller) {
          _googleMapController = controller;
-         changeMapMode();
        },
        markers: {
         if (_origin.markerId != '_origin') _origin,
