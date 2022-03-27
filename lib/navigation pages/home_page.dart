@@ -128,18 +128,18 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       //backgroundColor: Color.fromARGB(255, 155, 95, 95),
-     body: 
+     body:
+
+     // from this
       CustomGoogleMapMarkerBuilder(
         //screenshotDelay: const Duration(seconds: 4),
+
+
         customMarkers: [
           MarkerData(
               marker: Marker(
                   markerId: const MarkerId('id-1'), position: locations[0]),
-              child: _customMarkerDest(Color.fromARGB(255,182, 225,16))),
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('id-5'), position: locations[4]),
-              child: _customMarker('A', Colors.black)),
+              child: _customMarkerDest(Color.fromARGB(255,182, 225,16))), 
           MarkerData(
               marker: Marker(
                   markerId: const MarkerId('id-2'), position: locations[1]),
@@ -157,6 +157,7 @@ class _HomePageState extends State<HomePage> {
                   markerId: const MarkerId('id-5'), position: locations[4]),
               child: _customMarker('A', Color.fromARGB(255, 0, 0, 0))),
         ],
+        
         builder: (BuildContext context, Set<Marker>? markers) {
           if (markers == null) {
             return const Center(child: CircularProgressIndicator());
@@ -176,7 +177,7 @@ class _HomePageState extends State<HomePage> {
            
           );
         },
-      ),
+      ),  // upto this
 
      /* GoogleMap(
        myLocationButtonEnabled: false,
@@ -314,17 +315,12 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.all(6),
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-          color: color, borderRadius: BorderRadius.circular(50),boxShadow: [
-            BoxShadow(
-                color: Colors.black26,
-                blurRadius: 2,
-                offset: Offset(0, 2))
-          ]),
-      child: 
-      Icon(
-        LineAwesomeIcons.location_arrow,
-        color: Colors.white,
-        size: 30,
+
+          color: color, borderRadius: BorderRadius.circular(50),),
+      child: ImageIcon(
+        AssetImage('assets/images/circle.png'),
+        color: color,
+        size: 8,
       ),
     );
     

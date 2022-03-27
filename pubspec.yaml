@@ -36,6 +36,7 @@ dependencies:
   dio: ^4.0.4
   custom_map_markers: ^0.0.1 #used for google maps marker
   line_awesome_flutter: ^2.0.0 #used for line icons
+  animator: ^3.1.0
 
 
 dev_dependencies:
