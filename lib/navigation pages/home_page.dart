@@ -8,6 +8,7 @@ import 'pop_pages/side_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:custom_map_markers/custom_map_markers.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 
 
 
@@ -23,6 +24,16 @@ class _HomePageState extends State<HomePage> {
 
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
+  
+  int _selectedMarkerIndex = -1;
+  int _prevSelectedMarkerIndex = -1;
+
+  
+  
+  @override
+  initState() {
+    super.initState();
+  }
 
   //markers
   static Marker _origin = Marker(
@@ -138,24 +149,33 @@ class _HomePageState extends State<HomePage> {
         customMarkers: [
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('id-1'), position: locations[0]),
+                  markerId: const MarkerId('src'), position: locations[0],onTap: (){
+                    // code to execute when tapped
+                  }),
               child: _customMarkerDest(Color.fromARGB(255,182, 225,16))), 
+          
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('id-2'), position: locations[1]),
-              child: _customMarker('B', Color.fromARGB(255, 0, 0, 0))),
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('id-3'), position: locations[2]),
-              child: _customMarker('C', Color.fromARGB(255, 0, 0, 0))),
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('id-4'), position: locations[3]),
+                  markerId: const MarkerId('dst'), position: locations[3],rotation: 270),
               child: _customMarkerOrigin(Color.fromARGB(255,182, 225,16))),
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('id-5'), position: locations[4]),
+                  markerId: const MarkerId('1'), position: locations[4],onTap: (){
+                    // code to execute when tapped
+                  }),
               child: _customMarker('A', Color.fromARGB(255, 0, 0, 0))),
+              MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-2'), position: locations[1],onTap: (){
+                    // code to execute when tapped
+                  }),
+              child: _customMarker('B', Color.fromARGB(255, 0, 0, 0))),
+          MarkerData(
+              marker: Marker(
+                  markerId: const MarkerId('id-3'), position: locations[2],onTap: (){
+                    // code to execute when tapped
+                  }),
+              child: _customMarker('C', Color.fromARGB(255, 0, 0, 0))),
         ],
         
         builder: (BuildContext context, Set<Marker>? markers) {
@@ -272,11 +292,15 @@ class _HomePageState extends State<HomePage> {
         color: color,
         size: 40,
       ), */
+
       Icon(
         Icons.location_on,
         color: color,
         size: 40,
       ),
+      
+      
+
     );
   }
 
@@ -320,7 +344,7 @@ class _HomePageState extends State<HomePage> {
       child: ImageIcon(
         AssetImage('assets/images/circle.png'),
         color: color,
-        size: 8,
+        size: 6,
       ),
     );
     
