@@ -1,6 +1,5 @@
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/navigation%20pages/home_page.dart';
-import 'package:ev_homegrid/temp.dart';
 import 'package:flutter/material.dart';
 import 'Guest.dart';
 import 'MetaMask.dart';
