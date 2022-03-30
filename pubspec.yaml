@@ -36,8 +36,7 @@ dependencies:
   dio: ^4.0.4
   custom_map_markers: ^0.0.1 #used for google maps marker
   line_awesome_flutter: ^2.0.0 #used for line icons
-  flutter_compass: '^0.7.0'
-  syncfusion_flutter_maps: ^19.4.56-beta
+  google_maps_routes: ^1.1.2
 
 
 dev_dependencies:

@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import 'pop_pages/side_page.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:custom_map_markers/custom_map_markers.dart';
-import 'package:flutter_compass/flutter_compass.dart';
+import 'package:google_maps_routes/google_maps_routes.dart';
 
 
 
@@ -24,6 +25,13 @@ class _HomePageState extends State<HomePage> {
 
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
+
+  List<LatLng> points = [
+    LatLng(37.42796133580664, -122.085749655962),
+    LatLng(37.41796133580664, -122.085749655962),
+    ];
+  MapsRoutes route = new MapsRoutes();
+  String googleApiKey = 'AIzaSyBPVmFIW-OGZSrk2u5lfVov64M-GloBgXI';
     
   callmeToDelay() async {
     await Future.delayed(Duration(seconds: 2)); // code to make a delay of 2 seconds
@@ -35,7 +43,13 @@ class _HomePageState extends State<HomePage> {
     callmeToDelay();
   }
 
-  final locations = const [
+  findRoute()async{
+   await route.drawRoute(points, 'Test routes',
+              Color.fromRGBO(130, 78, 210, 1.0), googleApiKey,
+              travelMode: TravelModes.driving);
+  }
+
+  static var locations = const [
     LatLng(37.42796133580664, -122.085749655962),
     LatLng(37.41796133580664, -122.085749655962),
     LatLng(37.43796133580664, -122.085749655962),
@@ -56,6 +70,9 @@ class _HomePageState extends State<HomePage> {
     points: [
       //_origin.position,
       //_destination.position
+      LatLng(37.42796133580664, -122.085749655962),
+      LatLng(37.420844582802545, -122.12862715677983),
+
     ],
     width: 3,
     );
@@ -74,7 +91,15 @@ class _HomePageState extends State<HomePage> {
     print("set style");
   }
 
-  
+  @override
+  Widget button(VoidCallback function, IconData icon){
+    return FloatingActionButton(
+      onPressed: function,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      backgroundColor: Colors.blue,
+      child: Icon(icon, size: 24.0,),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,67 +131,100 @@ class _HomePageState extends State<HomePage> {
         customMarkers: [
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('src'), position: locations[0],onTap: (){
+                  markerId: const MarkerId('dst'), position: locations[0],onTap: (){
                     // code to execute when tapped
+                    print(locations[0]);
                   }),
               child: _customMarkerDest(Color.fromARGB(255,182, 225,16))), 
           
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('dst'), position: locations[3],rotation: 270),
+                  markerId: const MarkerId('src'), position: locations[1],rotation: 270),
               child: _customMarkerOrigin(Color.fromARGB(255,182, 225,16))),
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('1'), position: locations[4],onTap: (){
+                  markerId: const MarkerId('id-1'), position: locations[2],onTap: (){
                     // code to execute when tapped
                   }),
-              child: _customMarker('A', Color.fromARGB(255, 0, 0, 0))),
+              child: _customMarker('A', Color.fromARGB(255, 0, 0, 0))), //right
               MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('id-2'), position: locations[1],onTap: (){
+                  markerId: const MarkerId('id-2'), position: locations[3],onTap: (){
                     // code to execute when tapped
                   }),
-              child: _customMarker('B', Color.fromARGB(255, 0, 0, 0))),
+              child: _customMarker('B', Color.fromARGB(255, 0, 0, 0))), // bottom
           MarkerData(
               marker: Marker(
-                  markerId: const MarkerId('id-3'), position: locations[2],onTap: (){
+                  markerId: const MarkerId('id-3'), position: locations[4],onTap: (){
                     // code to execute when tapped
                   }),
-              child: _customMarker('C', Color.fromARGB(255, 0, 0, 0))),
+              child: _customMarker('C', Color.fromARGB(255, 0, 0, 0))), //top
         ],
         
         builder: (BuildContext context, Set<Marker>? markers) {
           if (markers == null) {
             return const Center(child: CircularProgressIndicator());
           }
-          return GoogleMap(
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            initialCameraPosition: _initialPosition,
-            //onMapCreated: (controller) => _googleMapController = controller,
-            onMapCreated: (controller) {
-              _googleMapController = controller;
-              changeMapMode();
-            },
-            markers: markers,
-            //onLongPress: addMarker,
+          return Stack(
+            children: [
+              Container(
+                  child: GoogleMap(
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              initialCameraPosition: _initialPosition,
+              //onMapCreated: (controller) => _googleMapController = controller,
+              onMapCreated: (controller) {
+                _googleMapController = controller;
+                changeMapMode();
+                //findRoute();
+              },
+              polylines: route.routes,
+              //polylines: Set.from([_polyline]), 
+              markers: markers,
+              
+              
+              //onLongPress: addMarker,
+              
+             
+                ),
+              ),
+              Padding(padding: EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Column(children: <Widget> [
+                  button(() {
+                    //findRoute();
+                    print(route.routes);
+                    }, Icons.directions),
+                ]),
+              ),
+              )
+            ],
             
-           
           );
         },
       ),  // upto this
 
      
-
+     
      floatingActionButton: FloatingActionButton(
        backgroundColor: Theme.of(context).primaryColor,
        foregroundColor: Colors.black,
-       onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
+       /* onPressed: (){
+       }, */
+      /*  onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
+       */
 
+          onPressed: () async {
+          await route.drawRoute(points, 'Test routes',
+              Color.fromRGBO(130, 78, 210, 1.0), googleApiKey,
+              travelMode: TravelModes.driving);
+              
+              },
        child: const Icon(Icons.my_location),
+       
      ),
      
-    
     );
   }
   
@@ -184,9 +242,6 @@ class _HomePageState extends State<HomePage> {
         color: color,
         size: 40,
       ),
-      
-      
-
     );
   }
 
@@ -219,8 +274,7 @@ class _HomePageState extends State<HomePage> {
     ); */
   }
 
-  _customMarkerDest(Color color) {
-    
+  _customMarkerDest(Color color) {    
     return Container(
       margin: const EdgeInsets.all(6),
       padding: const EdgeInsets.all(6),
@@ -243,6 +297,8 @@ class _HomePageState extends State<HomePage> {
      
     ); */
   }
+
+  
 }
 
 
