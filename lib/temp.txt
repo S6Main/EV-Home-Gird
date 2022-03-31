@@ -1,0 +1,12 @@
+variables
+    -    list locations[lan, log, name]  #used to store list of points
+
+    -    int selectedIndex 
+    -    int prevSelectedIndex
+
+functions   
+    -   addMarker
+    -   removeMarker
+    -   updateMarker
+    -   findRoute
+    
