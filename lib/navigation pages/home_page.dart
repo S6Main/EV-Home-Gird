@@ -13,7 +13,7 @@ import '../widgets/MapPointerBadge.dart';
 const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
 const LatLng DEST_LOCATION = LatLng(42.744421,-71.1698939);
 const double CAMERA_ZOOM = 16;
-const double CAMERA_TILT = 80;
+const double CAMERA_TILT = 20;
 const double CAMERA_BEARING = 30;
 const double PIN_VISIBLE_POSITION = 20;
 const double PIN_INVISIBLE_POSITION = -220;
@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   double _pinPillPosition = PIN_INVISIBLE_POSITION;
   bool _userBadgeSelected = false;
   
-  String googleApiKey = 'AIzaSyDBiRGvyGsmTThjfe1cwZNGhmwaxYW1kVA';
+  String googleApiKey = 'AIzaSyBs8B_gIp9zFDxxQrukPWeo6EI5Jtwk4Vc';
 
   Set<Polyline> _polylines = Set<Polyline>();
   List<LatLng> _polylineCoordinates = [];
@@ -127,8 +127,9 @@ class _HomePageState extends State<HomePage> {
       PointLatLng(_destinationLocation.latitude, _destinationLocation.longitude),
       travelMode: TravelMode.driving,
     );
-    print("here");
-    print(_results.status);
+    
+    print("status: ${_results.status}");
+    
     if(_results.status == 'OK'){
       
       _results.points.forEach((PointLatLng _point) {
