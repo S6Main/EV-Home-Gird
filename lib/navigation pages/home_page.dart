@@ -1,17 +1,22 @@
 import 'dart:ffi';
 import 'dart:developer' as dev;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'pop_pages/side_page.dart';
-
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:custom_map_markers/custom_map_markers.dart';
-import 'package:google_maps_routes/google_maps_routes.dart';
 
+import '../widgets/BottomInfoPanel.dart';
+import '../widgets/MapPointerBadge.dart';
 
+const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
+const LatLng DEST_LOCATION = LatLng(42.744421,-71.1698939);
+const double CAMERA_ZOOM = 16;
+const double CAMERA_TILT = 80;
+const double CAMERA_BEARING = 30;
+const double PIN_VISIBLE_POSITION = 20;
+const double PIN_INVISIBLE_POSITION = -220;
 
 
 class HomePage extends StatefulWidget {
@@ -26,61 +31,86 @@ class _HomePageState extends State<HomePage> {
   static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
   GoogleMapController? _googleMapController;
 
-  List<LatLng> points = [
-    LatLng(37.42796133580664, -122.085749655962),
-    LatLng(37.41796133580664, -122.085749655962),
-    ];
-  MapsRoutes route = new MapsRoutes();
-  String googleApiKey = 'AIzaSyBPVmFIW-OGZSrk2u5lfVov64M-GloBgXI';
-    
-  callmeToDelay() async {
-    await Future.delayed(Duration(seconds: 2)); // code to make a delay of 2 seconds
-  }
+  late BitmapDescriptor _sourceIcon;
+  late BitmapDescriptor _destinationIcon;
+  late LatLng _currentLocation;
+  late LatLng _destinationLocation;
+  Set<Marker> _markers = Set<Marker>();
+  double _pinPillPosition = PIN_INVISIBLE_POSITION;
+  bool _userBadgeSelected = false;
+  
+  String googleApiKey = 'AIzaSyDBiRGvyGsmTThjfe1cwZNGhmwaxYW1kVA';
+
+  Set<Polyline> _polylines = Set<Polyline>();
+  List<LatLng> _polylineCoordinates = [];
+  late PolylinePoints _polylinePoints;
   
   @override
   initState() {
     super.initState();
-    callmeToDelay();
+    // set initial locations
+    this.setIntitialLocation();
+
+    //set custom marker icons
+    this.setSourceAndDestinationMarker();
+
+    //instatiate polyinepointes
+    _polylinePoints = PolylinePoints();
   }
 
-  findRoute()async{
-   await route.drawRoute(points, 'Test routes',
-              Color.fromRGBO(130, 78, 210, 1.0), googleApiKey,
-              travelMode: TravelModes.driving);
+  void setSourceAndDestinationMarker() async{
+    _sourceIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.0),
+      'assets/images/marker-pointer.png');
+
+    _destinationIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.0),
+       'assets/images/marker-charger.png');
   }
+  void setIntitialLocation(){
+    _currentLocation = LatLng(
+      SOURCE_LOCATION.latitude, 
+      SOURCE_LOCATION.longitude
+      );
 
-  static var locations = const [
-    LatLng(37.42796133580664, -122.085749655962),
-    LatLng(37.41796133580664, -122.085749655962),
-    LatLng(37.43796133580664, -122.085749655962),
-    LatLng(37.42796133580664, -122.095749655962),
-    LatLng(37.42796133580664, -122.075749655962),
-  ];
-
-  
-
-  @override
-  void dispose() {
-    _googleMapController?.dispose();
-    super.dispose();
+    _destinationLocation = LatLng(
+      DEST_LOCATION.latitude, 
+      DEST_LOCATION.longitude
+      );
   }
+  void showPinsOnMap() {
+    setState(() {
+      _markers.add(Marker(
+        markerId: MarkerId('sourcePin'),
+        position: _currentLocation,
+        icon: _sourceIcon,
+        infoWindow: InfoWindow(title: 'Source'),
+        onTap: (){
+          setState(() {
+            this._userBadgeSelected = true;
+            this._pinPillPosition = PIN_INVISIBLE_POSITION;
+          });
+        }
+      ));
 
-  static Polyline _polyline = Polyline(
-    polylineId: PolylineId('_polyline'),
-    points: [
-      //_origin.position,
-      //_destination.position
-      LatLng(37.42796133580664, -122.085749655962),
-      LatLng(37.420844582802545, -122.12862715677983),
-
-    ],
-    width: 3,
-    );
+      _markers.add(Marker(
+        markerId: MarkerId('destPin'),
+        position: _destinationLocation,
+        icon: _destinationIcon,
+        infoWindow: InfoWindow(title: 'Destination'),
+        onTap: () {
+          setState(() {
+            this._pinPillPosition = PIN_VISIBLE_POSITION;
+            this._userBadgeSelected = false;
+          });
+        },
+      ));
+    });
+  }
 
   changeMapMode(){
     getJsonFile("assets/light.json").then(setMapStyle);
   }
-
   Future<String> getJsonFile(String path) async{
     String val =  await rootBundle.loadString(path);
     return val;
@@ -88,9 +118,36 @@ class _HomePageState extends State<HomePage> {
   }
   void setMapStyle(String mapStyle) {
     _googleMapController?.setMapStyle(mapStyle);
-    print("set style");
   }
 
+  void setPolylines() async{
+    PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey,
+      PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
+      PointLatLng(_destinationLocation.latitude, _destinationLocation.longitude),
+      travelMode: TravelMode.driving,
+    );
+    print("here");
+    print(_results.status);
+    if(_results.status == 'OK'){
+      
+      _results.points.forEach((PointLatLng _point) {
+        _polylineCoordinates.add(LatLng(_point.latitude, _point.longitude));
+       });
+
+       setState(() {
+         //print("here");
+         _polylines.add(
+           Polyline(
+             width: 1,
+             polylineId: PolylineId('polyline'),
+             color: Colors.black,
+             points: _polylineCoordinates 
+           )
+         );
+       });
+    }
+  }
   @override
   Widget button(VoidCallback function, IconData icon){
     return FloatingActionButton(
@@ -104,202 +161,60 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
+    CameraPosition _initialCameraPosition = CameraPosition(
+      target: SOURCE_LOCATION,
+      zoom: CAMERA_ZOOM,
+      tilt: CAMERA_TILT,
+      bearing: CAMERA_BEARING,
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text('Google Maps',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        actions: [
-          
-        ],
-      ),
-      //backgroundColor: Color.fromARGB(255, 155, 95, 95),
-     body:
-
-     // from this
-      CustomGoogleMapMarkerBuilder(
-        //screenshotDelay: const Duration(seconds: 4),
-
-
-        customMarkers: [
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('dst'), position: locations[0],onTap: (){
-                    // code to execute when tapped
-                    print(locations[0]);
-                  }),
-              child: _customMarkerDest(Color.fromARGB(255,182, 225,16))), 
-          
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('src'), position: locations[1],rotation: 270),
-              child: _customMarkerOrigin(Color.fromARGB(255,182, 225,16))),
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('id-1'), position: locations[2],onTap: (){
-                    // code to execute when tapped
-                  }),
-              child: _customMarker('A', Color.fromARGB(255, 0, 0, 0))), //right
-              MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('id-2'), position: locations[3],onTap: (){
-                    // code to execute when tapped
-                  }),
-              child: _customMarker('B', Color.fromARGB(255, 0, 0, 0))), // bottom
-          MarkerData(
-              marker: Marker(
-                  markerId: const MarkerId('id-3'), position: locations[4],onTap: (){
-                    // code to execute when tapped
-                  }),
-              child: _customMarker('C', Color.fromARGB(255, 0, 0, 0))), //top
-        ],
-        
-        builder: (BuildContext context, Set<Marker>? markers) {
-          if (markers == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return Stack(
-            children: [
-              Container(
-                  child: GoogleMap(
-              myLocationButtonEnabled: false,
+      body: Stack(
+        children : [
+          Positioned.fill(
+            child: GoogleMap(
+              myLocationButtonEnabled: true,
+              compassEnabled: false,
+              tiltGesturesEnabled: false,
               zoomControlsEnabled: false,
-              initialCameraPosition: _initialPosition,
-              //onMapCreated: (controller) => _googleMapController = controller,
-              onMapCreated: (controller) {
+              mapToolbarEnabled: false,
+              markers: _markers,
+              polylines: _polylines,
+              mapType:MapType.normal,
+              initialCameraPosition: _initialCameraPosition,
+              onTap: (LatLng loc){
+                //tapping on the map will dismiss the bottom pill
+                setState(() {
+                  this._pinPillPosition = PIN_INVISIBLE_POSITION;
+                  this._userBadgeSelected = false;
+                });
+              },
+              onMapCreated: (GoogleMapController controller){
                 _googleMapController = controller;
+                showPinsOnMap();
                 changeMapMode();
-                //findRoute();
+                setPolylines();
               },
-              polylines: route.routes,
-              //polylines: Set.from([_polyline]), 
-              markers: markers,
-              
-              
-              //onLongPress: addMarker,
-              
-             
-                ),
-              ),
-              Padding(padding: EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Column(children: <Widget> [
-                  button(() {
-                    //findRoute();
-                    print(route.routes);
-                    }, Icons.directions),
-                ]),
-              ),
-              )
-            ],
-            
-          );
-        },
-      ),  // upto this
-
-     
-     
-     floatingActionButton: FloatingActionButton(
-       backgroundColor: Theme.of(context).primaryColor,
-       foregroundColor: Colors.black,
-       /* onPressed: (){
-       }, */
-      /*  onPressed: () => _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialPosition),),
-       */
-
-          onPressed: () async {
-          await route.drawRoute(points, 'Test routes',
-              Color.fromRGBO(130, 78, 210, 1.0), googleApiKey,
-              travelMode: TravelModes.driving);
-              
-              },
-       child: const Icon(Icons.my_location),
-       
-     ),
-     
-    );
-  }
-  
-
-    _customMarker(String text, Color color) {
-    return Container(
-      child: /* ImageIcon(
-        AssetImage('assets/images/charging.png'),
-        color: color,
-        size: 40,
-      ), */
-
-      Icon(
-        Icons.location_on,
-        color: color,
-        size: 40,
+            ),
+          ),
+          Positioned(
+            top: 50,
+            left: 0,
+            right: 0,
+            child: MapPointerBadge(isSelected: _userBadgeSelected,)
+            ),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+              left: 0,
+              right: 0,
+              bottom: this._pinPillPosition,
+              child: BottomInfoPanel(),
+            )
+          ],
       ),
     );
   }
-
-  _customMarkerOrigin(Color color) {
-    return Container(
-      margin: const EdgeInsets.all(6),
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-          color: color, borderRadius: BorderRadius.circular(50),boxShadow: [
-            BoxShadow(
-                color: Colors.black26,
-                blurRadius: 2,
-                offset: Offset(0, 2))
-          ]),
-      child: 
-      Icon(
-        LineAwesomeIcons.location_arrow,
-        color: Colors.white,
-        size: 30,
-      ),
-    );
-    
-    /*  Container(
-      child: ImageIcon(
-        AssetImage('assets/images/src.png'),
-        color: color,
-        size: 40,
-      ),
-     
-    ); */
-  }
-
-  _customMarkerDest(Color color) {    
-    return Container(
-      margin: const EdgeInsets.all(6),
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-
-          color: color, borderRadius: BorderRadius.circular(50),),
-      child: ImageIcon(
-        AssetImage('assets/images/circle.png'),
-        color: color,
-        size: 6,
-      ),
-    );
-    
-    /*  Container(
-      child: ImageIcon(
-        AssetImage('assets/images/src.png'),
-        color: color,
-        size: 40,
-      ),
-     
-    ); */
-  }
-
   
 }
-
-
 
