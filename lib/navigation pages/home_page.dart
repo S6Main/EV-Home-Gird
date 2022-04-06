@@ -1,11 +1,14 @@
 import 'dart:ffi';
 import 'dart:developer' as dev;
 
+import 'package:ev_homegrid/components/directions_model.dart';
+import 'package:ev_homegrid/components/directions_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:dio/dio.dart';
 
 import '../widgets/BottomInfoPanel.dart';
 import '../widgets/MapPointerBadge.dart';
@@ -39,11 +42,15 @@ class _HomePageState extends State<HomePage> {
   double _pinPillPosition = PIN_INVISIBLE_POSITION;
   bool _userBadgeSelected = false;
   
-  String googleApiKey = 'AIzaSyBs8B_gIp9zFDxxQrukPWeo6EI5Jtwk4Vc';
+  String googleApiKey = 'AIzaSyATUTZMFhb74fCSV6WSfn8nKRt6ewvjFGM';
+
+  Directions? _info = null;
 
   Set<Polyline> _polylines = Set<Polyline>();
   List<LatLng> _polylineCoordinates = [];
   late PolylinePoints _polylinePoints;
+
+
   
   @override
   initState() {
@@ -149,6 +156,13 @@ class _HomePageState extends State<HomePage> {
        });
     }
   }
+
+  void getDirections() async{
+    final _directions = await DirectionsRepository().getDirections(origin: _currentLocation, destination: _destinationLocation);
+    setState(() => _info = _directions!);
+    print('im here');
+    print('info: ${_info.toString()}');
+  }
   @override
   Widget button(VoidCallback function, IconData icon){
     return FloatingActionButton(
@@ -180,7 +194,19 @@ class _HomePageState extends State<HomePage> {
               zoomControlsEnabled: false,
               mapToolbarEnabled: false,
               markers: _markers,
-              polylines: _polylines,
+              polylines:
+              
+              {
+                if(_info != null)
+                  Polyline(
+                    polylineId: const PolylineId('overview_polyline'),
+                    color: Colors.red,
+                    width: 5,
+                    points: _info!.polylinePoints
+                    .map((e) => LatLng(e.latitude, e.longitude))
+                    .toList(),
+                  )
+              }, 
               mapType:MapType.normal,
               initialCameraPosition: _initialCameraPosition,
               onTap: (LatLng loc){
@@ -194,7 +220,8 @@ class _HomePageState extends State<HomePage> {
                 _googleMapController = controller;
                 showPinsOnMap();
                 changeMapMode();
-                setPolylines();
+                //setPolylines();
+                getDirections();
               },
             ),
           ),

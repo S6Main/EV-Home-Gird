@@ -9,7 +9,7 @@
         android:label="ev_homegrid"
         android:icon="@mipmap/ic_launcher">
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBs8B_gIp9zFDxxQrukPWeo6EI5Jtwk4Vc"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyATUTZMFhb74fCSV6WSfn8nKRt6ewvjFGM"/>
 
         <activity
             android:name=".MainActivity"
