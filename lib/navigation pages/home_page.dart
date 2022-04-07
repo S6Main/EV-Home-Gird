@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:developer' as dev;
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ev_homegrid/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -39,6 +40,8 @@ class _HomePageState extends State<HomePage> {
   late BitmapDescriptor _sourceIcon;
   late BitmapDescriptor _destinationIcon;
   late BitmapDescriptor _markerIcon;
+  late BitmapDescriptor _pinIcon;
+  Marker? _lastSelectedMarker = null;
   late LatLng _currentLocation;
   late LatLng _destinationLocation;
   Set<Marker> _markers = Set<Marker>();
@@ -73,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   void setSourceAndDestinationMarker() async{
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
-      'assets/images/icons8-map-pin-96.png');
+      'assets/images/icons8-map-a-96.png');
 
     _destinationIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
@@ -83,6 +86,9 @@ class _HomePageState extends State<HomePage> {
       ImageConfiguration(devicePixelRatio: 2.0),
       'assets/images/icons8-location-96.png');
 
+    _pinIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.0),
+      'assets/images/icons8-map-pin-96.png');
     
   }
   void setIntitialLocation(){
@@ -101,7 +107,7 @@ class _HomePageState extends State<HomePage> {
       _markers.add(Marker(
         markerId: MarkerId('sourcePin'),
         position: _currentLocation,
-        icon: _sourceIcon,
+        icon: _pinIcon,
         infoWindow: InfoWindow(title: 'Your Location'),
         onTap: (){
           removePolylines();
@@ -114,7 +120,33 @@ class _HomePageState extends State<HomePage> {
       ));
     });
   }
+  void replaceDestinationMarker(String value, LatLng location){
 
+    //case 1 - no previous marker
+    if(_lastSelectedMarker == null){
+      print('case 1');
+      _lastSelectedMarker = _markers.firstWhere((marker) => marker.markerId.value == value);
+      _markers.remove(_lastSelectedMarker);
+      _destinationLocation = location;
+      //remove old marker_0
+      showDestinationPinOnMap();
+      //add new markerB
+    }
+    else{ //case 2 - have previous marker
+    print('case 2');
+      _markers.removeWhere((m) => m.markerId.value == 'destPin');
+      //remove old markerB
+      _markers.add(_lastSelectedMarker!);
+      //add new marker_0
+
+      _lastSelectedMarker = _markers.firstWhere((marker) => marker.markerId.value == value);
+      _markers.remove(_lastSelectedMarker);
+      _destinationLocation = location;
+      //remove old marker_1
+      showDestinationPinOnMap();
+       //add new markerB
+    }
+  }
   void showDestinationPinOnMap(){
     setState(() {
       _markers.add(Marker(
@@ -149,7 +181,18 @@ class _HomePageState extends State<HomePage> {
           position: _locations.locations[i].coordinates,
           icon: _markerIcon,
           onTap:(){
-            print('tap at ${_locations.locations[i].name}');
+                       
+            replaceDestinationMarker(_locations.locations[i].name,_locations.locations[i].coordinates);
+            if(_destSelected){
+              removePolylines();
+            }
+            _destinationLocation = _locations.locations[i].coordinates;
+            _destSelected = true;
+            setPolylines();
+            setState(() {
+              this._userBadgeSelected = false;
+              this._pinPillPosition = PIN_VISIBLE_POSITION;
+            });
           }
           ));
       
@@ -200,7 +243,7 @@ class _HomePageState extends State<HomePage> {
            Polyline(
              width: 3,
              polylineId: PolylineId('polyline'),
-             color: Colors.black,
+             color: Globals.MAIN_COLOR,
              points: _polylineCoordinates,
              startCap: Cap.buttCap,
               endCap: Cap.buttCap,
@@ -318,6 +361,7 @@ class _HomePageState extends State<HomePage> {
                         BottomInfoPanel(),
                         BottomInfoPanel(),
                         BottomInfoPanel(),
+                        BottomInfoPanel(),
                       ]
                       ),
               
@@ -332,16 +376,23 @@ class _HomePageState extends State<HomePage> {
                 AnimatedButton(
                     height: 45,
                     width: 200,
-                    text: 'Locate',
+                    text: 'Get Directions',
                     isReverse: true,
-                    selectedTextColor: Colors.black,
+                    selectedTextColor: Colors.white,
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
                     transitionType: TransitionType.LEFT_TO_RIGHT,
-                    backgroundColor: Colors.black,
+                    backgroundColor: Colors.white,
+                    selectedBackgroundColor: Colors.black,
                     borderColor: Colors.white,
                     borderRadius: 50,
                     borderWidth: 0,
                         onPress: () { 
                           showPinsOnMap();
+                          
                         },
                       ),
               ),
