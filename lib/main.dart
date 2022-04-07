@@ -35,8 +35,8 @@ class MyApp extends StatelessWidget {
       // theme: ThemeData(
       //   primaryColor: Colors.white,
       // ),
-      //home: MyHomePage(),
-      home: MainPage(),
+      home: MyHomePage(),
+      //home: MainPage(),
       //home: mainApp()
     );
   }
@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               label: Text(
                 'CONNCET WALLET',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(255, 255, 255, 255),
@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             child: Text(
               'GUEST',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:developer' as dev;
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -17,7 +18,7 @@ const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 20;
 const double CAMERA_BEARING = 30;
 const double PIN_VISIBLE_POSITION = 20;
-const double PIN_INVISIBLE_POSITION = -220;
+const double PIN_INVISIBLE_POSITION = -250;
 
 
 class HomePage extends StatefulWidget {
@@ -29,7 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  static const _initialPosition = CameraPosition(target: LatLng(37.42796133580664, -122.085749655962),zoom: 14.4746);
+  
   GoogleMapController? _googleMapController;
 
   late BitmapDescriptor _sourceIcon;
@@ -39,6 +40,9 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _markers = Set<Marker>();
   double _pinPillPosition = PIN_INVISIBLE_POSITION;
   bool _userBadgeSelected = false;
+
+  bool _mapCreated = false;
+  bool _destSelected = false;
   
   String googleApiKey = 'AIzaSyATUTZMFhb74fCSV6WSfn8nKRt6ewvjFGM';
 
@@ -90,7 +94,9 @@ class _HomePageState extends State<HomePage> {
         icon: _sourceIcon,
         infoWindow: InfoWindow(title: 'Source'),
         onTap: (){
+          removePolylines();
           setState(() {
+            _destSelected = false;
             this._userBadgeSelected = true;
             this._pinPillPosition = PIN_INVISIBLE_POSITION;
           });
@@ -103,6 +109,11 @@ class _HomePageState extends State<HomePage> {
         icon: _destinationIcon,
         infoWindow: InfoWindow(title: 'Destination'),
         onTap: () {
+          if(_mapCreated && !_destSelected)
+          {
+            setPolylines();
+            _destSelected = true;
+          }
           setState(() {
             this._pinPillPosition = PIN_VISIBLE_POSITION;
             this._userBadgeSelected = false;
@@ -131,9 +142,7 @@ class _HomePageState extends State<HomePage> {
       PointLatLng(_destinationLocation.latitude, _destinationLocation.longitude),
       travelMode: TravelMode.driving,
     );
-    
-    print("status: ${_results.status}");
-    
+    print('result: ${_results.points}');
     if(_results.status == 'OK'){
       
       _results.points.forEach((PointLatLng _point) {
@@ -144,17 +153,43 @@ class _HomePageState extends State<HomePage> {
          //print("here");
          _polylines.add(
            Polyline(
-             width: 1,
+             width: 3,
              polylineId: PolylineId('polyline'),
              color: Colors.black,
-             points: _polylineCoordinates 
+             points: _polylineCoordinates,
+             startCap: Cap.buttCap,
+              endCap: Cap.buttCap,
            )
          );
        });
     }
   }
-
+  void removePolylines() {
+    _polylineCoordinates.clear(); //prevent from forming a loop
+    _polylines.clear();
+  }
  
+ void animateCamera(Set<Polyline> polylines) { 
+   
+    double minLat = polylines.first.points.first.latitude;
+    double minLong = polylines.first.points.first.longitude;
+    double maxLat = polylines.first.points.first.latitude;
+    double maxLong = polylines.first.points.first.longitude;
+
+    polylines.forEach((poly) {
+      poly.points.forEach((point) {
+        if (point.latitude < minLat) minLat = point.latitude;
+        if (point.latitude > maxLat) maxLat = point.latitude;
+        if (point.longitude < minLong) minLong = point.longitude;
+        if (point.longitude > maxLong) maxLong = point.longitude;
+      });
+    });
+    _googleMapController?.animateCamera(CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+            southwest: LatLng(minLat, minLong),
+            northeast: LatLng(maxLat, maxLong)),
+            130));
+ }
   @override
   Widget button(VoidCallback function, IconData icon){
     return FloatingActionButton(
@@ -191,6 +226,14 @@ class _HomePageState extends State<HomePage> {
               mapType:MapType.normal,
               initialCameraPosition: _initialCameraPosition,
               onTap: (LatLng loc){
+                if(_destSelected){
+                  animateCamera(_polylines);  //animate camera to initial position from top
+                }
+                else{
+                  _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialCameraPosition),);
+                }
+                  
+                //removePolylines();
                 //tapping on the map will dismiss the bottom pill
                 setState(() {
                   this._pinPillPosition = PIN_INVISIBLE_POSITION;
@@ -199,9 +242,10 @@ class _HomePageState extends State<HomePage> {
               },
               onMapCreated: (GoogleMapController controller){
                 _googleMapController = controller;
+                _mapCreated = true;
                 showPinsOnMap();
                 changeMapMode();
-                setPolylines();
+                //setPolylines();
               },
             ),
           ),
@@ -210,14 +254,28 @@ class _HomePageState extends State<HomePage> {
             left: 0,
             right: 0,
             child: MapPointerBadge(isSelected: _userBadgeSelected,)
-            ),
+            ),    
           AnimatedPositioned(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
               left: 0,
               right: 0,
               bottom: this._pinPillPosition,
-              child: BottomInfoPanel(),
+              child: CarouselSlider(
+                      options: CarouselOptions(
+                        enlargeCenterPage: true,
+                        scrollDirection: Axis.horizontal,
+                        enableInfiniteScroll: false,
+                        autoPlay: false,
+                        ),
+                      items: [
+                        BottomInfoPanel(),
+                        BottomInfoPanel(),
+                        BottomInfoPanel(),
+                      ]
+                      ),
+              
+              
             )
           ],
       ),
