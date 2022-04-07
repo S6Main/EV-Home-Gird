@@ -5,16 +5,19 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_animated_button/flutter_animated_button.dart';
+import 'Map/locations.dart' as _locations;
 
 import '../widgets/BottomInfoPanel.dart';
 import '../widgets/MapPointerBadge.dart';
 
 const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
 const LatLng DEST_LOCATION = LatLng(42.744421,-71.1698939);
-const double CAMERA_ZOOM = 16;
+const double CAMERA_ZOOM = 15;
 const double CAMERA_TILT = 20;
 const double CAMERA_BEARING = 30;
 const double PIN_VISIBLE_POSITION = 20;
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   late BitmapDescriptor _sourceIcon;
   late BitmapDescriptor _destinationIcon;
+  late BitmapDescriptor _markerIcon;
   late LatLng _currentLocation;
   late LatLng _destinationLocation;
   Set<Marker> _markers = Set<Marker>();
@@ -69,11 +73,17 @@ class _HomePageState extends State<HomePage> {
   void setSourceAndDestinationMarker() async{
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
-      'assets/images/marker-pointer.png');
+      'assets/images/icons8-map-pin-96.png');
 
     _destinationIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
-       'assets/images/marker-charger.png');
+       'assets/images/icons8-marker-b-96.png');
+       
+    _markerIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.0),
+      'assets/images/icons8-location-96.png');
+
+    
   }
   void setIntitialLocation(){
     _currentLocation = LatLng(
@@ -86,13 +96,13 @@ class _HomePageState extends State<HomePage> {
       DEST_LOCATION.longitude
       );
   }
-  void showPinsOnMap() {
+  void showCurrentPinOnMap(){
     setState(() {
       _markers.add(Marker(
         markerId: MarkerId('sourcePin'),
         position: _currentLocation,
         icon: _sourceIcon,
-        infoWindow: InfoWindow(title: 'Source'),
+        infoWindow: InfoWindow(title: 'Your Location'),
         onTap: (){
           removePolylines();
           setState(() {
@@ -102,25 +112,55 @@ class _HomePageState extends State<HomePage> {
           });
         }
       ));
+    });
+  }
 
+  void showDestinationPinOnMap(){
+    setState(() {
       _markers.add(Marker(
         markerId: MarkerId('destPin'),
         position: _destinationLocation,
         icon: _destinationIcon,
         infoWindow: InfoWindow(title: 'Destination'),
-        onTap: () {
-          if(_mapCreated && !_destSelected)
-          {
-            setPolylines();
-            _destSelected = true;
-          }
+        onTap: (){
+          removePolylines();
           setState(() {
-            this._pinPillPosition = PIN_VISIBLE_POSITION;
+            _destSelected = false;
             this._userBadgeSelected = false;
+            this._pinPillPosition = PIN_INVISIBLE_POSITION;
           });
-        },
+        }
       ));
     });
+  }
+  void showPinsOnMap() {
+
+    //Marker? resultMarker = null;
+    List<Marker> resultMarker = [];
+
+      
+
+    
+      for(int i = 0; i < _locations.locations.length; i++){
+          resultMarker.add(Marker(
+          markerId: MarkerId(_locations.locations[i].name),
+          infoWindow: InfoWindow(
+          title: "${_locations.locations[i].name}"),
+          position: _locations.locations[i].coordinates,
+          icon: _markerIcon,
+          onTap:(){
+            print('tap at ${_locations.locations[i].name}');
+          }
+          ));
+      
+      if(_locations.locations.length > 0){
+        setState(() {
+          _markers.addAll(resultMarker);
+        });
+      }
+    } 
+      
+      
   }
 
   changeMapMode(){
@@ -136,6 +176,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setPolylines() async{
+
+    //change origin icon
+    _sourceIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.0),
+      'assets/images/icons8-map-a-96.png');
+
     PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
       googleApiKey,
       PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
@@ -150,7 +196,6 @@ class _HomePageState extends State<HomePage> {
        });
 
        setState(() {
-         //print("here");
          _polylines.add(
            Polyline(
              width: 3,
@@ -243,7 +288,8 @@ class _HomePageState extends State<HomePage> {
               onMapCreated: (GoogleMapController controller){
                 _googleMapController = controller;
                 _mapCreated = true;
-                showPinsOnMap();
+                //showPinsOnMap();
+                showCurrentPinOnMap();
                 changeMapMode();
                 //setPolylines();
               },
@@ -276,7 +322,32 @@ class _HomePageState extends State<HomePage> {
                       ),
               
               
-            )
+            ),
+          Column(
+            children: [
+              Expanded(
+                child: SizedBox()),
+              Center(
+                child: 
+                AnimatedButton(
+                    height: 45,
+                    width: 200,
+                    text: 'Locate',
+                    isReverse: true,
+                    selectedTextColor: Colors.black,
+                    transitionType: TransitionType.LEFT_TO_RIGHT,
+                    backgroundColor: Colors.black,
+                    borderColor: Colors.white,
+                    borderRadius: 50,
+                    borderWidth: 0,
+                        onPress: () { 
+                          showPinsOnMap();
+                        },
+                      ),
+              ),
+              SizedBox(height: 30,),
+            ],
+          )
           ],
       ),
     );

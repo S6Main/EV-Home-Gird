@@ -34,6 +34,8 @@ dependencies:
   line_awesome_flutter: ^2.0.0 #used for line icons
   dio: ^4.0.6
   carousel_slider: ^4.0.0
+  flutter_animated_button: ^2.0.0
+  after_layout: ^1.1.0
 
   font_awesome_flutter: ^10.1.0
   google_fonts: ^2.3.1

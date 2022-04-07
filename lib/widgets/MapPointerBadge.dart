@@ -65,7 +65,7 @@ class MapPointerBadge extends StatelessWidget {
             ),
           ),
           Icon(
-            Icons.location_pin,
+            Icons.my_location,
             color: this.isSelected ? Colors.white :Globals.MAIN_COLOR,
             size: 40,)
         ],
