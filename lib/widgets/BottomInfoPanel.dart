@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BottomInfoPanel extends StatelessWidget {
+  final int index;
+  final String id;
+  final String title;
   const BottomInfoPanel({
-    Key? key,
+    Key? key, required this.title, required this.index, required this.id,
   }) : super(key: key);
 
   @override
@@ -44,14 +47,14 @@ class BottomInfoPanel extends StatelessWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      Text('Carne de Cerdo',
+                      Text(title,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[700]
                         ),
                       ),
-                      Text('Vendta por delia'),
+                      Text('id: $id'),
                       Text('2km de distencia')
 
                     ],
