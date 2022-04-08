@@ -53,6 +53,8 @@ class _HomePageState extends State<HomePage> {
   String _destinationName = 'Destination';
   int _currenInfoPanel = -1;
   String _currentMarkerId = 'destPin';
+  int _currentMarkerIndex = -1;
+  bool _onSlider = false;
 
   List<BottomInfoPanel> _bottonInfoPaneles =[];
   
@@ -64,6 +66,8 @@ class _HomePageState extends State<HomePage> {
   late PolylinePoints _polylinePoints;
 
   CarouselController bottonCarouselController = CarouselController();
+
+  //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
 
   
   @override
@@ -79,6 +83,10 @@ class _HomePageState extends State<HomePage> {
     _polylinePoints = PolylinePoints();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
   void setSourceAndDestinationMarker() async{
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
@@ -194,13 +202,16 @@ class _HomePageState extends State<HomePage> {
           position: _locations.locations[i].coordinates,
           icon: _markerIcon,
           onTap:(){
-            
-            //change destination name
+            _onSlider = false;
+
+            if(!_onSlider){
+               //change destination name
             _destinationName = _locations.locations[i].name;
             //get index of marker
             int _index = _locations.locations.indexWhere((location) => location.id == resultMarker[i].markerId.value);
             bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
-                       
+            _onSlider = true;    
+
             replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
             
             // _currentMarkerId = _locations.locations[i].id;
@@ -222,6 +233,8 @@ class _HomePageState extends State<HomePage> {
             //   this._userBadgeSelected = false;
             //   this._pinPillPosition = PIN_VISIBLE_POSITION;
             // });
+            }
+           
           }
           ));
       
@@ -288,6 +301,13 @@ class _HomePageState extends State<HomePage> {
     _polylines.clear();
   }
   void changeMarkerSelection(){
+    
+    Future.delayed(Duration(milliseconds: 200), () {
+      Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPaneles[_currentMarkerIndex].id);
+      _marker.onTap!();
+    });
+
+    
     //Marker _marker = _markers.firstWhere((marker) => _markers.markerId.value == _bottonInfoPaneles[_currenInfoPanel].id);
       // Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPaneles[_currenInfoPanel].id);
       // _marker.onTap!();
@@ -310,6 +330,7 @@ class _HomePageState extends State<HomePage> {
 
     //change polylines
   }
+ 
  void animateCamera(Set<Polyline> polylines) { 
    
     double minLat = polylines.first.points.first.latitude;
@@ -376,10 +397,10 @@ class _HomePageState extends State<HomePage> {
                 }
 
                 if(_polylines.isEmpty){
-                  print('polylines is empty');
                   removeDestinationMarker(); // remove dest marker when tapped
                 }
                 
+                _onSlider = false;
                 //removePolylines();
                 //tapping on the map will dismiss the bottom pill
                 setState(() {
@@ -414,14 +435,16 @@ class _HomePageState extends State<HomePage> {
                       options: CarouselOptions(
                         enlargeCenterPage: true,
                         scrollDirection: Axis.horizontal,
-                        enableInfiniteScroll: false,
+                        enableInfiniteScroll: true,
                         initialPage: 2,
                         autoPlay: false,
                         onPageChanged: (index, reason) {
+                        _onSlider = true;
                         setState(() {
-                          _currenInfoPanel = index;
+                          _currentMarkerIndex = index;
                         });
                         changeMarkerSelection(); 
+                        _onSlider = false;
                         },
                   ),
                       items: _bottonInfoPaneles
