@@ -126,6 +126,12 @@ class _HomePageState extends State<HomePage> {
       ));
     });
   }
+  void removeDestinationMarker(){
+    setState(() {
+      _markers.removeWhere((m) => m.markerId.value == _currentMarkerId);
+      _markers.add(_lastSelectedMarker!);
+    });
+  }
   void replaceDestinationMarker(String value, LatLng location){
 
     //case 1 - no previous marker
@@ -196,18 +202,26 @@ class _HomePageState extends State<HomePage> {
             bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
                        
             replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
+            
             // _currentMarkerId = _locations.locations[i].id;
             // print('current marker id: $_currentMarkerId');
             if(_destSelected){
               removePolylines();
             }
-            _destinationLocation = _locations.locations[i].coordinates;
-            _destSelected = true;
-            setPolylines();
-            setState(() {
-              this._userBadgeSelected = false;
-              this._pinPillPosition = PIN_VISIBLE_POSITION;
-            });
+              _destinationLocation = _locations.locations[i].coordinates;
+              _destSelected = true;
+              setPolylines();
+              setState(() {
+                this._userBadgeSelected = false;
+                this._pinPillPosition = PIN_VISIBLE_POSITION;
+              });
+            // _destinationLocation = _locations.locations[i].coordinates;
+            // _destSelected = true;
+            // setPolylines();
+            // setState(() {
+            //   this._userBadgeSelected = false;
+            //   this._pinPillPosition = PIN_VISIBLE_POSITION;
+            // });
           }
           ));
       
@@ -238,22 +252,17 @@ class _HomePageState extends State<HomePage> {
 
   void setPolylines() async{
     
-    print('setPolylines');
     //change origin icon
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
       'assets/images/icons8-map-a-96.png');
     
-    print('current location: $_currentLocation');
-    print('destination location: $_destinationLocation');
     PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
       googleApiKey,
       PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
       PointLatLng(_destinationLocation.latitude, _destinationLocation.longitude),
       travelMode: TravelMode.driving,
     );
-    print('here');
-    print('polyline result: ${_results.status}');
     if(_results.status == 'OK'){
       
       _results.points.forEach((PointLatLng _point) {
@@ -365,7 +374,12 @@ class _HomePageState extends State<HomePage> {
                 else{
                   _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialCameraPosition),);
                 }
-                  
+
+                if(_polylines.isEmpty){
+                  print('polylines is empty');
+                  removeDestinationMarker(); // remove dest marker when tapped
+                }
+                
                 //removePolylines();
                 //tapping on the map will dismiss the bottom pill
                 setState(() {
