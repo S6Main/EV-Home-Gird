@@ -50,6 +50,11 @@ class _HomePageState extends State<HomePage> {
 
   bool _mapCreated = false;
   bool _destSelected = false;
+  String _destinationName = 'Destination';
+  int _currenInfoPanel = -1;
+  String _currentMarkerId = 'destPin';
+
+  List<BottomInfoPanel> _bottonInfoPaneles =[];
   
   String googleApiKey = 'AIzaSyATUTZMFhb74fCSV6WSfn8nKRt6ewvjFGM';
 
@@ -58,6 +63,7 @@ class _HomePageState extends State<HomePage> {
   List<LatLng> _polylineCoordinates = [];
   late PolylinePoints _polylinePoints;
 
+  CarouselController bottonCarouselController = CarouselController();
 
   
   @override
@@ -124,17 +130,18 @@ class _HomePageState extends State<HomePage> {
 
     //case 1 - no previous marker
     if(_lastSelectedMarker == null){
-      print('case 1');
       _lastSelectedMarker = _markers.firstWhere((marker) => marker.markerId.value == value);
       _markers.remove(_lastSelectedMarker);
       _destinationLocation = location;
+      
       //remove old marker_0
       showDestinationPinOnMap();
       //add new markerB
     }
     else{ //case 2 - have previous marker
-    print('case 2');
-      _markers.removeWhere((m) => m.markerId.value == 'destPin');
+      _markers.removeWhere((m) => m.markerId.value == _currentMarkerId);
+
+      //_currentMarkerId = value;
       //remove old markerB
       _markers.add(_lastSelectedMarker!);
       //add new marker_0
@@ -150,10 +157,10 @@ class _HomePageState extends State<HomePage> {
   void showDestinationPinOnMap(){
     setState(() {
       _markers.add(Marker(
-        markerId: MarkerId('destPin'),
+        markerId: MarkerId(_currentMarkerId),
         position: _destinationLocation,
         icon: _destinationIcon,
-        infoWindow: InfoWindow(title: 'Destination'),
+        infoWindow: InfoWindow(title: _destinationName),
         onTap: (){
           removePolylines();
           setState(() {
@@ -175,14 +182,22 @@ class _HomePageState extends State<HomePage> {
     
       for(int i = 0; i < _locations.locations.length; i++){
           resultMarker.add(Marker(
-          markerId: MarkerId(_locations.locations[i].name),
+          markerId: MarkerId(_locations.locations[i].id),
           infoWindow: InfoWindow(
           title: "${_locations.locations[i].name}"),
           position: _locations.locations[i].coordinates,
           icon: _markerIcon,
           onTap:(){
+            
+            //change destination name
+            _destinationName = _locations.locations[i].name;
+            //get index of marker
+            int _index = _locations.locations.indexWhere((location) => location.id == resultMarker[i].markerId.value);
+            bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
                        
-            replaceDestinationMarker(_locations.locations[i].name,_locations.locations[i].coordinates);
+            replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
+            // _currentMarkerId = _locations.locations[i].id;
+            // print('current marker id: $_currentMarkerId');
             if(_destSelected){
               removePolylines();
             }
@@ -201,6 +216,9 @@ class _HomePageState extends State<HomePage> {
           _markers.addAll(resultMarker);
         });
       }
+
+      //add bottom info panel set
+      _bottonInfoPaneles.add(BottomInfoPanel(title :_locations.locations[i].name, index: i, id: _locations.locations[i].id,));
     } 
       
       
@@ -219,19 +237,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setPolylines() async{
-
+    
+    print('setPolylines');
     //change origin icon
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
       'assets/images/icons8-map-a-96.png');
-
+    
+    print('current location: $_currentLocation');
+    print('destination location: $_destinationLocation');
     PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
       googleApiKey,
       PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
       PointLatLng(_destinationLocation.latitude, _destinationLocation.longitude),
       travelMode: TravelMode.driving,
     );
-    print('result: ${_results.points}');
+    print('here');
+    print('polyline result: ${_results.status}');
     if(_results.status == 'OK'){
       
       _results.points.forEach((PointLatLng _point) {
@@ -256,7 +278,29 @@ class _HomePageState extends State<HomePage> {
     _polylineCoordinates.clear(); //prevent from forming a loop
     _polylines.clear();
   }
- 
+  void changeMarkerSelection(){
+    //Marker _marker = _markers.firstWhere((marker) => _markers.markerId.value == _bottonInfoPaneles[_currenInfoPanel].id);
+      // Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPaneles[_currenInfoPanel].id);
+      // _marker.onTap!();
+      // animateCamera(_polylines);
+
+    //print('_markers.length: ${_markers.length}');
+    //print('botton info panel id: ${_bottonInfoPaneles[_currenInfoPanel].id}');
+    //print('marker id: ${_marker.markerId.value}');
+    // Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _markers.first.markerId.value);
+    //need coding 
+
+    //forcus to marker
+    // _googleMapController
+    //         ?.animateCamera(CameraUpdate.newLatLng(_marker.position))
+    //         .then((_) async {
+    //       await Future.delayed(Duration(seconds: 1));
+    // });
+    //change prperty and info window
+    // _googleMapController?.showMarkerInfoWindow(_marker.markerId);
+
+    //change polylines
+  }
  void animateCamera(Set<Polyline> polylines) { 
    
     double minLat = polylines.first.points.first.latitude;
@@ -288,6 +332,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+ 
   @override
   Widget build(BuildContext context) {
 
@@ -351,18 +396,21 @@ class _HomePageState extends State<HomePage> {
               right: 0,
               bottom: this._pinPillPosition,
               child: CarouselSlider(
+                      carouselController: bottonCarouselController,
                       options: CarouselOptions(
                         enlargeCenterPage: true,
                         scrollDirection: Axis.horizontal,
                         enableInfiniteScroll: false,
+                        initialPage: 2,
                         autoPlay: false,
-                        ),
-                      items: [
-                        BottomInfoPanel(),
-                        BottomInfoPanel(),
-                        BottomInfoPanel(),
-                        BottomInfoPanel(),
-                      ]
+                        onPageChanged: (index, reason) {
+                        setState(() {
+                          _currenInfoPanel = index;
+                        });
+                        changeMarkerSelection(); 
+                        },
+                  ),
+                      items: _bottonInfoPaneles
                       ),
               
               
