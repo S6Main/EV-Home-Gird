@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   int _currentMarkerIndex = -1;
   bool _onSlider = false;
 
-  List<BottomInfoPanel> _bottonInfoPaneles =[];
+  List<BottomInfoPanel> _bottonInfoPanels =[];
   
   String googleApiKey = 'AIzaSyCV_x2q82h5TjN5py9HS7Fx7bxV1Wgr_K8';
 
@@ -216,9 +216,10 @@ class _HomePageState extends State<HomePage> {
             
             // _currentMarkerId = _locations.locations[i].id;
             // print('current marker id: $_currentMarkerId');
-            if(_destSelected){
-              removePolylines();
-            }
+            // if(_destSelected){
+            //   removePolylines();
+            // }
+            //removePolylines();
               _destinationLocation = _locations.locations[i].coordinates;
               _destSelected = true;
               setPolylines();
@@ -245,7 +246,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       //add bottom info panel set
-      _bottonInfoPaneles.add(BottomInfoPanel(title :_locations.locations[i].name, index: i, id: _locations.locations[i].id,));
+      _bottonInfoPanels.add(BottomInfoPanel(title :_locations.locations[i].name, index: i, id: _locations.locations[i].id,));
     } 
       
       
@@ -265,6 +266,8 @@ class _HomePageState extends State<HomePage> {
 
   void setPolylines() async{
     
+    removePolylines(); // clear polylines
+
     //change origin icon
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
@@ -302,38 +305,28 @@ class _HomePageState extends State<HomePage> {
   }
   void changeMarkerSelection(){
     
-    Future.delayed(Duration(milliseconds: 200), () {
-      Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPaneles[_currentMarkerIndex].id);
+    Future.delayed(Duration(milliseconds: 150), () {
+      Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPanels[_currentMarkerIndex].id);
       _marker.onTap!();
+
+      _googleMapController
+            ?.animateCamera(CameraUpdate.newCameraPosition(
+              CameraPosition(
+                  target: _marker.position,
+                  zoom: CAMERA_ZOOM,
+                  tilt: CAMERA_TILT,
+                  bearing: CAMERA_BEARING,
+                ),
+              ));
     });
 
-    
-    //Marker _marker = _markers.firstWhere((marker) => _markers.markerId.value == _bottonInfoPaneles[_currenInfoPanel].id);
-      // Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPaneles[_currenInfoPanel].id);
-      // _marker.onTap!();
-      // animateCamera(_polylines);
-
-    //print('_markers.length: ${_markers.length}');
-    //print('botton info panel id: ${_bottonInfoPaneles[_currenInfoPanel].id}');
-    //print('marker id: ${_marker.markerId.value}');
-    // Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _markers.first.markerId.value);
-    //need coding 
-
-    //forcus to marker
-    // _googleMapController
-    //         ?.animateCamera(CameraUpdate.newLatLng(_marker.position))
-    //         .then((_) async {
-    //       await Future.delayed(Duration(seconds: 1));
-    // });
-    //change prperty and info window
-    // _googleMapController?.showMarkerInfoWindow(_marker.markerId);
-
-    //change polylines
   }
  
  void animateCamera(Set<Polyline> polylines) { 
    
-    double minLat = polylines.first.points.first.latitude;
+   print('animateCamera');
+    if(_polylines != null){
+      double minLat = polylines.first.points.first.latitude;
     double minLong = polylines.first.points.first.longitude;
     double maxLat = polylines.first.points.first.latitude;
     double maxLong = polylines.first.points.first.longitude;
@@ -351,6 +344,8 @@ class _HomePageState extends State<HomePage> {
             southwest: LatLng(minLat, minLong),
             northeast: LatLng(maxLat, maxLong)),
             130));
+    }
+    
  }
   @override
   Widget button(VoidCallback function, IconData icon){
@@ -447,7 +442,7 @@ class _HomePageState extends State<HomePage> {
                         _onSlider = false;
                         },
                   ),
-                      items: _bottonInfoPaneles
+                      items: _bottonInfoPanels
                       ),
               
               
