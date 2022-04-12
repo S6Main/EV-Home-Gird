@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/globals.dart';
 import '../navigation pages/main_page.dart';
+import 'SrcDestPg.dart';
 
 class MapPointerBadge extends StatelessWidget {
   bool isSelected = false;
@@ -72,10 +73,15 @@ class MapPointerBadge extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            Icons.search_rounded,
+          IconButton(
+            icon: new Icon(Icons.search_rounded, size: 40),
             color: this.isSelected ? Colors.white : Globals.MAIN_COLOR,
-            size: 40,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SrcDestpg()),
+              );
+            },
           )
         ],
       ),
@@ -163,10 +169,7 @@ Widget _buildPopupDialog(BuildContext context) {
           ),
           InkWell(
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => MainPage(),
-              );
+              Navigator.pop(context);
             },
             child: Container(
               padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
