@@ -2,7 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import  'package:ev_homegrid/globals.dart';
-
+import 'ProfilePopUp.dart';
 class MapPointerBadge extends StatelessWidget {
 
   bool isSelected  = false;
@@ -29,7 +29,14 @@ class MapPointerBadge extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => BuildPopupDialog(context),
+              );
+            },
+            child: Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
@@ -40,7 +47,7 @@ class MapPointerBadge extends StatelessWidget {
                  border: Border.all(
                    color: this.isSelected ? Colors.white :Globals.MAIN_COLOR,
                    width: 1
-                 )
+                 )),
             ),
           ),
           SizedBox(width: 10),
@@ -64,10 +71,47 @@ class MapPointerBadge extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            Icons.my_location,
+        //   Card(
+
+        //     elevation: 3,
+        //     shadowColor: Colors.black26,
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(35.0),
+        //     ),
+        //     child: ClipOval(
+        //       child: Material(
+        //         color: this.isSelected ?Globals.MAIN_COLOR : Colors.white, // button color
+        //         child: InkWell(
+        //           splashColor: Colors.black26, // inkwell color
+        //           child: SizedBox(
+        //             width: 40,
+        //             height: 40,
+        //             child: Container(  
+        //               child: Icon(
+        //                 Icons.search,
+        //                 color: this.isSelected ? Colors.white :Globals.MAIN_COLOR,
+        //                 size: 30,),
+        //             ),
+        //           ),
+        //           onTap: () {
+        //             print('Clicked on Search Icon');
+        //           },
+        //         ),
+        //       ),
+        //     ),
+        // )
+          IconButton(
+            iconSize: 30, 
+            icon: Icon(
+            Icons.search,
             color: this.isSelected ? Colors.white :Globals.MAIN_COLOR,
-            size: 40,)
+            size: 30,), 
+            
+            onPressed: () { 
+              
+             },
+            ),
+          
           
         ],
       ),
