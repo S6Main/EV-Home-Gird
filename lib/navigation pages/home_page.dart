@@ -385,15 +385,20 @@ class _HomePageState extends State<HomePage> {
               initialCameraPosition: _initialCameraPosition,
               onTap: (LatLng loc){
                 if(_destSelected){
-                  animateCamera(_polylines);  //animate camera to initial position from top
+                  if(_polylines.isEmpty){
+                    removeDestinationMarker(); // remove dest marker when tapped
+                  }
+                  else{
+                    animateCamera(_polylines);  //animate camera to initial position from top
+                  }
                 }
                 else{
                   _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialCameraPosition),);
                 }
 
-                if(_polylines.isEmpty){
-                  removeDestinationMarker(); // remove dest marker when tapped
-                }
+                // if(_polylines.isEmpty){
+                //   removeDestinationMarker(); // remove dest marker when tapped
+                // }
                 
                 _onSlider = false;
                 //removePolylines();
