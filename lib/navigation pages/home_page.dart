@@ -51,11 +51,14 @@ class _HomePageState extends State<HomePage> {
 
   bool _mapCreated = false;
   bool _destSelected = false;
+  bool _sourcSelected = false;
   String _destinationName = 'Destination';
   int _currenInfoPanel = -1;
   String _currentMarkerId = 'destPin';
   int _currentMarkerIndex = -1;
   bool _onSlider = false;
+
+  bool _canShowButton = true;
 
   List<BottomInfoPanel> _bottonInfoPanels =[];
   
@@ -128,6 +131,11 @@ class _HomePageState extends State<HomePage> {
           removePolylines();
           setState(() {
             _destSelected = false;
+            if(_sourcSelected){
+              removeMarkers();
+            _canShowButton = true;
+            }
+            _sourcSelected = true;
             this._userBadgeSelected = true;
             this._pinPillPosition = PIN_INVISIBLE_POSITION;
           });
@@ -138,6 +146,9 @@ class _HomePageState extends State<HomePage> {
   void removeDestinationMarker(){
     setState(() {
       _markers.removeWhere((m) => m.markerId.value == _currentMarkerId);
+      if(_sourcSelected){
+        _lastSelectedMarker = null;
+      }
       _markers.add(_lastSelectedMarker!);
     });
   }
@@ -170,6 +181,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
   void showDestinationPinOnMap(){
+    _sourcSelected = false;
     setState(() {
       _markers.add(Marker(
         markerId: MarkerId(_currentMarkerId),
@@ -253,6 +265,11 @@ class _HomePageState extends State<HomePage> {
       
   }
 
+  void removeMarkers(){
+    setState(() {
+      _markers.removeWhere((m) => m.markerId.value != 'sourcePin');
+    });
+  }
   changeMapMode(){
     getJsonFile("assets/light.json").then(setMapStyle);
   }
@@ -353,7 +370,7 @@ class _HomePageState extends State<HomePage> {
     return FloatingActionButton(
       onPressed: function,
       materialTapTargetSize: MaterialTapTargetSize.padded,
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.black,
       child: Icon(icon, size: 24.0,),
     );
   }
@@ -385,6 +402,7 @@ class _HomePageState extends State<HomePage> {
               mapType:MapType.normal,
               initialCameraPosition: _initialCameraPosition,
               onTap: (LatLng loc){
+                
                 if(_destSelected){
                   if(_polylines.isEmpty){
                     removeDestinationMarker(); // remove dest marker when tapped
@@ -400,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                 if(_polylines.isEmpty){
                   removeDestinationMarker(); // remove dest marker when tapped
                 }
-                
+                _sourcSelected = false;
                 _onSlider = false;
                 //removePolylines();
                 //tapping on the map will dismiss the bottom pill
@@ -478,30 +496,30 @@ class _HomePageState extends State<HomePage> {
                     Expanded(
                       child: SizedBox()),
                     Center(
-                      child: 
-                      AnimatedButton(
-                          height: 45,
-                          width: 200,
-                          text: 'Find Nearest',
-                          isReverse: true,
-                          selectedTextColor: Colors.white,
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          transitionType: TransitionType.LEFT_TO_RIGHT,
-                          backgroundColor: Colors.white,
-                          selectedBackgroundColor: Colors.black,
-                          borderColor: Colors.white,
-                          borderRadius: 50,
-                          borderWidth: 0,
-                              onPress: () { 
-                                showPinsOnMap();
-                                setState(() {
+                      child: !_canShowButton
+                        ? const SizedBox.shrink()
+                        : AnimatedButton(
+                            height: 45,
+                            width: 200,
+                            text: 'Find Nearest',
+                            isReverse: true,
+                            selectedTextColor: Colors.black,
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            transitionType: TransitionType.LEFT_TO_RIGHT,
+                            backgroundColor: Colors.black,
+                            selectedBackgroundColor: Colors.white,
+                            borderColor: Colors.white,
+                            borderRadius: 50,
+                            borderWidth: 0,
+                                onPress: () { 
+                                  showPinsOnMap();
+                                  _canShowButton = false;
                                   
-                                });
-                              },
+                                },
                             ),
                     ),
                     SizedBox(height: 30,),
