@@ -71,35 +71,7 @@ class MapPointerBadge extends StatelessWidget {
               ],
             ),
           ),
-        //   Card(
-
-        //     elevation: 3,
-        //     shadowColor: Colors.black26,
-        //     shape: RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.circular(35.0),
-        //     ),
-        //     child: ClipOval(
-        //       child: Material(
-        //         color: this.isSelected ?Globals.MAIN_COLOR : Colors.white, // button color
-        //         child: InkWell(
-        //           splashColor: Colors.black26, // inkwell color
-        //           child: SizedBox(
-        //             width: 40,
-        //             height: 40,
-        //             child: Container(  
-        //               child: Icon(
-        //                 Icons.search,
-        //                 color: this.isSelected ? Colors.white :Globals.MAIN_COLOR,
-        //                 size: 30,),
-        //             ),
-        //           ),
-        //           onTap: () {
-        //             print('Clicked on Search Icon');
-        //           },
-        //         ),
-        //       ),
-        //     ),
-        // )
+       
           IconButton(
             iconSize: 30, 
             icon: Icon(

@@ -12,6 +12,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'Map/locations.dart' as _locations;
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../widgets/BottomInfoPanel.dart';
 import '../widgets/MapPointerBadge.dart';
@@ -21,7 +22,7 @@ const LatLng DEST_LOCATION = LatLng(42.744421,-71.1698939);
 const double CAMERA_ZOOM = 15;
 const double CAMERA_TILT = 20;
 const double CAMERA_BEARING = 30;
-const double PIN_VISIBLE_POSITION = 20;
+const double PIN_VISIBLE_POSITION = 0;
 const double PIN_INVISIBLE_POSITION = -250;
 
 
@@ -396,9 +397,9 @@ class _HomePageState extends State<HomePage> {
                   _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialCameraPosition),);
                 }
 
-                // if(_polylines.isEmpty){
-                //   removeDestinationMarker(); // remove dest marker when tapped
-                // }
+                if(_polylines.isEmpty){
+                  removeDestinationMarker(); // remove dest marker when tapped
+                }
                 
                 _onSlider = false;
                 //removePolylines();
@@ -424,66 +425,88 @@ class _HomePageState extends State<HomePage> {
             right: 0,
             child: MapPointerBadge(isSelected: _userBadgeSelected,)
             ),    
+          // AnimatedPositioned(
+          //   duration: const Duration(milliseconds: 500),
+          //   curve: Curves.easeInOut,
+          //     left: 0,
+          //     right: 0,
+          //     bottom: this._pinPillPosition,
+          //     child: CarouselSlider(
+          //             carouselController: bottonCarouselController,
+          //             options: CarouselOptions(
+          //               enlargeCenterPage: true,
+          //               scrollDirection: Axis.horizontal,
+          //               enableInfiniteScroll: true,
+          //               initialPage: 2,
+          //               autoPlay: false,
+          //               onPageChanged: (index, reason) {
+          //               _onSlider = true;
+          //               setState(() {
+          //                 _currentMarkerIndex = index;
+          //               });
+          //               changeMarkerSelection(); 
+          //               _onSlider = false;
+          //               },
+          //         ),
+          //             items: _bottonInfoPanels
+          //             ),
+              
+              
           AnimatedPositioned(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
               left: 0,
               right: 0,
               bottom: this._pinPillPosition,
-              child: CarouselSlider(
-                      carouselController: bottonCarouselController,
-                      options: CarouselOptions(
-                        enlargeCenterPage: true,
-                        scrollDirection: Axis.horizontal,
-                        enableInfiniteScroll: true,
-                        initialPage: 2,
-                        autoPlay: false,
-                        onPageChanged: (index, reason) {
-                        _onSlider = true;
-                        setState(() {
-                          _currentMarkerIndex = index;
-                        });
-                        changeMarkerSelection(); 
-                        _onSlider = false;
-                        },
+              child:
+              SlidingUpPanel(
+                  parallaxEnabled: true,
+                  parallaxOffset: .5,
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
+                  borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                   ),
-                      items: _bottonInfoPanels
-                      ),
-              
-              
-            ),
+                  panel: Center(
+                    child: Text("This is the sliding Widget"),
+                  ),
+                  ),
+                ),
+          
           Column(
-            children: [
-              Expanded(
-                child: SizedBox()),
-              Center(
-                child: 
-                AnimatedButton(
-                    height: 45,
-                    width: 200,
-                    text: 'Get Directions',
-                    isReverse: true,
-                    selectedTextColor: Colors.white,
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                  children: [
+                    Expanded(
+                      child: SizedBox()),
+                    Center(
+                      child: 
+                      AnimatedButton(
+                          height: 45,
+                          width: 200,
+                          text: 'Find Nearest',
+                          isReverse: true,
+                          selectedTextColor: Colors.white,
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          transitionType: TransitionType.LEFT_TO_RIGHT,
+                          backgroundColor: Colors.white,
+                          selectedBackgroundColor: Colors.black,
+                          borderColor: Colors.white,
+                          borderRadius: 50,
+                          borderWidth: 0,
+                              onPress: () { 
+                                showPinsOnMap();
+                                setState(() {
+                                  
+                                });
+                              },
+                            ),
                     ),
-                    transitionType: TransitionType.LEFT_TO_RIGHT,
-                    backgroundColor: Colors.white,
-                    selectedBackgroundColor: Colors.black,
-                    borderColor: Colors.white,
-                    borderRadius: 50,
-                    borderWidth: 0,
-                        onPress: () { 
-                          showPinsOnMap();
-                          
-                        },
-                      ),
-              ),
-              SizedBox(height: 30,),
-            ],
-          )
+                    SizedBox(height: 30,),
+                  ],
+                )
           ],
       ),
     );
