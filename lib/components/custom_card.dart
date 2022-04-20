@@ -19,6 +19,7 @@ class CustomCard extends StatelessWidget {
       // color: Colors.amberAccent,
       height: MediaQuery.of(context).size.height * 0.080,
       child: Card(
+        elevation: 1.0,
         color: Color(0xFFF5F6F9),
         child: ListTile(
           leading: Icon(
@@ -40,7 +41,7 @@ class CustomCard extends StatelessWidget {
           ),
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
+          borderRadius: BorderRadius.circular(25.0),
         ),
       ),
     );
