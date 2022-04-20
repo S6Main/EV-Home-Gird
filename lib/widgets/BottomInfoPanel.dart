@@ -2,18 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BottomInfoPanel extends StatelessWidget {
+  final int index;
+  final String id;
+  final String title;
   const BottomInfoPanel({
-    Key? key,
+    Key? key, required this.title, required this.index, required this.id,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(20),
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -45,14 +47,14 @@ class BottomInfoPanel extends StatelessWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      Text('Carne de Cerdo',
+                      Text(title,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey[700]
                         ),
                       ),
-                      Text('Vendta por delia'),
+                      Text('id: $id'),
                       Text('2km de distencia')
 
                     ],

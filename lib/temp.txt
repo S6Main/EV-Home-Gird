@@ -1,12 +1,43 @@
-variables
-    -    list locations[lan, log, name]  #used to store list of points
-
-    -    int selectedIndex 
-    -    int prevSelectedIndex
-
-functions   
-    -   addMarker
-    -   removeMarker
-    -   updateMarker
-    -   findRoute
-    
+class OnBoarding extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoApp(
+      home: OnBoardingSlider(
+        headerBackgroundColor: Colors.white,
+        finishButtonText: 'Register',
+        skipTextButton: Text('Skip'),
+        trailing: Text('Login'),
+        background: [
+          Image.asset('assets/slide_1.png'),
+          Image.asset('assets/slide_2.png'),
+        ],
+        totalPage: 2,
+        speed: 1.8,
+        pageBodies: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 480,
+                ),
+                Text('Description Text 1'),
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 480,
+                ),
+                Text('Description Text 2'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

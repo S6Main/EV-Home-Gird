@@ -51,6 +51,7 @@ class _MainPageState extends State<MainPage> {
             items: [
               BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Home'),
               BottomNavigationBarItem(
+                  
                   icon: Icon(Icons.bar_chart_sharp), label: 'Owner'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.history), label: 'History'),

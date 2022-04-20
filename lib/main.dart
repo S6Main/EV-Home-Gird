@@ -2,15 +2,13 @@ import 'package:ev_homegrid/front_screen.dart';
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/navigation%20pages/home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:ev_homegrid/icons/custom_icon.dart';
-import 'navigation pages/main_page.dart';
+import 'login/login_page.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'constants.dart';
+import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
 // import 'package:ev_homegrid/navigation%20pages/home_page.dart';
-// import 'package:ev_homegrid/temp.dart';
 // import 'Guest.dart';
-// import 'MetaMask.dart';
 // import 'navigation pages/pop_pages/side_page.dart';
 
 void main() {
@@ -48,6 +46,8 @@ class MyApp extends StatelessWidget {
       // ),
       //home: MyHomePage(),
       home: FrontScreen(),
+      home: MyHomePage(),
+      //home: MainPage(),
       //home: mainApp()
     );
   }
@@ -64,72 +64,163 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        /*appBar: AppBar(
-        title: Text('EV Home Grid'),
-      ),*/
-        body: Center(
-            child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: 550,
+    return OnBoardingSlider(
+      finishButtonText: 'Register',
+      onFinish: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          // CupertinoPageRoute(
+          //   builder: (context) => LoginPage(),
+          // ),
+          
+        );
+      },
+      finishButtonColor: Colors.black,
+      skipTextButton: Text(
+        'Skip',
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.black54,
+          fontWeight: FontWeight.w600,
         ),
-        SizedBox(
-            width: 338,
-            height: 45,
-            child: ElevatedButton.icon(
-              icon: Icon(
-                CustomIcon.account_balance_wallet,
-                size: 24,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
-              label: Text(
-                'CONNCET WALLET',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                primary: Color.fromARGB(255, 255, 255, 255),
-                onPrimary: Color.fromARGB(255, 0, 0, 0),
-                shadowColor: Color.fromARGB(68, 0, 0, 0),
-                side:
-                    BorderSide(width: 1.5, color: Color.fromARGB(20, 0, 0, 0)),
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                minimumSize: Size(100, 40), //////// HERE
-              ),
-              onPressed: () {},
-            )),
-        SizedBox(
-          height: 16,
+      ),
+      // trailing: Text(
+      //   'Login',
+      //   style: TextStyle(
+      //     fontSize: 16,
+      //     color: Colors.black,
+      //     fontWeight: FontWeight.w600,
+      //   ),
+      // ),
+      // trailingFunction: () {
+      //   Navigator.push(
+      //     context,
+      //     CupertinoPageRoute(
+      //       builder: (context) => LoginPage(),
+      //     ),
+      //   );
+      // },
+      controllerColor: Colors.black,
+      totalPage: 3,
+      headerBackgroundColor: Colors.white,
+      pageBackgroundColor: Colors.white,
+      background: [
+        Image.asset(
+          'assets/images/login/slide_1.png',
+          height: 400,
         ),
-        SizedBox(
-          width: 338,
-          height: 45,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Colors.black,
-              onPrimary: Colors.white,
-              shadowColor: Color.fromARGB(255, 65, 65, 65),
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              minimumSize: Size(100, 40), //////// HERE
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-              );
-            },
-            child: Text(
-              'GUEST',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+        Image.asset(
+          'assets/images/login/slide_2.png',
+          height: 400,
+        ),
+        Image.asset(
+          'assets/images/login/slide_3.png',
+          height: 400,
+        ),
+      ],
+      speed: 1.8,
+      pageBodies: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 480,
+              ),
+              Text(
+                'On your way...',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'to find the perfect looking Onboarding for your app?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black26,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 480,
+              ),
+              Text(
+                'You’ve reached your destination.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Sliding with animation',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black26,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 480,
+              ),
+              Text(
+                'Start now!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Where everything is possible and customize your onboarding.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black26,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
       ],
-    )));
+    );
   }
 }
