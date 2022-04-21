@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
-import '../profile_pic.dart';
+import 'profile_pic.dart';
 import 'package:ev_homegrid/components/custom_profilepic_button.dart';
 import 'package:ev_homegrid/components/custom_card.dart';
-import 'my_vehicle.dart';
+import 'vehicle/my_vehicle.dart';
 
 class EditUserProfile extends StatefulWidget {
   const EditUserProfile({Key? key}) : super(key: key);
@@ -40,7 +40,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
                 Column(
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * .0095,
+                      height: MediaQuery.of(context).size.height * .02,
                     ),
                     Text('Name', style: kProfileSubtitleStyle),
                     // SizedBox(
@@ -97,10 +97,42 @@ class _EditUserProfileState extends State<EditUserProfile> {
                   cardTitle: 'About',
                   onPressed: () {},
                 ),
-                CustomCard(
-                  leadingIconData: Icons.handshake_rounded,
-                  cardTitle: 'Connect With us',
-                  onPressed: () {},
+                // CustomCard(
+                //   leadingIconData: Icons.handshake_rounded,
+                //   cardTitle: 'Connect With us',
+                //   onPressed: () {},
+                // ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.080,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    elevation: 1.0,
+                    color: Color(0xFFF5F6F9),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                      // leading:
+                      title: Text(
+                        'Connect With Us',
+                        textAlign: TextAlign.justify,
+                        style: kCardTitleTextStyle,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.facebook_rounded,
+                            size: 28.0,
+                          ),
+                          Icon(
+                            Icons.facebook_rounded,
+                            size: 28.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -120,27 +152,20 @@ class _EditUserProfileState extends State<EditUserProfile> {
 
                 child: Align(
                   // alignment: Alignment.bottomCenter,
-                  child: RawMaterialButton(
-                    constraints: BoxConstraints.tightFor(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * .06),
-                    elevation: 6.0,
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => LoginPage()),
-                      // );
-                    },
-                    fillColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      // side: BorderSide(color: Colors.black),
-
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                    child: Text(
-                      'Log Out',
-                      style: TextStyle(
-                        fontSize: 15.0,
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 55.0,
+                      width: 220.0,
+                      decoration: BoxDecoration(
+                        color: kThemeColor,
+                        borderRadius:
+                            BorderRadius.circular(kBorderCircleRadius),
+                      ),
+                      child: Text(
+                        'Log out',
+                        style: kButtonTextStyle,
                       ),
                     ),
                   ),

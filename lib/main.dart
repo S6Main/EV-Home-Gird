@@ -1,13 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import 'package:ev_homegrid/front_screen.dart';
+import 'package:ev_homegrid/icons/custom_icon.dart';
+import 'package:ev_homegrid/navigation%20pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'login/login_page.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'constants.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
 // import 'package:ev_homegrid/navigation%20pages/home_page.dart';
-// import 'package:ev_homegrid/temp.dart';
 // import 'Guest.dart';
-// import 'MetaMask.dart';
 // import 'navigation pages/pop_pages/side_page.dart';
 
 void main() {
@@ -25,15 +26,26 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EV Home Grid',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData().copyWith(
-        textTheme: GoogleFonts.comfortaaTextTheme(
-          Theme.of(context).textTheme,
-        ),
+      theme: ThemeData(
+        fontFamily: 'Comfortaa',
+        scaffoldBackgroundColor: kBackgroundColor,
+        primaryColor: kThemeColor,
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: kBackgroundColor,
+            ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      // theme: ThemeData().copyWith(
+      //   textTheme: GoogleFonts.comfortaaTextTheme(
+      //     Theme.of(context).textTheme,
+      //   ),
+      // ),
 
       // theme: ThemeData(
       //   primaryColor: Colors.white,
       // ),
+      //home: MyHomePage(),
+      home: FrontScreen(),
       home: MyHomePage(),
       //home: MainPage(),
       //home: mainApp()
