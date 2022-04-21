@@ -44,7 +44,8 @@ dependencies:
   google_fonts: ^2.3.1
 
 
-  material_floating_search_bar: ^0.3.7 
+  material_floating_search_bar: ^0.3.7
+  place_picker: ^0.9.20-nullsafety
 
 dev_dependencies:
   flutter_test:

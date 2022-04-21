@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const kHorizontalPadding = 20.0;
 const kVerticalPadding = 15.0;
 const kScrollBarThickness = 10.0;
+const apiKey = '';
 
 const kProfileTitleStyle = TextStyle(
   color: Colors.black,

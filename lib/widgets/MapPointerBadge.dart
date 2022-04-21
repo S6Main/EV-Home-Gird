@@ -1,8 +1,8 @@
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/globals.dart';
-import '../navigation pages/main_page.dart';
-import 'SrcDestPg.dart';
+import 'SourceDestPage.dart';
+
 
 class MapPointerBadge extends StatelessWidget {
   bool isSelected = false;
@@ -79,7 +79,7 @@ class MapPointerBadge extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SrcDestpg()),
+                MaterialPageRoute(builder: (context) => SourceDestPage()),
               );
             },
           )
