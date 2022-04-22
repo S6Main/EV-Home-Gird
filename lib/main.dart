@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:ev_homegrid/front_screen.dart';
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/navigation%20pages/home_page.dart';
@@ -46,8 +47,8 @@ class MyApp extends StatelessWidget {
       // ),
       //home: MyHomePage(),
       home: FrontScreen(),
-      home: MyHomePage(),
-      //home: MainPage(),
+      // home: MyHomePage(),
+      // home: MainPage(),
       //home: mainApp()
     );
   }
@@ -73,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
           // CupertinoPageRoute(
           //   builder: (context) => LoginPage(),
           // ),
-          
         );
       },
       finishButtonColor: Colors.black,

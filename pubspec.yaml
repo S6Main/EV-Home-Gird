@@ -42,9 +42,8 @@ dependencies:
 
   font_awesome_flutter: ^10.1.0
   google_fonts: ^2.3.1
-
-
-  material_floating_search_bar: ^0.3.7 
+  place_picker: ^0.9.19-nullsafety
+  input_history_text_field: ^0.1.0
 
 dev_dependencies:
   flutter_test:
