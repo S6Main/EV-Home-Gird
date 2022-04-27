@@ -7,7 +7,8 @@ const apiKey = '';
 // const kThemeColor = Color(0xFF0F8F6E);
 const kThemeColor = Color(0xFF0C9869);
 const kTextColor = Color(0xFF3C4046);
-const kBackgroundColor = Color(0xFFF9F8FD);
+const kBackgroundColor = Color(0xFFF6F7F6);
+
 
 const double kDefaultPadding = 20.0;
 const kBorderCircleRadius = 25.0;

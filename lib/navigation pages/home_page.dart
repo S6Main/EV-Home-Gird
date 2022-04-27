@@ -1,5 +1,7 @@
 import 'dart:ffi';
 import 'dart:developer' as dev;
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ev_homegrid/globals.dart';
@@ -12,10 +14,11 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'Map/locations.dart' as _locations;
-import 'package:sliding_up_panel/sliding_up_panel.dart';
+//import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../widgets/BottomInfoPanel.dart';
-import '../widgets/MapPointerBadge.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
+//import '../widgets/MapPointerBadge.dart';
 
 const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
 const LatLng DEST_LOCATION = LatLng(42.744421,-71.1698939);
@@ -71,6 +74,10 @@ class _HomePageState extends State<HomePage> {
 
   CarouselController bottonCarouselController = CarouselController();
 
+  //v2
+  TextEditingController _searchController = new TextEditingController();
+  bool _isOnline = false;
+
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
 
   
@@ -85,6 +92,11 @@ class _HomePageState extends State<HomePage> {
 
     //instatiate polyinepointes
     _polylinePoints = PolylinePoints();
+    networkCheck();
+  }
+
+  void networkCheck()async{
+    _isOnline = await hasNetwork();
   }
 
   @override
@@ -387,148 +399,788 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      body: Stack(
-        children : [
-          Positioned.fill(
-            child: GoogleMap(
-              myLocationButtonEnabled: true,
-              compassEnabled: false,
-              tiltGesturesEnabled: false,
-              zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
-              markers: _markers,
-              polylines:_polylines,
-              
-              mapType:MapType.normal,
-              initialCameraPosition: _initialCameraPosition,
-              onTap: (LatLng loc){
+      body: InkWell(
+        onDoubleTap: (){
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children : [
+            Positioned.fill(
+              child: GoogleMap(
+                myLocationButtonEnabled: true,
+                compassEnabled: false,
+                tiltGesturesEnabled: false,
+                zoomControlsEnabled: false,
+                mapToolbarEnabled: false,
+                markers: _markers,
+                polylines:_polylines,
                 
-                if(_destSelected){
+                mapType:MapType.normal,
+                initialCameraPosition: _initialCameraPosition,
+                onTap: (LatLng loc){
+                  
+                  if(_destSelected){
+                    if(_polylines.isEmpty){
+                      removeDestinationMarker(); // remove dest marker when tapped
+                    }
+                    else{
+                      animateCamera(_polylines);  //animate camera to initial position from top
+                    }
+                  }
+                  else{
+                    _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialCameraPosition),);
+                  }
+
                   if(_polylines.isEmpty){
                     removeDestinationMarker(); // remove dest marker when tapped
                   }
-                  else{
-                    animateCamera(_polylines);  //animate camera to initial position from top
-                  }
-                }
-                else{
-                  _googleMapController?.animateCamera(CameraUpdate.newCameraPosition(_initialCameraPosition),);
-                }
-
-                if(_polylines.isEmpty){
-                  removeDestinationMarker(); // remove dest marker when tapped
-                }
-                _sourcSelected = false;
-                _onSlider = false;
-                //removePolylines();
-                //tapping on the map will dismiss the bottom pill
-                setState(() {
-                  this._pinPillPosition = PIN_INVISIBLE_POSITION;
-                  this._userBadgeSelected = false;
-                });
-              },
-              onMapCreated: (GoogleMapController controller){
-                _googleMapController = controller;
-                _mapCreated = true;
-                //showPinsOnMap();
-                showCurrentPinOnMap();
-                changeMapMode();
-                //setPolylines();
-              },
+                  _sourcSelected = false;
+                  _onSlider = false;
+                  //removePolylines();
+                  //tapping on the map will dismiss the bottom pill
+                  setState(() {
+                    this._pinPillPosition = PIN_INVISIBLE_POSITION;
+                    this._userBadgeSelected = false;
+                  });
+                },
+                onMapCreated: (GoogleMapController controller){
+                  _googleMapController = controller;
+                  _mapCreated = true;
+                  //showPinsOnMap();
+                  showCurrentPinOnMap();
+                  changeMapMode();
+                  //setPolylines();
+                },
+              ),
             ),
-          ),
-          Positioned(
-            top: 50,
-            left: 0,
-            right: 0,
-            child: MapPointerBadge(isSelected: _userBadgeSelected,)
-            ),    
-          // AnimatedPositioned(
-          //   duration: const Duration(milliseconds: 500),
-          //   curve: Curves.easeInOut,
-          //     left: 0,
-          //     right: 0,
-          //     bottom: this._pinPillPosition,
-          //     child: CarouselSlider(
-          //             carouselController: bottonCarouselController,
-          //             options: CarouselOptions(
-          //               enlargeCenterPage: true,
-          //               scrollDirection: Axis.horizontal,
-          //               enableInfiniteScroll: true,
-          //               initialPage: 2,
-          //               autoPlay: false,
-          //               onPageChanged: (index, reason) {
-          //               _onSlider = true;
-          //               setState(() {
-          //                 _currentMarkerIndex = index;
-          //               });
-          //               changeMarkerSelection(); 
-          //               _onSlider = false;
-          //               },
-          //         ),
-          //             items: _bottonInfoPanels
-          //             ),
-              
-              
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
+            Positioned(
+              top: 50,
               left: 0,
               right: 0,
-              bottom: this._pinPillPosition,
-              child:
-              SlidingUpPanel(
-                  parallaxEnabled: true,
-                  parallaxOffset: .5,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
-                  borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  ),
-                  panel: Center(
-                    child: Text("This is the sliding Widget"),
-                  ),
-                  ),
-                ),
-          
-          Column(
-                  children: [
-                    Expanded(
-                      child: SizedBox()),
-                    Center(
-                      child: !_canShowButton
-                        ? const SizedBox.shrink()
-                        : AnimatedButton(
-                            height: 45,
-                            width: 200,
-                            text: 'Find Nearest',
-                            isReverse: true,
-                            selectedTextColor: Colors.black,
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+              child: 
+              Stack(
+                children: [
+                  
+                  Container(
+                            margin:EdgeInsets.only(left: 30, right: 40),
+                            decoration: BoxDecoration(
                               color: Colors.white,
+                              borderRadius:  BorderRadius.circular(16),
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                  color: Color.fromARGB(15, 0, 0, 0),
+                                  blurRadius: 12,
+                                ),
+                              ],
                             ),
-                            transitionType: TransitionType.LEFT_TO_RIGHT,
-                            backgroundColor: Colors.black,
-                            selectedBackgroundColor: Colors.white,
-                            borderColor: Colors.white,
-                            borderRadius: 50,
-                            borderWidth: 0,
-                                onPress: () { 
-                                  showPinsOnMap();
-                                  _canShowButton = false;
-                                  
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 15),
+                              child: TextField(
+                                maxLength: 42,
+                                controller: _searchController,
+                                readOnly: true,
+                                style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
+                                onTap: () async {
+                                  // _isOnline = await hasNetwork();
+                                  // if(!_isOnline){
+                                  //   setState(() {
+                                  //     CustomDialogNetworkIssue();
+                                  //   });
+                                  // }
                                 },
+                                decoration: InputDecoration(
+                                  hintStyle: TextStyle(fontSize: 17,color: Color(0xFFBFBFBF)),
+                                  hintText: 'Search anything…',
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(top: 20,bottom: 20),
+                                  counterText: '',
+                                  icon: Icon(LineAwesomeIcons.search,color: Colors.black.withOpacity(0.4),),
+                                ),
+                              ),
                             ),
+                          ),
+                  Positioned(
+                    right: 25,
+                    top: 5,
+                    bottom: 5,
+                    child: Container(
+                      width: 45,
+                      height: 45,
+                      child: 
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF2B2D41),
+                            elevation: 3,
+                            shadowColor: Colors.black26,
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(15.0),
+                            ),),
+                          onPressed:() {
+                            networkCheck();
+                            if(_isOnline){
+                              CustomDialogFilterMenu();
+                            }
+                            else{
+                              CustomDialogNetworkIssue();
+                            }
+                          },
+                          child: ImageIcon(AssetImage("assets/images/Filter_v2.png",),),
+                          ),
                     ),
-                    SizedBox(height: 30,),
-                  ],
-                )
-          ],
+                  ),        
+                ],
+              ),
+            ),
+            // Positioned(
+            //   top: 50,
+            //   left: 0,
+            //   right: 0,
+            //   child: MapPointerBadge(isSelected: _userBadgeSelected,)
+            //   ),    
+
+            // AnimatedPositioned(
+            //   duration: const Duration(milliseconds: 500),
+            //   curve: Curves.easeInOut,
+            //     left: 0,
+            //     right: 0,
+            //     bottom: this._pinPillPosition,
+            //     child: CarouselSlider(
+            //             carouselController: bottonCarouselController,
+            //             options: CarouselOptions(
+            //               enlargeCenterPage: true,
+            //               scrollDirection: Axis.horizontal,
+            //               enableInfiniteScroll: true,
+            //               initialPage: 2,
+            //               autoPlay: false,
+            //               onPageChanged: (index, reason) {
+            //               _onSlider = true;
+            //               setState(() {
+            //                 _currentMarkerIndex = index;
+            //               });
+            //               changeMarkerSelection(); 
+            //               _onSlider = false;
+            //               },
+            //         ),
+            //             items: _bottonInfoPanels
+            //             ),
+                
+                
+            // AnimatedPositioned(
+            //   duration: const Duration(milliseconds: 500),
+            //   curve: Curves.easeInOut,
+            //     left: 0,
+            //     right: 0,
+            //     bottom: this._pinPillPosition,
+            //     child:
+            //     SlidingUpPanel(
+            //         parallaxEnabled: true,
+            //         parallaxOffset: .5,
+            //         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
+            //         borderRadius: BorderRadius.only(
+            //         topLeft: Radius.circular(20),
+            //         topRight: Radius.circular(20),
+            //         ),
+            //         panel: Center(
+            //           child: Text("This is the sliding Widget"),
+            //         ),
+            //         ),
+            //       ),
+            
+            Column(
+                    children: [
+                      Expanded(
+                        child: SizedBox()),
+                      Center(
+                        child: !_canShowButton
+                          ? const SizedBox.shrink()
+                          : AnimatedButton(
+                              height: 45,
+                              width: 200,
+                              text: 'Find Nearest',
+                              isReverse: true,
+                              selectedTextColor: Colors.black,
+                              textStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                              transitionType: TransitionType.LEFT_TO_RIGHT,
+                              backgroundColor: Colors.black,
+                              selectedBackgroundColor: Colors.white,
+                              borderColor: Colors.white,
+                              borderRadius: 50,
+                              borderWidth: 0,
+                                  onPress: () { 
+                                    showPinsOnMap();
+                                    _canShowButton = false;
+                                    
+                                  },
+                              ),
+                      ),
+                      SizedBox(height: 30,),
+                    ],
+                  )
+            ],
+        ),
       ),
     );
   }
-  
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+  void CustomDialogNetworkIssue() {
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return Stack(
+            children :<Widget>[
+
+              Container(
+              child: BackdropFilter(
+                blendMode: BlendMode.srcOver,
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  color: Color(0xFFC4C4C4).withOpacity(0.5),
+                  child: AlertDialog(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                            32.0,
+                          ),
+                        ),
+                      ),
+
+                    title:  Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Center(
+                        child: Text('Network Error',
+                                style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                )),
+                    ),
+                    content: Builder(
+                      builder: (context) {
+
+                        return Container(
+                          height: 100,
+                          width: 280,
+                          child: Column(children: [
+                            Text('Please Connect to the internet.',
+                                style: TextStyle(fontSize: 15,fontWeight: FontWeight.normal,color: Color.fromARGB(255, 0, 0, 0)),),
+
+                            Padding(
+                              padding: const EdgeInsets.only(top: 23),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(0xFFFEDE00),
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 100,
+                                    right: 100,
+                                    top: 18,
+                                    bottom: 18
+                                  ),
+                                  child: const Text(
+                                    'Okay',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Comfortaa',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    ),
+                                ),
+                                ),
+                            ),
+                          ],),
+                        );
+                      },
+                    ),
+                    
+                  ),
+                ),
+              ),
+            ),
+
+            Align(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 330,
+                      height: 40,
+                      child: Row(
+                        children: [
+                          Expanded(child: Container(
+                            color: Colors.transparent,
+                          ),),
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: new BorderRadius.circular(20.0),
+                              onTap: (() {
+                                Navigator.of(context).pop();
+                              }),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                color: Colors.transparent,
+                                child: Image.asset('assets/images/closeIcon_v2.png')
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 180),
+                    
+                  ],
+                ),
+              ),
+            ]);
+        });
+  }
+  void CustomDialogFilterMenu() {
+    bool? _restaurant = false;
+    bool? _parking = false;
+    int _rangeFrom = 1;
+    int _rangeTo = 3;
+
+    bool _isAvailable = true;
+    bool _isOccupied = false;
+    bool _isClosed = false;
+
+    bool _isAtherDot = true;
+    bool _isAtherGrid = true;
+    bool _isOther = false;
+
+    Color _pressed = Color(0xFF2B2D41);
+    Color _unpressed = Color(0xFFF6F7F6);
+
+    SfRangeValues _values = SfRangeValues(20.0, 60.0);
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Stack(
+                children :<Widget>[
+
+                  Container(
+                  child: BackdropFilter(
+                    blendMode: BlendMode.srcOver,
+                    filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                    child: Container(
+                      color: Color(0xFFC4C4C4).withOpacity(0.5),
+                      child: AlertDialog(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(
+                                32.0,
+                              ),
+                            ),
+                          ),
+
+                        title:  Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Center(
+                            child: Text('Filters',
+                                    style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                    )),
+                        ),
+                        content: Builder(
+                          builder: (context) {
+
+                            return Container(
+                              height: 400,
+                              width: 280,
+                              child: Column(children: [
+                                // Text('Please Connect to the internet.',
+                                //     style: TextStyle(fontSize: 15,fontWeight: FontWeight.normal,color: Color.fromARGB(255, 0, 0, 0)),),
+                                
+                                Container(
+                                  height: 75,
+                                  color: Colors.transparent,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text('Range',style: TextStyle(fontSize: 19,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),),
+                                          Expanded(child: Container(),),
+                                          Container(width: 100,height: 20,color: Colors.transparent,alignment: Alignment.bottomCenter,
+                                            child: Text('$_rangeFrom km - $_rangeTo km',style: TextStyle(fontSize: 15,fontWeight: FontWeight.normal,color: Color(0xFF4136F1)),),
+                                            ),
+                                        ],
+                                      ),
+                                      Expanded(child:  Container( height: 20,color: Colors.transparent,
+                                            child:  SfRangeSlider(
+                                                min: 0.0,
+                                                max: 100.0,
+                                                values: _values,
+                                                inactiveColor: Color(0xFF4136F1).withOpacity(0.2),
+                                                activeColor: Color(0xFF7740FC),
+                                                interval: 20,
+                                                showTicks: false,
+                                                showLabels: false,
+                                                stepSize: 20.0,
+                                                enableTooltip: false,
+                                                onChanged: (SfRangeValues values){
+                                                  setState(() {
+                                                    _values = values;
+                                                    _rangeFrom = ((values.start)/20).round();
+                                                    _rangeTo = ((values.end)/20).round();
+                                                  });
+                                                },
+                                              ),
+                                      ),),
+                                    ],
+                                  ),
+                                ),
+                                 SizedBox(height: 5,),
+                                Container(
+                                  height: 75,
+                                  color: Colors.transparent,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text('Type of Charger',style: TextStyle(fontSize: 19,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),),
+                                          Expanded(child: Container(),),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10,),
+                                      Container(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                          SizedBox(width: 5,),
+                                          Container( width: 80, height: 35,color: Colors.transparent,
+                                            child:ElevatedButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  _isAtherDot =!_isAtherDot;
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                              primary: _isAtherDot ? _pressed : _unpressed,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                            ),
+                                              child: Text('Ather Dot',style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color:
+                                              _isAtherDot ? Colors.white : Colors.black),),
+                                              ),  
+                                            ),
+                                            Container( width: 82, height: 35,color: Colors.transparent,
+                                            child:ElevatedButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  _isAtherGrid = !_isAtherGrid;
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                              primary: _isAtherGrid ? _pressed : _unpressed,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                            ),
+                                              child: Text('Ather Grid',style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,
+                                              color: _isAtherGrid ? Colors.white : Colors.black
+                                              ),),
+                                              ),  
+                                            ),
+                                            Container( width: 80, height: 35,color: Colors.transparent,
+                                            child:ElevatedButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  _isOther = !_isOther;
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                              primary: _isOther ? _pressed : _unpressed,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                            ),
+                                              child: Text('Other',style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color: 
+                                              _isOther ? Colors.white : Colors.black),),
+                                              ),  
+                                            ),
+                                          SizedBox(width: 5,),
+                                        ],),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 5,),
+                                Container(
+                                  height: 75,
+                                  color: Colors.transparent,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text('Status',style: TextStyle(fontSize: 19,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),),
+                                          Expanded(child: Container(),),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10,),
+                                      Container(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                          SizedBox(width: 5,),
+                                          Container( width: 80, height: 35,color: Colors.transparent,
+                                            child:ElevatedButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  _isAvailable = true;
+                                                  _isOccupied = false;
+                                                  _isClosed = false;
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                              primary: _isAvailable ? _pressed : _unpressed,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                            ),
+                                              child: Text('Available',style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color:
+                                              _isAvailable ? Colors.white : Colors.black),),
+                                              ),  
+                                            ),
+                                            Container( width: 80, height: 35,color: Colors.transparent,
+                                            child:ElevatedButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  _isAvailable = false;
+                                                  _isOccupied = true;
+                                                  _isClosed = false;
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                              primary: _isOccupied ? _pressed : _unpressed,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                            ),
+                                              child: Text('Occupied',style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,
+                                              color: _isOccupied ? Colors.white : Colors.black
+                                              ),),
+                                              ),  
+                                            ),
+                                            Container( width: 80, height: 35,color: Colors.transparent,
+                                            child:ElevatedButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  _isAvailable = false;
+                                                  _isOccupied = false;
+                                                  _isClosed = true;
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                              primary: _isClosed ? _pressed : _unpressed,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                            ),
+                                              child: Text('Closed',style: TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color: 
+                                              _isClosed ? Colors.white : Colors.black),),
+                                              ),  
+                                            ),
+                                          SizedBox(width: 5,),
+                                        ],),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 5,),
+                                Container(
+                                  height: 55,
+                                  color: Colors.transparent,
+                                  child: Column(children: [
+                                    Row(children: [
+                                      SizedBox(width: 20,),
+                                      Container(
+                                        width: 25,
+                                        height: 25,
+                                        color: Colors.transparent,
+                                        child: Center(
+                                          child: Checkbox(
+                                            shape:RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(4),
+                                                side: BorderSide(color: Colors.black54)
+                                              ),
+                                            checkColor: Colors.transparent,
+                                            value: _parking,
+                                            activeColor: Colors.black,
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                _parking = value;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10,),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _parking = !_parking!;
+                                          });
+                                        },
+                                        child: Text('Restaurant nearby',
+                                            style: TextStyle(fontSize: 15,fontWeight: FontWeight.normal,color: Color.fromARGB(255, 0, 0, 0)),),
+                                      ),
+                                    ],),
+                                    SizedBox(height: 5,),
+                                    Row(children: [
+                                      SizedBox(width: 20,),
+                                      Container(
+                                        width: 25,
+                                        height: 25,
+                                        color: Colors.transparent,
+                                        child: Center(
+                                          child: Checkbox(
+                                            shape:RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(4),
+                                                side: BorderSide(color: Colors.black54)
+                                              ),
+                                            checkColor: Colors.transparent,
+                                            value: _restaurant,
+                                            activeColor: Colors.black,
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                _restaurant = value;
+                                              });
+                                              print('new value: $_restaurant');
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10,),
+                                      InkWell(
+                                        onTap: (){
+                                          setState(() {
+                                            _restaurant = !_restaurant!;
+                                          });
+                                        },
+                                        child: Text('Parking available',
+                                            style: TextStyle(fontSize: 15,fontWeight: FontWeight.normal,color: Color.fromARGB(255, 0, 0, 0)),),
+                                      ),
+                                    ],)
+                                  ]),
+                                ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 23),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(ctx).pop();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Color(0xFFFEDE00),
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 100,
+                                        right: 100,
+                                        top: 18,
+                                        bottom: 18
+                                      ),
+                                      child: const Text(
+                                        'Apply',
+                                        style: TextStyle(
+                                          fontSize: 18.0,
+                                          color: Colors.black,
+                                          fontFamily: 'Comfortaa',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        ),
+                                    ),
+                                    ),
+                                ),
+                              ],),
+                            );
+                          },
+                        ),
+                        
+                      ),
+                    ),
+                  ),
+                ),
+
+                Align(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 330,
+                          height: 40,
+                          child: Row(
+                            children: [
+                              Expanded(child: Container(
+                                color: Colors.transparent,
+                              ),),
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: new BorderRadius.circular(20.0),
+                                  onTap: (() {
+                                    Navigator.of(context).pop();
+                                  }),
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    color: Colors.transparent,
+                                    child: Image.asset('assets/images/closeIcon_v2.png')
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 470),
+                        
+                      ],
+                    ),
+                  ),
+                ]);
+            }
+          );
+        });
+  }
+
 }
 
