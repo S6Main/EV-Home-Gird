@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
   //v2
   TextEditingController _searchController = new TextEditingController();
   bool _isOnline = false;
+  bool _isExpanded = false;
 
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
 
@@ -481,6 +482,10 @@ class _HomePageState extends State<HomePage> {
                                 readOnly: true,
                                 style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                                 onTap: () async {
+                                  print('tapped');
+                                  setState(() {
+                                    _isExpanded = true;
+                                  });
                                   // _isOnline = await hasNetwork();
                                   // if(!_isOnline){
                                   //   setState(() {

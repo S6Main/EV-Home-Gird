@@ -10,7 +10,10 @@ import 'package:flutter/material.dart';
 
 //v2
 import '../_v2/_widgets/BottonNavBar.dart';
+import '../_v2/componets/SlideRightRoute.dart';
 import '../_v2/componets/globals.dart' as globals;
+import '../_v2/stage_1/terms_page.dart';
+import '../_v2/stage_0/wallet_page.dart';
 
 GlobalKey _key = GlobalKey();
 
@@ -37,7 +40,7 @@ class _MainPageState extends State<MainPage> {
     _bottomNavBar = BottomNavBar(this.callback);
   }
   void readName(){
-    if(globals.isOnline && globals.isLoggedIn && globals.isFirstTime && globals.currentIndex == 0){
+    if(globals.isOnline && !globals.isLoggedIn && globals.isFirstTime && globals.currentIndex == 0){
       _canShow = true;
       globals.isLoggedIn = true;
     }
@@ -196,9 +199,17 @@ class _MainPageState extends State<MainPage> {
                                             ),
                                       ),
                                     ),
-                                    Text('Terms and Conditions',
-                                        style: TextStyle(decoration: TextDecoration.underline,
-                                          fontSize: 14,fontWeight: FontWeight.normal, color: Color.fromARGB(255, 0, 0, 0)),),
+                                    Material(
+                                      child: InkWell(
+                                        onTap: () {
+                                          print('tapped on terms');
+                                          Navigator.push(context, SlideRightRoute(page: TermsPage()),);
+                                        },
+                                        child: Text('Terms and Conditions',
+                                            style: TextStyle(decoration: TextDecoration.underline,
+                                              fontSize: 14,fontWeight: FontWeight.normal, color: Color.fromARGB(255, 0, 0, 0)),),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -252,51 +263,9 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
 
-            
-
-              // Align(
-              //   child: Column(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       Container(
-              //         width: 330,
-              //         height: 40,
-              //         child: Row(
-              //           children: [
-              //             Expanded(child: Container(
-              //               color: Colors.transparent,
-              //             ),),
-              //             Material(
-              //               color: Colors.transparent,
-              //               child: InkWell(
-              //                 borderRadius: new BorderRadius.circular(20.0),
-              //                 onTap: (() {
-              //                   Navigator.of(context).pop();
-              //                 }),
-              //                 child: Container(
-              //                   width: 40,
-              //                   height: 40,
-              //                   color: Colors.transparent,
-              //                   child: Image.asset('assets/images/closeIcon_v2.png')
-              //                 ),
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //       SizedBox(height: 240),
-                    
-              //     ],
-              //   ),
-              // ),
             ]);
         }
         );
-        // print('key: ${_key.currentContext!.findRenderObject()}');
-        // RenderBox renderBox = _key.currentContext!.findRenderObject()! as RenderBox;
-        // Offset position = renderBox.localToGlobal(Offset.zero);
-        // print('postion is $position');
-
   }
 }
 
