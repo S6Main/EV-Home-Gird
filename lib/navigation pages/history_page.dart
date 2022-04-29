@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({ Key? key }) : super(key: key);
@@ -7,7 +7,7 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child:Center(
-        child: Text('History Page'),)
+        child: Text('History Page',style: TextStyle(fontSize: 20,color: Colors.black54),),)
     );
   }
 }

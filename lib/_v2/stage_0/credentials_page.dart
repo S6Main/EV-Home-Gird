@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
@@ -134,24 +135,57 @@ class _CredentialsPageState extends State<CredentialsPage> {
                             ),
                           ),
                         ElevatedButton(
-                                    onPressed: () async {
-                                      globals.isOnline = await hasNetwork();
-
-                                      if(globals.isOnline){
+                                    onPressed: (){
+                                      checkNetwork();
+                                      Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
                                           setState(() {
                                             _message = validateWalletAddress(_keyController.text);
-                                          });
+                                          }),
                                           if(_message == ''){
-                                            _walletkey = _keyController.text;
+                                            _walletkey = _keyController.text,
                                             //true stage
-                                            CustomLoading();
-                                          }
-                                        }
-                                        else{
-                                          setState(() {
+                                            CustomLoading(),
+                                          },
+                                        print('place one'),
+                                        // Navigator.push(context, SlideRightRoute(page: WalletPage())),
+                                      } : {
+                                        setState(() {
                                             CustomDialog();
-                                          });
-                                        }
+                                          }),
+                                        print('place two'),
+                                      });
+
+                                      // Future.delayed(Duration(milliseconds: 300), () => globals.isOnline ? {
+                                      //   print('globals.isOnline: ' + globals.isOnline.toString()),
+                                      //   setState(() {
+                                      //       _message = validateWalletAddress(_keyController.text);
+                                      //     }),
+                                      //     if(_message == ''){
+                                      //       _walletkey = _keyController.text,
+                                      //       //true stage
+                                      //       CustomLoading(),
+                                      //     }
+                                      // } : {
+                                      //   setState(() {
+                                      //       CustomDialog();
+                                      //     }),
+                                      // });
+
+                                      // if(globals.isOnline){
+                                      //     setState(() {
+                                      //       _message = validateWalletAddress(_keyController.text);
+                                      //     });
+                                      //     if(_message == ''){
+                                      //       _walletkey = _keyController.text;
+                                      //       //true stage
+                                      //       CustomLoading();
+                                      //     }
+                                      //   }
+                                      //   else{
+                                      //     setState(() {
+                                      //       CustomDialog();
+                                      //     });
+                                      //   }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       primary: Color(0xFF0AB0BD),
@@ -189,7 +223,9 @@ class _CredentialsPageState extends State<CredentialsPage> {
 
     ),);
   }
-
+  void checkNetwork() async{
+    globals.isOnline = await hasNetwork();
+  }
   Future<bool> hasNetwork() async {
     try {
       final result = await InternetAddress.lookup('example.com');
@@ -333,6 +369,7 @@ void CustomDialog() {
                 child: Container(
                   color: Color(0xFFC4C4C4).withOpacity(0.5),
                   child: AlertDialog(
+                    titlePadding: EdgeInsets.zero,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(
@@ -342,13 +379,48 @@ void CustomDialog() {
                         ),
                       ),
 
-                    title:  Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Center(
-                        child: Text('Network Error',
-                                style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
-                                )),
-                    ),
+                    title:  
+                    Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Network Error',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(color: Colors.transparent, height: 40,width: 40,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  child:  Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: new BorderRadius.circular(20.0),
+                                    onTap: (() {
+                                      Navigator.of(context).pop();
+                                    }),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.transparent,
+                                      child: Image.asset('assets/images/closeIcon_v2.png')
+                                    ),
+                                  ),
+                                ),)
+                              ],
+                            ),),)
+                        ],
+                      ),
                     content: Builder(
                       builder: (context) {
 
@@ -401,41 +473,7 @@ void CustomDialog() {
               ),
             ),
 
-            Align(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 330,
-                      height: 40,
-                      child: Row(
-                        children: [
-                          Expanded(child: Container(
-                            color: Colors.transparent,
-                          ),),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: new BorderRadius.circular(20.0),
-                              onTap: (() {
-                                Navigator.of(context).pop();
-                              }),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                color: Colors.transparent,
-                                child: Image.asset('assets/images/closeIcon_v2.png')
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 180),
-                    
-                  ],
-                ),
-              ),
+            
             ]);
         });
   }

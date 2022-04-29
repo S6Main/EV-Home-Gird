@@ -233,8 +233,8 @@ class _HomePageState extends State<HomePage> {
                //change destination name
             _destinationName = _locations.locations[i].name;
             //get index of marker
-            int _index = _locations.locations.indexWhere((location) => location.id == resultMarker[i].markerId.value);
-            bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
+            //int _index = _locations.locations.indexWhere((location) => location.id == resultMarker[i].markerId.value);
+            //bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
             _onSlider = true;    
 
             replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
@@ -517,12 +517,16 @@ class _HomePageState extends State<HomePage> {
                             ),),
                           onPressed:() {
                             networkCheck();
-                            if(_isOnline){
+                            Future.delayed(Duration(milliseconds: 200), () {
+                              if(_isOnline){
                               CustomDialogFilterMenu();
                             }
                             else{
                               CustomDialogNetworkIssue();
                             }
+                            });
+                            networkCheck();
+                            
                           },
                           child: ImageIcon(AssetImage("assets/images/Filter_v2.png",),),
                           ),
@@ -649,6 +653,7 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   color: Color(0xFFC4C4C4).withOpacity(0.5),
                   child: AlertDialog(
+                    titlePadding: EdgeInsets.zero,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(
@@ -658,13 +663,55 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                    title:  Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Center(
-                        child: Text('Network Error',
-                                style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
-                                )),
-                    ),
+                    title:  
+                    Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Network Error',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(color: Colors.transparent, height: 40,width: 40,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  child:  Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: new BorderRadius.circular(20.0),
+                                    onTap: (() {
+                                      Navigator.of(context).pop();
+                                    }),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.transparent,
+                                      child: Image.asset('assets/images/closeIcon_v2.png')
+                                    ),
+                                  ),
+                                ),)
+                              ],
+                            ),),)
+                        ],
+                      ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 20),
+                    //   child: Center(
+                    //     child: Text('Network Error',
+                    //             style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                    //             )),
+                    // ),
                     content: Builder(
                       builder: (context) {
 
@@ -717,41 +764,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            Align(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 330,
-                      height: 40,
-                      child: Row(
-                        children: [
-                          Expanded(child: Container(
-                            color: Colors.transparent,
-                          ),),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: new BorderRadius.circular(20.0),
-                              onTap: (() {
-                                Navigator.of(context).pop();
-                              }),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                color: Colors.transparent,
-                                child: Image.asset('assets/images/closeIcon_v2.png')
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 180),
-                    
-                  ],
-                ),
-              ),
+            
             ]);
         });
   }
@@ -790,6 +803,7 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       color: Color(0xFFC4C4C4).withOpacity(0.5),
                       child: AlertDialog(
+                        titlePadding: EdgeInsets.zero,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -799,13 +813,55 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
 
-                        title:  Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Center(
-                            child: Text('Filters',
-                                    style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
-                                    )),
-                        ),
+                        title:  
+                         Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Filters',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(color: Colors.transparent, height: 40,width: 40,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  child:  Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: new BorderRadius.circular(20.0),
+                                    onTap: (() {
+                                      Navigator.of(context).pop();
+                                    }),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.transparent,
+                                      child: Image.asset('assets/images/closeIcon_v2.png')
+                                    ),
+                                  ),
+                                ),)
+                              ],
+                            ),),)
+                        ],
+                      ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 20),
+                        //   child: Center(
+                        //     child: Text('Filters',
+                        //             style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                        //             )),
+                        // ),
                         content: Builder(
                           builder: (context) {
 
@@ -1141,41 +1197,41 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                Align(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 330,
-                          height: 40,
-                          child: Row(
-                            children: [
-                              Expanded(child: Container(
-                                color: Colors.transparent,
-                              ),),
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: new BorderRadius.circular(20.0),
-                                  onTap: (() {
-                                    Navigator.of(context).pop();
-                                  }),
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    color: Colors.transparent,
-                                    child: Image.asset('assets/images/closeIcon_v2.png')
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 470),
+                // Align(
+                //     child: Column(
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       children: [
+                //         Container(
+                //           width: 330,
+                //           height: 40,
+                //           child: Row(
+                //             children: [
+                //               Expanded(child: Container(
+                //                 color: Colors.transparent,
+                //               ),),
+                //               Material(
+                //                 color: Colors.transparent,
+                //                 child: InkWell(
+                //                   borderRadius: new BorderRadius.circular(20.0),
+                //                   onTap: (() {
+                //                     Navigator.of(context).pop();
+                //                   }),
+                //                   child: Container(
+                //                     width: 40,
+                //                     height: 40,
+                //                     color: Colors.transparent,
+                //                     child: Image.asset('assets/images/closeIcon_v2.png')
+                //                   ),
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //         SizedBox(height: 470),
                         
-                      ],
-                    ),
-                  ),
+                //       ],
+                //     ),
+                //   ),
                 ]);
             }
           );

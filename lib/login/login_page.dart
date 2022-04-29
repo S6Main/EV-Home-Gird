@@ -69,10 +69,10 @@ class _LoginPageState extends State<LoginPage> {
               minimumSize: Size(100, 40), //////// HERE
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => MainPage()),
+              // );
             },
             child: Text(
               'GUEST',

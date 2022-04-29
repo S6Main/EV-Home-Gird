@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ev_homegrid/_v2/stage_0/credentials_page.dart';
@@ -18,6 +20,7 @@ import '../componets/globals.dart' as globals;
  Color _one = Color(0xFF000000);
  Color _two = Color(0xFFC4C4C4);
  Color _three = Color(0xFFC4C4C4);
+
 
 class WelcomePage extends StatefulWidget {
 
@@ -196,9 +199,10 @@ class _WelcomePageState extends State<WelcomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        
-                        Navigator.push(context, SlideRightRoute(page: WalletPage()));
-                        
+                        checkNetwork();
+                        Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
+                          Navigator.push(context, SlideRightRoute(page: WalletPage())),
+                        } : CustomDialogNetworkIssue());
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFF0AB0BD),
@@ -230,7 +234,11 @@ class _WelcomePageState extends State<WelcomePage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(context, SlideLeftRoute(page: MainPage()));
+                        checkNetwork();
+                        Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
+                          Navigator.push(context, SlideLeftRoute(page: MainPage())),
+                        } : CustomDialogNetworkIssue());
+                        
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.white,
@@ -271,6 +279,137 @@ class _WelcomePageState extends State<WelcomePage> {
           ],
         ),
     );
+  }
+  void CustomDialogNetworkIssue() {
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return Stack(
+            children :<Widget>[
+
+              Container(
+              child: BackdropFilter(
+                blendMode: BlendMode.srcOver,
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  color: Color(0xFFC4C4C4).withOpacity(0.5),
+                  child: AlertDialog(
+                    titlePadding: EdgeInsets.zero,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                            32.0,
+                          ),
+                        ),
+                      ),
+
+                    title:  
+                    Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Network Error',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(color: Colors.transparent, height: 40,width: 40,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  child:  Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: new BorderRadius.circular(20.0),
+                                    onTap: (() {
+                                      Navigator.of(context).pop();
+                                    }),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.transparent,
+                                      child: Image.asset('assets/images/closeIcon_v2.png')
+                                    ),
+                                  ),
+                                ),)
+                              ],
+                            ),),)
+                        ],
+                      ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 20),
+                    //   child: Center(
+                    //     child: Text('Network Error',
+                    //             style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                    //             )),
+                    // ),
+                    content: Builder(
+                      builder: (context) {
+
+                        return Container(
+                          height: 100,
+                          width: 280,
+                          child: Column(children: [
+                            Text('Please Connect to the internet.',
+                                style: TextStyle(fontSize: 15,fontWeight: FontWeight.normal,color: Color.fromARGB(255, 0, 0, 0)),),
+
+                            Padding(
+                              padding: const EdgeInsets.only(top: 23),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(0xFFFEDE00),
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 100,
+                                    right: 100,
+                                    top: 18,
+                                    bottom: 18
+                                  ),
+                                  child: const Text(
+                                    'Okay',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.black,
+                                      fontFamily: 'Comfortaa',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    ),
+                                ),
+                                ),
+                            ),
+                          ],),
+                        );
+                      },
+                    ),
+                    
+                  ),
+                ),
+              ),
+            ),
+
+            
+            ]);
+        });
   }
 }
 

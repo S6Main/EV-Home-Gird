@@ -55,8 +55,8 @@ class _FrontScreenState extends State<FrontScreen> {
             Center(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MainPage()));
+                  // Navigator.push(context,
+                  //     MaterialPageRoute(builder: (context) => MainPage()));
                 },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 70.0),

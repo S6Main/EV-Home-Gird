@@ -7,13 +7,21 @@ import 'package:ev_homegrid/navigation%20pages/profile/profile_page.dart';
 import '../../navigation pages/main_page.dart';
 import '../componets/globals.dart' as globals;
 import 'package:ev_homegrid/navigation pages/main_page.dart';
+
 class BottomNavBar extends StatefulWidget {
-  @override
+  //from
+    Function callback;
+    BottomNavBar(this.callback);
+  //-
+
+  //const BottomNavBar({Key? key,}) : super(key: key);
+
   _BottomNavBarState createState() => _BottomNavBarState();
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
   List pages = [HomePage(),HistoryPage(), ProfilePage()];
+
   @override
   void initState() {
     super.initState();
@@ -22,7 +30,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     setState(() {
       globals.currentIndex = index;
     });
-    print('currentIndex: ${globals.currentIndex}');
+    this.widget.callback(index); //
   }
 
   
@@ -42,7 +50,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
               blurRadius: 12,
             ),
           ],),
-        height: 80,
+        height: 85,
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(25)),
           child: BottomNavigationBar(
