@@ -39,11 +39,13 @@ class _MainPageState extends State<MainPage> {
   void readName(){
     if(globals.isOnline && globals.isLoggedIn && globals.isFirstTime && globals.currentIndex == 0){
       _canShow = true;
+      globals.isLoggedIn = true;
     }
   }
   void callback(int index) {
     setState(() {
       _currentIndex = index;
+      readName();
     });
   }
   void infoPrint(){
@@ -113,31 +115,31 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ],
                           ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(color: Colors.transparent, height: 40,width: 40,
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  right: 0,
-                                  child:  Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: new BorderRadius.circular(20.0),
-                                    onTap: (() {
-                                      Navigator.of(context).pop();
-                                    }),
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      color: Colors.transparent,
-                                      child: Image.asset('assets/images/closeIcon_v2.png')
-                                    ),
-                                  ),
-                                ),)
-                              ],
-                            ),),)
+                          // Positioned(
+                          //   top: 0,
+                          //   right: 0,
+                          //   child: Container(color: Colors.transparent, height: 40,width: 40,
+                          //   child: Stack(
+                          //     children: [
+                          //       Positioned(
+                          //         right: 0,
+                          //         child:  Material(
+                          //         color: Colors.transparent,
+                          //         child: InkWell(
+                          //           borderRadius: new BorderRadius.circular(20.0),
+                          //           onTap: (() {
+                          //             Navigator.of(context).pop();
+                          //           }),
+                          //           child: Container(
+                          //             width: 40,
+                          //             height: 40,
+                          //             color: Colors.transparent,
+                          //             child: Image.asset('assets/images/closeIcon_v2.png')
+                          //           ),
+                          //         ),
+                          //       ),)
+                          //     ],
+                          //   ),),)
                         ],
                       ),
                       content: Builder(
@@ -196,7 +198,7 @@ class _MainPageState extends State<MainPage> {
                                     ),
                                     Text('Terms and Conditions',
                                         style: TextStyle(decoration: TextDecoration.underline,
-                                          fontSize: 13,fontWeight: FontWeight.normal, color: Color.fromARGB(255, 0, 0, 0)),),
+                                          fontSize: 14,fontWeight: FontWeight.normal, color: Color.fromARGB(255, 0, 0, 0)),),
                                   ],
                                 ),
                               ),
