@@ -7,3 +7,6 @@ bool isFirstTime = true;
 bool isNameAsked = false;
 bool termsAccepted = false;
 String name = '';
+
+//manual editings
+bool canExit = false;
