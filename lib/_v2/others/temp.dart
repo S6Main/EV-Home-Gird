@@ -1,131 +1,170 @@
-// import 'dart:ui';
+// import 'dart:math' as math;
 
+// import 'package:expansion_widget/expansion_widget.dart';
 // import 'package:flutter/material.dart';
-// import 'package:ev_homegrid/_v2/componets/globals.dart' as globals;
 
-// import '../_v2/componets/SlideLeftRoute.dart';
-// import '../_v2/stage_0/wallet_page.dart';
-
-// class HistoryPage extends StatefulWidget {
-
-//   const HistoryPage({Key? key}) : super(key: key);
-
-//   @override
-//   State<HistoryPage> createState() => _HistoryPageState();
+// void main() {
+//   runApp(MyApp());
 // }
 
-// class _HistoryPageState extends State<HistoryPage> {
-//   int _index = 0;
-//   Color _selected = Colors.black;
-//   Color _selectedBlue = Color(0xFF0AB0BD);
-//   Color _unSelected = Colors.black.withOpacity(0.3);
+// class MyApp extends StatelessWidget {
+//   // This widget is the root of your application.
 //   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Flutter Demo',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       home: HomePage(),
+//     );
 //   }
+// }
+
+// class HomePage extends StatefulWidget {
+//   @override
+//   _HomePageState createState() => _HomePageState();
+// }
+
+// class _HomePageState extends State<HomePage> {
+//   bool? _expanded2;
+//   final _key3 = GlobalKey<ExpansionWidgetState>();
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       body: Container(
-//         alignment: Alignment.center,
-//         child: Container(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.end,
-//             children: [
-//               SizedBox(
-//                 height: 10,
-//               ),
-//               Container(
-//                 child: Container(
+//       appBar: AppBar(title: Text('Flutter Expansion Widget Demo')),
+//       body: Column(
+//         children: [
+//           Card(
+//             color: Colors.white,
+//             child: ExpansionWidget(
+//                 initiallyExpanded: true,
+//                 titleBuilder:
+//                     (double animationValue, _, bool isExpaned, toogleFunction) {
+//                   return InkWell(
+//                       onTap: () => toogleFunction(animated: true),
+//                       child: Padding(
+//                         padding: EdgeInsets.all(8),
+//                         child: Row(
+//                           crossAxisAlignment: CrossAxisAlignment.center,
+//                           children: [
+//                             Expanded(
+//                                 child: Text('1. Expansion Widget Title 1')),
+//                             Transform.rotate(
+//                               angle: math.pi * animationValue / 2,
+//                               child: Icon(Icons.arrow_right, size: 40),
+//                               alignment: Alignment.center,
+//                             )
+//                           ],
+//                         ),
+//                       ));
+//                 },
+//                 content: Container(
 //                   width: double.infinity,
-//                   height: 600,
-//                   color: Colors.blueAccent,
-//                 ),
-//               ),
-              
-//               Container(
-//                 padding: EdgeInsets.only(left: 50, right: 50),
-//                 color: Colors.transparent,
-//                 width: double.infinity,
-//                 height :40,
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: [
-//                     Container(
-//                       padding: EdgeInsets.only(top: 7),
-//                       alignment: Alignment.bottomCenter,
-//                       width: 100,
-//                       height: 40,
-//                       child: Column(
-//                         children: [
-//                           Text('History', style: TextStyle(color: (_index == 0) ? _selected: _unSelected, 
-//                           fontSize: 16,fontWeight: FontWeight.w600,),textAlign: TextAlign.center,),
-//                           Padding(
-//                             padding: const EdgeInsets.only(left:35,right: 35),
-//                             child: Divider(
-//                               thickness: 2.5,
-//                             color: (_index == 0) ? _selectedBlue: _unSelected, 
-//                         ),
-//                           )
-
-//                         ],
-//                       ),
-//                     ),
-
-//                     Container(
-//                       padding: EdgeInsets.only(top: 7),
-//                       alignment: Alignment.center,
-//                       color: Colors.transparent,
-//                       width: 100,
-//                       height: 40,
-//                       child: Column(
-//                         children: [
-//                           Text('Notifications', style: TextStyle(color: (_index == 1) ? _selected: _unSelected, 
-//                           fontSize: 16,fontWeight: FontWeight.w600,),textAlign: TextAlign.center,),
-//                           Padding(
-//                             padding: const EdgeInsets.only(left:35,right: 35),
-//                             child: Divider(
-//                               thickness: 2.5,
-//                             color: (_index == 1) ? _selectedBlue: _unSelected, 
-//                         ),
-//                           )
-
-//                         ],
-//                       ),
-//                     ),
-
-//                     Container(
-//                       padding: EdgeInsets.only(top: 7),
-//                       alignment: Alignment.center,
-//                       color: Colors.transparent,
-//                       width: 100,
-//                       height: 40,
-//                       child: Column(
-//                         children: [
-//                           Text('Favorite', style: TextStyle(color: (_index == 2) ? _selected: _unSelected, 
-//                           fontSize: 16,fontWeight: FontWeight.w600,),textAlign: TextAlign.center,),
-//                           Padding(
-//                             padding: const EdgeInsets.only(left:35,right: 35),
-//                             child: Divider(
-//                               thickness: 2.5,
-//                             color: (_index ==2) ? _selectedBlue: _unSelected, 
-//                         ),
-//                           )
-
-//                         ],
-//                       ),
-//                     ),
-                    
-                    
-//                   ],
-//                 ),
-//               )
-//             ],
+//                   padding: EdgeInsets.all(20),
+//                   child: Text('Expaned Content'),
+//                 )),
 //           ),
-//         )
+//           Card(
+//             clipBehavior: Clip.hardEdge,
+//             child: ExpansionWidget(
+//                 onSaveState: (value) => _expanded2 = value,
+//                 onRestoreState: () => _expanded2,
+//                 duration: const Duration(seconds: 1),
+//                 titleBuilder:
+//                     (_, double easeInValue, bool isExpaned, toogleFunction) {
+//                   return Material(
+//                     color: Color.lerp(
+//                         Colors.red.shade100, Colors.orange, easeInValue),
+//                     child: InkWell(
+//                         onTap: () => toogleFunction(animated: true),
+//                         child: Padding(
+//                           padding: EdgeInsets.all(8),
+//                           child: Row(
+//                             crossAxisAlignment: CrossAxisAlignment.center,
+//                             children: [
+//                               Expanded(
+//                                   child: Text('2. Title 2',
+//                                       style: TextStyle(
+//                                           color: Color.lerp(Colors.black,
+//                                               Colors.white, easeInValue)))),
+//                               Transform.rotate(
+//                                   angle: -math.pi * 2 * (easeInValue),
+//                                   child: Icon(Icons.settings,
+//                                       size: 40, color: Colors.white)),
+//                               Container(
+//                                 color: Colors.transparent,
+//                                 height: 1,
+//                                 width: easeInValue * math.pi * 40,
+//                               ),
+//                               Transform.rotate(
+//                                 angle: math.pi * (easeInValue + 0.5),
+//                                 child: Icon(Icons.arrow_back,
+//                                     size: 40,
+//                                     color: Color.lerp(Colors.white,
+//                                         Colors.black, easeInValue)),
+//                                 alignment: Alignment.center,
+//                               )
+//                             ],
+//                           ),
+//                         )),
+//                   );
+//                 },
+//                 content: Container(
+//                   width: double.infinity,
+//                   color: Colors.orange,
+//                   padding: EdgeInsets.all(20),
+//                   child: Text('Expaned Content'),
+//                 )),
+//           ),
+//           Card(
+//             color: Colors.white,
+//             child: ExpansionWidget(
+//                 key: _key3,
+//                 initiallyExpanded: true,
+//                 titleBuilder:
+//                     (double animationValue, _, bool isExpaned, toogleFunction) {
+//                   return InkWell(
+//                       onTap: () => toogleFunction(animated: true),
+//                       child: Padding(
+//                         padding: EdgeInsets.all(8),
+//                         child: Row(
+//                           crossAxisAlignment: CrossAxisAlignment.center,
+//                           children: [
+//                             Expanded(
+//                                 child: Text('3. Expansion Widget Title 3')),
+//                             Transform.rotate(
+//                               angle: math.pi * animationValue / 2,
+//                               child: Icon(Icons.arrow_right, size: 40),
+//                               alignment: Alignment.center,
+//                             )
+//                           ],
+//                         ),
+//                       ));
+//                 },
+//                 content: Container(
+//                   width: double.infinity,
+//                   padding: EdgeInsets.all(20),
+//                   child: Text('Expaned Content'),
+//                 )),
+//           ),
+//           ElevatedButton(
+//               onPressed: () {
+//                 setState(() {
+//                   _expanded2 = !(_expanded2 ?? false);
+//                 });
+//               },
+//               child: Text('Toogle 2')),
+//           ElevatedButton(
+//               onPressed: () {
+//                 setState(() {
+//                   _key3.currentState?.toggle(animated: true);
+//                 });
+//               },
+//               child: Text('Toogle 3')),
+//         ],
 //       ),
-//       );
+//     );
 //   }
-//   }
+// }
