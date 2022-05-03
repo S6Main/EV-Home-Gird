@@ -58,7 +58,6 @@ dependencies:
   syncfusion_flutter_sliders: ^20.1.50
   styled_text: ^5.1.0
   expansion_widget: ^0.0.3
-  favorite_button: ^0.0.4
   #animations: ^2.0.2
 
 dev_dependencies:

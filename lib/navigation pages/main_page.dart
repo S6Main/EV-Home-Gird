@@ -64,7 +64,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     Future.delayed(Duration(milliseconds: 1000), () => _canShow ? CustomDialogAskName() : null);
-    //Future.delayed(Duration(milliseconds: 200), () => CustomDialogExit());
+    Future.delayed(Duration(milliseconds: 200), () => CustomDialogDetails());
     Future<bool> _onWillPop() async {
     return (await showDialog(
         barrierDismissible: false,
@@ -450,7 +450,244 @@ class _MainPageState extends State<MainPage> {
         );
   }
 
+  void CustomDialogDetails() {
+    TextEditingController _nameController = new TextEditingController();
+    String _text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Volutpat eu, consectetur sed in tincidunt turpis volutpat, nunc. Purus suspendisse purus nibh nam nisl egestas sed. Facilisis enim urna morbi.';
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return Stack(
+            children :<Widget>[
 
+            Container(
+              child: BackdropFilter(
+                blendMode: BlendMode.srcOver,
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Color(0xFFC4C4C4).withOpacity(0.5),
+                  child: StatefulBuilder(builder: (context, _setState) => AlertDialog(
+                      titlePadding: EdgeInsets.zero,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                              32.0,
+                            ),
+                          ),
+                        ),
+
+                      title:  Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Ather Dot 1007',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(color: Colors.transparent, height: 40,width: 40,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  child:  Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: new BorderRadius.circular(20.0),
+                                    onTap: (() {
+                                      Navigator.of(context).pop();
+                                    }),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.transparent,
+                                      child: Image.asset('assets/images/closeIcon_v2.png')
+                                    ),
+                                  ),
+                                ),)
+                              ],
+                            ),),)
+                        ],
+                      ),
+                      content: Builder(
+                        builder: (context) {
+
+                          return Container(
+                            height: 278,
+                            width: 280,
+                            child: Column(children: [
+                               SizedBox(height: 5,),
+                              Container(
+                                height: 35,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Container(
+                                  height: 35,
+                                  width: double.infinity,
+                                  color: Colors.transparent,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 50,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Colors.transparent,
+                                          border: Border.all(color: Color(0xFF2A2A2A).withOpacity(0.25), width: 1.2),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(width: 2,),
+                                            Icon(Icons.star, color: Color(0xFFFFE033), size: 20,),
+                                            Text('4.3', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,color: Colors.black.withOpacity(0.5)),),
+                                            SizedBox(width: 2,),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 15,),
+                                      Container(
+                                        width: 50,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Colors.transparent,
+                                          border: Border.all(color: Color(0xFF2A2A2A).withOpacity(0.25), width: 1.2),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text('\$0.99', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,color: Colors.black.withOpacity(0.5)),),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 15,),
+                              Container(
+                                height: 20,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Text('0xB...b8', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500,color: Colors.black.withOpacity(0.3)),),
+                              ),
+                              SizedBox(height: 5,),
+                              Container(
+                                height: 88,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Text(_text, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.8)),),
+                              ),
+                              SizedBox(height: 8,),
+                              Container(
+                                height: 20,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(width: 5,),
+                                    Container(
+                                      width: 60,
+                                      height: double.infinity,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: Text('parking', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),)),
+                                    SizedBox(width: 5,
+                                    child: VerticalDivider(
+                                      color: Colors.black.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),),
+                                      Container(
+                                      width: 60,
+                                      height: double.infinity,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: Text('restaurant', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),)),
+                                    SizedBox(width: 5,
+                                    child: VerticalDivider(
+                                      color: Colors.black.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),),
+                                      Container(
+                                      width: 60,
+                                      height: double.infinity,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: Text('24/7', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),)),
+                                       SizedBox(width: 5,),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 8,),
+                             
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                child: ElevatedButton(
+                                  onPressed:() {
+                                      setState(() {
+                                        
+                                      });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFFFEDE00),
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 60,
+                                      right: 60,
+                                      top: 18,
+                                      bottom: 18
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'Start',
+                                        style: TextStyle(
+                                          fontSize: 18.0,
+                                          color: Colors.black,
+                                          fontFamily: 'Comfortaa',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        ),
+                                    ),
+                                  ),
+                                  ),
+                              ),
+                            ],),
+                          );
+                        },
+                      ),
+                      
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            ]);
+        }
+        );
+  }
 
 }
 
