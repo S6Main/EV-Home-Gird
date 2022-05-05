@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ev_homegrid/_v2/stage_1/search_page.dart';
 import 'package:ev_homegrid/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,8 +17,10 @@ import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'Map/locations.dart' as _locations;
 //import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+//v2
 import '../widgets/BottomInfoPanel.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
+import '../_v2/componets/FadeRoute.dart';
 //import '../widgets/MapPointerBadge.dart';
 
 const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
@@ -77,7 +80,6 @@ class _HomePageState extends State<HomePage> {
   //v2
   TextEditingController _searchController = new TextEditingController();
   bool _isOnline = false;
-  bool _isExpanded = false;
 
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
 
@@ -482,9 +484,9 @@ class _HomePageState extends State<HomePage> {
                                 readOnly: true,
                                 style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                                 onTap: () async {
-                                  print('tapped');
+                                  print('here tapped');
+                                  Navigator.of(context).push(CustomPageRoute(SearchPage()));
                                   setState(() {
-                                    _isExpanded = true;
                                   });
                                   // _isOnline = await hasNetwork();
                                   // if(!_isOnline){

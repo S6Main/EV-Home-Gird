@@ -64,7 +64,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     Future.delayed(Duration(milliseconds: 1000), () => _canShow ? CustomDialogAskName() : null);
-    Future.delayed(Duration(milliseconds: 200), () => CustomDialogDetails());
+    //Future.delayed(Duration(milliseconds: 200), () => CustomDialogDetails());
     Future<bool> _onWillPop() async {
     return (await showDialog(
         barrierDismissible: false,
