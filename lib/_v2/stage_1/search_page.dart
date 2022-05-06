@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:google_place/google_place.dart';
+
+import '../componets/globals.dart' as globals;
+
 
 
 class SearchPage extends StatefulWidget {
@@ -13,8 +17,8 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   
-  TextEditingController _searchControllerS = new TextEditingController();
-  TextEditingController _searchControllerD = new TextEditingController();
+  TextEditingController _searchControllerDest = new TextEditingController();
+  TextEditingController _searchControllerSour = new TextEditingController();
 
   bool _searchIconVisibleS = true;
   bool _searchIconVisibleD = true;
@@ -24,7 +28,41 @@ class _SearchPageState extends State<SearchPage> {
   bool _clearIconVisibleS = false;
   bool _clearIconVisibleD = false;
 
-  bool _startSelected = false;
+  bool _destSelected = false;
+
+  //google places
+  late GooglePlace googlePlace;
+  List<AutocompletePrediction> predictions = [];
+  
+
+  @override
+  void initState() {
+    String apiKey = 'AIzaSyCV_x2q82h5TjN5py9HS7Fx7bxV1Wgr_K8';
+    googlePlace = GooglePlace(apiKey);
+    super.initState();
+  }
+
+  void _update(String place) async {
+    setState(() {
+      if(_destSelected){
+        if(place.length > 42){
+          _searchControllerSour.text = place.substring(0, 42) + '...';
+        }else{
+          _searchControllerSour.text = place;
+        }
+      }
+      else{
+        if(place.length > 42){
+          _searchControllerDest.text = place.substring(0, 42) + '...';
+        }else{
+          _searchControllerDest.text = place;
+        }
+      }
+      
+      _destSelected = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,31 +94,23 @@ class _SearchPageState extends State<SearchPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 15),
                     child: TextField(
-                      maxLength: 42,
-                      controller: _searchControllerS,
-                      readOnly: false,
+                      controller: _searchControllerDest ,
+                      readOnly: _destSelected,
                       style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                       onChanged: (val){
-                        if(val != ''){
-                          setState(() {
-                            _clearIconVisibleS = true;
-                             _recentVisible = false;
-                            if(_searchIconVisibleS){
-                              _searchIconVisibleS = false;
-                            }
-                          });
+
+                        if(val.length >0){
+                          autoCompleteSearch(val);
                         }
                         else{
-                          setState(() {
-                            _clearIconVisibleS = false;
-                            _recentVisible = true;
-                          });
+                          if (predictions.length > 0 && mounted) {
+                              setState(() {
+                                predictions = [];
+                              _clearIconVisibleS = false;
+                              _recentVisible = true;
+                            });
+                          }
                         }
-                      },
-                      onTap: ()  {
-                        setState(() {
-                          // _recentVisible = false;
-                        });
                       },
                       decoration: InputDecoration(
                         hintStyle: TextStyle(fontSize: 17,color: Color(0xFFBFBFBF)),
@@ -90,7 +120,7 @@ class _SearchPageState extends State<SearchPage> {
                         counterText: '',
                           icon: Visibility(
                             visible: _searchIconVisibleS,
-                            child: Icon( _startSelected ? LineAwesomeIcons.angle_left :LineAwesomeIcons.search
+                            child: Icon( _destSelected ? LineAwesomeIcons.angle_left :LineAwesomeIcons.search
                             ,color: Colors.black.withOpacity(0.4),)),
                       ),
                     ),
@@ -137,7 +167,8 @@ class _SearchPageState extends State<SearchPage> {
                         child: InkWell(
                           onTap: (() {
                             setState(() {
-                              _searchControllerS.clear();
+                              _destSelected = false;
+                              _searchControllerDest.clear();
                               _clearIconVisibleS = false;
                               _searchIconVisibleS = true;
                               _recentVisible = true;
@@ -164,7 +195,7 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
             Visibility(
-              visible: _startSelected,
+              visible: _destSelected,
               child: Container(
                 height: 150,
                 width: double.infinity,
@@ -187,10 +218,25 @@ class _SearchPageState extends State<SearchPage> {
                           padding: const EdgeInsets.only(left: 15),
                           child: TextField(
                             maxLength: 42,
-                            controller: _searchControllerD,
+                            controller: _searchControllerSour,
                             readOnly: false,
                             style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                             onChanged: (val){
+                              
+                              if(val.length >0){
+                                autoCompleteSearch(val);
+                              }
+                              else{
+                                if (predictions.length > 0 && mounted) {
+                                    setState(() {
+                                      predictions = [];
+                                    _clearIconVisibleD = false;
+                                    _recentVisible = true;
+                                  });
+                                }
+                              }
+
+
                               if(val != ''){
                                 setState(() {
                                   _clearIconVisibleD = true;
@@ -266,7 +312,7 @@ class _SearchPageState extends State<SearchPage> {
                               child: InkWell(
                                 onTap: (() {
                                   setState(() {
-                                    _searchControllerD.clear();
+                                    _searchControllerSour.clear();
                                     _clearIconVisibleD = false;
                                     _searchIconVisibleD = true;
                                     _recentVisible = true;
@@ -349,7 +395,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             Visibility(
-              visible: _recentVisible,
+              visible: _recentVisible && (globals.queueID.length > 0),
               child: Container(
                 width: double.infinity,
                 height: 20,
@@ -366,18 +412,31 @@ class _SearchPageState extends State<SearchPage> {
                 width: double.infinity,
                 height: 500,
                 color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    RecentWidget(),
-                    RecentWidget(),
-                    RecentWidget(),
-                    RecentWidget(),
-                    RecentWidget(),
-                    RecentWidget(),
-                    
-                  ],
+                child: Expanded(
+                  flex: 1,
+                  child: ListView.builder(
+                    itemCount: globals.queueID.length,
+                    itemBuilder: (context,index){
+                      return RecentWidget(
+                        update: _update,
+                        placeID: globals.queueID.toList()[index],
+                        placeName: globals.queuePlace.toList()[index].toString()
+                        );
+                    },
+                  ),
                 ),
+                // child: Column(
+                //   mainAxisAlignment: MainAxisAlignment.start,
+                //   children: [
+                //     RecentWidget(),
+                //     RecentWidget(),
+                //     RecentWidget(),
+                //     RecentWidget(),
+                //     RecentWidget(),
+                //     RecentWidget(),
+                    
+                //   ],
+                // ),
               ),
             ),
             Visibility(
@@ -387,16 +446,31 @@ class _SearchPageState extends State<SearchPage> {
                 width: double.infinity,
                 height: 500,
                 color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SearchResultWidget(),
-                    SearchResultWidget(),
-                    SearchResultWidget(),
-                    SearchResultWidget(),
-                    SearchResultWidget(hasSeperator: false,),
-                  ],
-                ),
+                child: 
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: predictions.length,
+                    itemBuilder: (context,index){
+                      return SearchResultWidget(
+                        update: _update,
+                        placeID: predictions[index].placeId.toString(),
+                        title: predictions[index].description.toString(),
+                        hasSeperator: (index == predictions.length - 1) ? false : true,
+                      );
+                    },
+                  ),
+                )
+                
+                // Column(
+                //   mainAxisAlignment: MainAxisAlignment.start,
+                //   children: [
+                //     SearchResultWidget(),
+                //     SearchResultWidget(),
+                //     SearchResultWidget(),
+                //     SearchResultWidget(),
+                //     SearchResultWidget(hasSeperator: false,),
+                //   ],
+                // ),
               ),
             ),
           ],
@@ -404,20 +478,67 @@ class _SearchPageState extends State<SearchPage> {
       ),);
   }
 
+  void autoCompleteSearch(String value) async {
+    var result = await googlePlace.autocomplete.get(value);
+    if (result != null && result.predictions != null && mounted) {
+      setState(() {
+        predictions = result.predictions!;
+        
+        //change visibility of icons
+        if(!_destSelected){
+          _clearIconVisibleS = true;
+          if(_searchIconVisibleS){
+            _searchIconVisibleS = false;
+          }
+        }
+        else{
+          _clearIconVisibleD = true;
+          if(_searchIconVisibleD){
+            _searchIconVisibleD = false;
+          }
+        }
+        _recentVisible = false;
+      });
+    }
+  }
+
 }
 
-class RecentWidget extends StatelessWidget {
+class RecentWidget extends StatefulWidget {
+  
+  final String placeID;
+  final String placeName;
+
+  final ValueChanged<String> update;
   const RecentWidget({
-    Key? key,
+    Key? key, required this.placeID, required this.placeName, required this.update,
   }) : super(key: key);
 
+  @override
+  State<RecentWidget> createState() => _RecentWidgetState();
+}
+
+class _RecentWidgetState extends State<RecentWidget> {
+
+  late String placeAddress;
+  late String placeName;
+
+  @override
+  void initState() {
+    super.initState();
+
+    int idx = widget.placeName.indexOf(',');
+    placeAddress = widget.placeName.substring(idx+1).toString();
+
+    placeName =  widget.placeName.split(',')[0];
+  }
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
       child: InkWell(
         onTap: () {
-
+          widget.update(widget.placeName);
         },
         child: Column(
           children: [
@@ -453,7 +574,7 @@ class RecentWidget extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.only(top: 15),
                           alignment: Alignment.topLeft,
-                          child: Text('Kerala Startup Mission',
+                          child: Text(placeName,
                             style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
                             fontWeight: FontWeight.w500),
                           ),
@@ -461,7 +582,7 @@ class RecentWidget extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.only(top: 4),
                           alignment: Alignment.topLeft,
-                          child: Text('Kinfra Hi-Tech Park, P.O, Kalamassery, Kochi, Kerala 683503',
+                          child: Text(placeAddress,
                             style: TextStyle(fontSize: 11.5,color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
                             fontWeight: FontWeight.w500),
                           ),
@@ -481,8 +602,13 @@ class RecentWidget extends StatelessWidget {
 
 class SearchResultWidget extends StatefulWidget {
   final bool hasSeperator;
+  final String title;
+  final String placeID;
+
+  final ValueChanged<String> update;
+
   const SearchResultWidget({
-    Key? key, this.hasSeperator = true,
+    Key? key, required this.hasSeperator,  required this.title, required this.placeID, required this.update,
   }) : super(key: key);
   @override
   State<SearchResultWidget> createState() => _SearchResultWidgetState();
@@ -494,9 +620,17 @@ class _SearchResultWidgetState extends State<SearchResultWidget> {
     return Material(
       color: Colors.white,
       child: InkWell(
-        onTap: () {
-
+        onTap: (){
+          widget.update(widget.title);
+          // globals.queue.add(widget.placeID);
+          globals.queuePlace.addFirst(widget.title);
+          globals.queueID.addFirst(widget.placeID);
+          if(globals.queueID.length > 7){
+            globals.queuePlace.removeLast();
+            globals.queueID.removeLast();
+          }
         },
+
         child: Column(
           children: [
             
@@ -525,11 +659,13 @@ class _SearchResultWidgetState extends State<SearchResultWidget> {
                   SizedBox(width: 10,),
 
                   
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Cochin University of Science and Tech...',
-                      style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
-                      fontWeight: FontWeight.w500),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(widget.title,
+                        style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
+                        fontWeight: FontWeight.w500),
+                      ),
                     ),
                   ),
                 ],
