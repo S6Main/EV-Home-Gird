@@ -465,7 +465,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   
                   Container(
-                            margin:EdgeInsets.only(left: 30, right: 40),
+                            margin:EdgeInsets.only(left: 40, right: 40),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius:  BorderRadius.circular(16),
@@ -483,17 +483,8 @@ class _HomePageState extends State<HomePage> {
                                 controller: _searchController,
                                 readOnly: true,
                                 style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
-                                onTap: () async {
-                                  print('here tapped');
+                                onTap: () {
                                   Navigator.of(context).push(CustomPageRoute(SearchPage()));
-                                  setState(() {
-                                  });
-                                  // _isOnline = await hasNetwork();
-                                  // if(!_isOnline){
-                                  //   setState(() {
-                                  //     CustomDialogNetworkIssue();
-                                  //   });
-                                  // }
                                 },
                                 decoration: InputDecoration(
                                   hintStyle: TextStyle(fontSize: 17,color: Color(0xFFBFBFBF)),
@@ -501,7 +492,13 @@ class _HomePageState extends State<HomePage> {
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.only(top: 20,bottom: 20),
                                   counterText: '',
-                                  icon: Icon(LineAwesomeIcons.search,color: Colors.black.withOpacity(0.4),),
+                                  icon:  IconButton(icon: Icon(LineAwesomeIcons.search,
+                                    color: Colors.black.withOpacity(0.4),),
+                                    padding: EdgeInsets.zero,
+                                    constraints: BoxConstraints(), 
+                                    onPressed: (){
+                                      Navigator.of(context).push(CustomPageRoute(SearchPage()));
+                                    },)
                                 ),
                               ),
                             ),
