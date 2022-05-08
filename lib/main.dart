@@ -22,6 +22,8 @@ void main() {
     DeviceOrientation.portraitUp,
   ]);
   runApp(MyApp());
+  FocusManager.instance.primaryFocus?.unfocus();
+
 }
 
 class MyApp extends StatelessWidget {

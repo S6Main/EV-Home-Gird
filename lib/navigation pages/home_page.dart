@@ -21,6 +21,7 @@ import 'Map/locations.dart' as _locations;
 import '../widgets/BottomInfoPanel.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../_v2/componets/FadeRoute.dart';
+import '../_v2/componets/globals.dart' as globals;
 //import '../widgets/MapPointerBadge.dart';
 
 const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
@@ -354,7 +355,47 @@ class _HomePageState extends State<HomePage> {
     });
 
   }
- 
+  void setPolylinesRoute() async{
+    
+      // print('status : start location: ${globals.startLocation.latitude } ${globals.startLocation.longitude}');
+      // print('status : end location: ${globals.endLocation.latitude } ${globals.endLocation.longitude}');
+    removePolylines(); // clear polylines
+
+    //change origin icon
+    _sourceIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.0),
+      'assets/images/icons8-map-a-96.png');
+    
+    PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey,
+      PointLatLng(globals.startLocation.latitude, globals.startLocation.longitude),
+      PointLatLng(globals.endLocation.latitude, globals.endLocation.longitude),
+      travelMode: TravelMode.driving,
+    );
+
+    print('status : ${_results.points.length}');
+
+    if(_results.status == 'OK'){
+      
+      _results.points.forEach((PointLatLng _point) {
+        _polylineCoordinates.add(LatLng(_point.latitude, _point.longitude));
+       });
+
+       setState(() {
+         _polylines.add(
+           Polyline(
+             width: 3,
+             polylineId: PolylineId('polyline'),
+             color: Globals.MAIN_COLOR,
+             points: _polylineCoordinates,
+             startCap: Cap.buttCap,
+              endCap: Cap.buttCap,
+           )
+         );
+       });
+    }
+  }
+
  void animateCamera(Set<Polyline> polylines) { 
    
    print('animateCamera');
@@ -390,6 +431,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _drowRoute(String msg) async{
+
+    setPolylinesRoute();
+    //drow route
+  }
  
   @override
   Widget build(BuildContext context) {
@@ -484,7 +530,7 @@ class _HomePageState extends State<HomePage> {
                                 readOnly: true,
                                 style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                                 onTap: () {
-                                  Navigator.of(context).push(CustomPageRoute(SearchPage()));
+                                  Navigator.of(context).push(CustomPageRoute(SearchPage(drowRoute: _drowRoute,)));
                                 },
                                 decoration: InputDecoration(
                                   hintStyle: TextStyle(fontSize: 17,color: Color(0xFFBFBFBF)),
@@ -497,7 +543,7 @@ class _HomePageState extends State<HomePage> {
                                     padding: EdgeInsets.zero,
                                     constraints: BoxConstraints(), 
                                     onPressed: (){
-                                      Navigator.of(context).push(CustomPageRoute(SearchPage()));
+                                      Navigator.of(context).push(CustomPageRoute(SearchPage( drowRoute: _drowRoute,)));
                                     },)
                                 ),
                               ),

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:google_place/google_place.dart';
 
 import '../componets/globals.dart' as globals;
+import '../componets/Geocoding.dart';
 
 
 
 class SearchPage extends StatefulWidget {
 
-  const SearchPage({Key? key}) : super(key: key);
-
+  const SearchPage({Key? key, required this.drowRoute}) : super(key: key);
+  final ValueChanged<String> drowRoute;
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
@@ -53,6 +55,9 @@ class _SearchPageState extends State<SearchPage> {
 
   void _update(String place) async {
 
+    //LatLng
+    // print('status : place is $place');
+
     if(_destSelected){
       _clearIconVisibleD = false;
       FocusManager.instance.primaryFocus?.unfocus();
@@ -63,6 +68,7 @@ class _SearchPageState extends State<SearchPage> {
       _sourceSelected = true;
       _searchIconVisibleD = false;
       _searchIconVisibleS = false;
+      locating(place,true);
     }
     else{
       // _searchIconVisibleS = false;
@@ -70,6 +76,7 @@ class _SearchPageState extends State<SearchPage> {
       _searchVisible = false;
       _recentVisible = true;
       FocusManager.instance.primaryFocus?.unfocus();
+      locating(place,false);
     }
     setState(() {
       if(_destSelected){
@@ -582,7 +589,8 @@ class _SearchPageState extends State<SearchPage> {
                                 margin: EdgeInsets.all(10),
                                 child: ElevatedButton(
                                         onPressed: () {
-                                          print('press to find route');
+                                          widget.drowRoute('success');
+                                          Navigator.pop(context);
                                         },
                                         style: ElevatedButton.styleFrom(
                                           primary: Color(0xFF1A1A24),
@@ -641,6 +649,9 @@ class _SearchPageState extends State<SearchPage> {
         }
         _recentVisible = false;
       });
+
+      //get latlng
+      
     }
   }
 
@@ -764,13 +775,18 @@ class _SearchResultWidgetState extends State<SearchResultWidget> {
       child: InkWell(
         onTap: (){
           widget.update(widget.title);
-          // globals.queue.add(widget.placeID);
-          globals.queuePlace.addFirst(widget.title);
-          globals.queueID.addFirst(widget.placeID);
-          if(globals.queueID.length > 7){
-            globals.queuePlace.removeLast();
-            globals.queueID.removeLast();
+          // globals.queueID.contains(widget.placeID) ? print('hello : item exists') : print('hello : item not exists');
+
+          if(!globals.queueID.contains(widget.placeID)){
+            globals.queuePlace.addFirst(widget.title);
+            globals.queueID.addFirst(widget.placeID);
+            if(globals.queueID.length > 7){
+              globals.queuePlace.removeLast();
+              globals.queueID.removeLast();
+            }
           }
+
+          
         },
 
         child: Column(
