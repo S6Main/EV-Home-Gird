@@ -127,15 +127,20 @@ class _HomePageState extends State<HomePage> {
     
   }
   void setIntitialLocation(){
-    _currentLocation = LatLng(
-      SOURCE_LOCATION.latitude, 
-      SOURCE_LOCATION.longitude
-      );
 
-    _destinationLocation = LatLng(
-      DEST_LOCATION.latitude, 
-      DEST_LOCATION.longitude
+    _currentLocation = LatLng(
+      globals.currentLocation.latitude,
+      globals.currentLocation.longitude,
       );
+    // _currentLocation = LatLng(
+    //   SOURCE_LOCATION.latitude, 
+    //   SOURCE_LOCATION.longitude
+    //   );
+
+    // _destinationLocation = LatLng(
+    //   DEST_LOCATION.latitude, 
+    //   DEST_LOCATION.longitude
+    //   );
   }
   void showCurrentPinOnMap(){
     setState(() {
@@ -242,7 +247,7 @@ class _HomePageState extends State<HomePage> {
             //bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
             _onSlider = true;    
 
-            replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
+            // replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
             
             // _currentMarkerId = _locations.locations[i].id;
             // print('current marker id: $_currentMarkerId');
@@ -441,6 +446,12 @@ class _HomePageState extends State<HomePage> {
 
   void _drowRoute(String msg) async{
     _routeFound = true;
+    if(globals.travelRoute.length > 38){
+      _searchController.text = globals.travelRoute.substring(0, 38) + '...';
+    }
+    else{
+      _searchController.text = globals.travelRoute;
+    }
     setPolylinesRoute();
     //drow route
   }
@@ -449,7 +460,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     CameraPosition _initialCameraPosition = CameraPosition(
-      target: SOURCE_LOCATION,
+      // target: SOURCE_LOCATION,
+      target: globals.currentLocation,
       zoom: CAMERA_ZOOM,
       tilt: CAMERA_TILT,
       bearing: CAMERA_BEARING,
@@ -457,8 +469,11 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       body: InkWell(
-        onDoubleTap: (){
-          FocusScope.of(context).unfocus();
+        onLongPress: (){
+         Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => super.widget));
         },
         child: Stack(
           children : [
@@ -518,6 +533,7 @@ class _HomePageState extends State<HomePage> {
               Stack(
                 children: [
                   
+                  
                   Container(
                             margin:EdgeInsets.only(left: 40, right: 40),
                             decoration: BoxDecoration(
@@ -538,6 +554,8 @@ class _HomePageState extends State<HomePage> {
                                 readOnly: true,
                                 style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                                 onTap: () {
+                                  _searchController.text = '';
+                                  
                                   Navigator.of(context).push(CustomPageRoute(SearchPage(drowRoute: _drowRoute,)));
                                 },
                                 decoration: InputDecoration(

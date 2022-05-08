@@ -65,6 +65,8 @@ class _SearchPageState extends State<SearchPage> {
       _searchIconVisibleD = false;
       _searchIconVisibleS = false;
       locating(place,true);
+
+      globals.travelRoute = place.toString().split(',')[0] + '  ➔  ' + globals.travelRoute;
     }
     else{
       // _searchIconVisibleS = false;
@@ -73,6 +75,8 @@ class _SearchPageState extends State<SearchPage> {
       _recentVisible = true;
       FocusManager.instance.primaryFocus?.unfocus();
       locating(place,false);
+
+      globals.travelRoute = place.toString().split(',')[0];
     }
     setState(() {
       if(_destSelected){
@@ -173,7 +177,7 @@ class _SearchPageState extends State<SearchPage> {
                         padding: const EdgeInsets.only(left: 10),
                         child: TextField(
                           controller: _searchControllerDest ,
-                          readOnly: _sourceSelected,
+                          readOnly: _destSelected,
                           style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
                           onChanged: (val){
 
