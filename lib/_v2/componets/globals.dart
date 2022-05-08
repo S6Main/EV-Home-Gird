@@ -20,6 +20,7 @@ Queue queuePlace = new Queue();
 
 LatLng startLocation = LatLng(0, 0);
 LatLng endLocation = LatLng(0, 0);
+LatLng currentLocation = LatLng(0, 0);
 
 //manual editings
 bool canExit = false;

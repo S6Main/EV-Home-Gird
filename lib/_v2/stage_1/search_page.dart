@@ -6,8 +6,7 @@ import 'package:google_place/google_place.dart';
 
 import '../componets/globals.dart' as globals;
 import '../componets/Geocoding.dart';
-
-
+import 'package:geolocator/geolocator.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -54,9 +53,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _update(String place) async {
-
-    //LatLng
-    // print('status : place is $place');
 
     if(_destSelected){
       _clearIconVisibleD = false;
@@ -447,7 +443,10 @@ class _SearchPageState extends State<SearchPage> {
                               color: Colors.white,
                               child: InkWell(
                                 onTap: () {
-
+                                  // Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+                                  // globals.currentLocation = LatLng(position.latitude, position.longitude);
+                                  globals.startLocation = globals.currentLocation;
+                                  _update('Your Location');
                                 },
                                 child: Column(
                                   children: [
@@ -627,7 +626,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),);
   }
-
+  
   void autoCompleteSearch(String value) async {
     var result = await googlePlace.autocomplete.get(value);
     if (result != null && result.predictions != null && mounted) {

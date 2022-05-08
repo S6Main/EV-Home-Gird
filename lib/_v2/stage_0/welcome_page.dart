@@ -9,6 +9,8 @@ import 'package:ev_homegrid/navigation%20pages/home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../navigation pages/main_page.dart';
 
@@ -41,6 +43,7 @@ class _WelcomePageState extends State<WelcomePage> {
     super.initState();
     addQuotes();
     checkNetwork();
+    getCurrentLocation();
   }
   void checkNetwork() async{
     globals.isOnline = await hasNetwork();
@@ -89,6 +92,10 @@ class _WelcomePageState extends State<WelcomePage> {
       text_3: 'It’s Free',
     ));
     
+  }
+  void getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    globals.currentLocation = LatLng(position.latitude, position.longitude);
   }
   @override
   Widget build(BuildContext context) {

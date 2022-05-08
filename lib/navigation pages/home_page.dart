@@ -81,6 +81,7 @@ class _HomePageState extends State<HomePage> {
   //v2
   TextEditingController _searchController = new TextEditingController();
   bool _isOnline = false;
+  bool _routeFound = false;
 
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
 
@@ -110,15 +111,15 @@ class _HomePageState extends State<HomePage> {
   void setSourceAndDestinationMarker() async{
     _sourceIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
-      'assets/images/icons8-map-a-96.png');
+      'assets/images/marker-pointers.png');
 
     _destinationIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
-       'assets/images/icons8-marker-b-96.png');
+       'assets/images/marker-pointer.png');
        
     _markerIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
-      'assets/images/icons8-location-96.png');
+      'assets/images/marker-charger.png');
 
     _pinIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.0),
@@ -141,7 +142,7 @@ class _HomePageState extends State<HomePage> {
       _markers.add(Marker(
         markerId: MarkerId('sourcePin'),
         position: _currentLocation,
-        icon: _pinIcon,
+         icon: _routeFound ?_sourceIcon : _pinIcon,
         infoWindow: InfoWindow(title: 'Your Location'),
         onTap: (){
           removePolylines();
@@ -303,9 +304,9 @@ class _HomePageState extends State<HomePage> {
     removePolylines(); // clear polylines
 
     //change origin icon
-    _sourceIcon = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.0),
-      'assets/images/icons8-map-a-96.png');
+    // _sourceIcon = await BitmapDescriptor.fromAssetImage(
+    //   ImageConfiguration(devicePixelRatio: 2.0),
+    //   'assets/images/icons8-map-a-96.png');
     
     PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
       googleApiKey,
@@ -357,23 +358,28 @@ class _HomePageState extends State<HomePage> {
   }
   void setPolylinesRoute() async{
     
-      // print('status : start location: ${globals.startLocation.latitude } ${globals.startLocation.longitude}');
-      // print('status : end location: ${globals.endLocation.latitude } ${globals.endLocation.longitude}');
+    //change positions of markers
+    _currentLocation = globals.startLocation;
+    _destinationLocation = globals.endLocation;
+      
+    //change marker icons
+    showCurrentPinOnMap();
+    showDestinationPinOnMap();
+
     removePolylines(); // clear polylines
 
     //change origin icon
-    _sourceIcon = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.0),
-      'assets/images/icons8-map-a-96.png');
+    // _sourceIcon = await BitmapDescriptor.fromAssetImage(
+    //   ImageConfiguration(devicePixelRatio: 2.0),
+    //   'assets/images/icons8-map-a-96.png');
     
     PolylineResult _results = await _polylinePoints.getRouteBetweenCoordinates(
       googleApiKey,
-      PointLatLng(globals.startLocation.latitude, globals.startLocation.longitude),
-      PointLatLng(globals.endLocation.latitude, globals.endLocation.longitude),
+      PointLatLng(_currentLocation.latitude, _currentLocation.longitude),
+      PointLatLng(_destinationLocation.latitude, _destinationLocation.longitude),
       travelMode: TravelMode.driving,
     );
 
-    print('status : ${_results.points.length}');
 
     if(_results.status == 'OK'){
       
@@ -393,12 +399,12 @@ class _HomePageState extends State<HomePage> {
            )
          );
        });
+       animateCamera(_polylines);
     }
   }
 
  void animateCamera(Set<Polyline> polylines) { 
    
-   print('animateCamera');
     if(_polylines != null){
       double minLat = polylines.first.points.first.latitude;
     double minLong = polylines.first.points.first.longitude;
@@ -417,7 +423,9 @@ class _HomePageState extends State<HomePage> {
         LatLngBounds(
             southwest: LatLng(minLat, minLong),
             northeast: LatLng(maxLat, maxLong)),
-            130));
+            50));
+    
+    
     }
     
  }
@@ -432,7 +440,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _drowRoute(String msg) async{
-
+    _routeFound = true;
     setPolylinesRoute();
     //drow route
   }
