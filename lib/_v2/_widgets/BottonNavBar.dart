@@ -49,7 +49,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
     return Container(
       color: Colors.transparent,
-      padding: EdgeInsets.only(left: 15, right: 15,bottom: 15,top: 10),
+      padding: EdgeInsets.only(left: 15, right: 15,bottom: 5,top: 0),
         //padding: const EdgeInsets.only(left: 12, right: 12,bottom: 15, top: 10),
       child: Container(
           decoration: BoxDecoration(
@@ -149,6 +149,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                     borderRadius: new BorderRadius.circular(20.0),
                                     onTap: (() {
                                       Navigator.of(context).pop();
+                                      if(globals.accessPermision){
+                                        onTap(0);
+                                      }
+                                      //code to redirect to home page
                                     }),
                                     child: Container(
                                       width: 40,
@@ -190,6 +194,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                   ElevatedButton(
                                     onPressed: () {
                                       Navigator.of(ctx).pop();
+                                      //code to redirect to home page
+                                      if(globals.accessPermision){
+                                        onTap(0);
+                                      }
+                                      
                                     },
                                     style: ElevatedButton.styleFrom(
                                       primary: Color(0xFFFFFFFF),

@@ -25,3 +25,4 @@ String travelRoute = '';
 
 //manual editings
 bool canExit = false;
+bool accessPermision = true;
