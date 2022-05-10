@@ -241,16 +241,26 @@ class _MainPageState extends State<MainPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Material(
-        child: Center(
-          child: Scaffold(
-                resizeToAvoidBottomInset: true,
-                //body: pages[_currentIndex],
-                bottomNavigationBar: BottomNavBar(this.callback),
-                body: IndexedStack(
-                  index: _currentIndex,
-                  children: <Widget>[..._pages]
+        child: InkWell(
+          onLongPress: () {
+            if(_currentIndex == 0){
+                Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => super.widget));
+              }
+          },
+          child: Center(
+            child: Scaffold(
+                  resizeToAvoidBottomInset: true,
+                  //body: pages[_currentIndex],
+                  bottomNavigationBar: BottomNavBar(this.callback),
+                  body: IndexedStack(
+                    index: _currentIndex,
+                    children: <Widget>[..._pages]
+                  ),
                 ),
-              ),
+          ),
         ),
       ),
     );

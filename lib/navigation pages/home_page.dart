@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:developer' as dev;
 import 'dart:io';
@@ -14,7 +15,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
-import 'Map/locations.dart' as _locations;
+import '../_v2/_widgets/CustomWindow.dart';
+import '../_v2/componets/Distance.dart';
+import '../_v2/componets/locations.dart' as _locations;
 //import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 //v2
@@ -22,6 +25,10 @@ import '../widgets/BottomInfoPanel.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../_v2/componets/FadeRoute.dart';
 import '../_v2/componets/globals.dart' as globals;
+import 'package:custom_info_window/custom_info_window.dart';
+
+
+
 //import '../widgets/MapPointerBadge.dart';
 
 const LatLng SOURCE_LOCATION = LatLng(42.7477863,-71.1699932);
@@ -44,6 +51,7 @@ class _HomePageState extends State<HomePage> {
 
   
   GoogleMapController? _googleMapController;
+  Dio _dio = new Dio();
 
   late BitmapDescriptor _sourceIcon;
   late BitmapDescriptor _destinationIcon;
@@ -82,6 +90,15 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _searchController = new TextEditingController();
   bool _isOnline = false;
   bool _routeFound = false;
+  LatLng _nearestMarkerCoordinates = LatLng(0, 0);
+  String _nearstMarkerName = '';
+  String _nearestMarkerId = '';
+  bool _isSinglePoint = true;
+  String _arrival = 'Arrival(0 mins)';
+  List<String> _arrivalList = [];
+
+
+  CustomInfoWindowController controller = CustomInfoWindowController();
 
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
 
@@ -98,6 +115,7 @@ class _HomePageState extends State<HomePage> {
     //instatiate polyinepointes
     _polylinePoints = PolylinePoints();
     networkCheck();
+    gatherArrivals();
   }
 
   void networkCheck()async{
@@ -106,6 +124,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    controller.dispose();
     super.dispose();
   }
   void setSourceAndDestinationMarker() async{
@@ -226,70 +245,118 @@ class _HomePageState extends State<HomePage> {
     //Marker? resultMarker = null;
     List<Marker> resultMarker = [];
 
-      
-
-    
+    int minDistance = 100000;
+    // for(int i = 0; i < _locations.locations.length; i++){
+    //   getDetails(i).then((_time) {
+    //         _arrivalList.add(_time);
+    //       });
+    // }
       for(int i = 0; i < _locations.locations.length; i++){
-          resultMarker.add(Marker(
-          markerId: MarkerId(_locations.locations[i].id),
-          infoWindow: InfoWindow(
-          title: "${_locations.locations[i].name}"),
-          position: _locations.locations[i].coordinates,
-          icon: _markerIcon,
-          onTap:(){
-            _onSlider = false;
+        // print('status :  ${_locations.locations[i].coordinates}');
 
-            if(!_onSlider){
-               //change destination name
-            _destinationName = _locations.locations[i].name;
-            //get index of marker
-            //int _index = _locations.locations.indexWhere((location) => location.id == resultMarker[i].markerId.value);
-            //bottonCarouselController.animateToPage(_index,duration: Duration(milliseconds: 500),curve : Curves.easeInOut);
-            _onSlider = true;    
+          // gather time infomrmation
+          
 
-            // replaceDestinationMarker(_locations.locations[i].id,_locations.locations[i].coordinates);
-            
-            // _currentMarkerId = _locations.locations[i].id;
-            // print('current marker id: $_currentMarkerId');
-            // if(_destSelected){
-            //   removePolylines();
-            // }
-            //removePolylines();
+          num distance = getDistance([
+            _locations.locations[i].coordinates.latitude,
+            _locations.locations[i].coordinates.longitude],);
+
+          int distanceInMeters = distance.toInt();
+          bool test = (distanceInMeters < (globals.maxDistance * 1000) && distanceInMeters > (globals.minDistance * 1000));
+          // print('status : distance of ${_locations.locations[i].name} is $distanceInMeters');
+          if(distanceInMeters < minDistance) {
+            minDistance = distanceInMeters;
+            _nearestMarkerCoordinates = _locations.locations[i].coordinates;
+            _nearstMarkerName = _locations.locations[i].name;
+            _nearestMarkerId = _locations.locations[i].id;
+          }
+          
+          if (test) {
+            resultMarker.add(Marker(
+            markerId: MarkerId(_locations.locations[i].id),
+            infoWindow: InfoWindow(title: _locations.locations[i].name,
+            snippet: 'Arrival(${_locations.locations[i].time})'
+            ),
+            position: _locations.locations[i].coordinates,
+            icon: _markerIcon,
+            // anchor: Offset(0.5, 0.5), 
+            onTap:(){
+              _isSinglePoint = true;
+                //change destination name
+              _destinationName = _locations.locations[i].name;
               _destinationLocation = _locations.locations[i].coordinates;
               _destSelected = true;
+
+
               setPolylines();
-              setState(() {
-                this._userBadgeSelected = false;
-                this._pinPillPosition = PIN_VISIBLE_POSITION;
-              });
-            // _destinationLocation = _locations.locations[i].coordinates;
-            // _destSelected = true;
-            // setPolylines();
-            // setState(() {
-            //   this._userBadgeSelected = false;
-            //   this._pinPillPosition = PIN_VISIBLE_POSITION;
-            // });
-            }
            
-          }
-          ));
+            }
+            ));
+            }
       
-      if(_locations.locations.length > 0){
-        setState(() {
-          _markers.addAll(resultMarker);
-        });
-      }
+          if(_locations.locations.length > 0){
+            setState(() {
+              _markers.addAll(resultMarker);
+            });
+          } 
 
       //add bottom info panel set
-      _bottonInfoPanels.add(BottomInfoPanel(title :_locations.locations[i].name, index: i, id: _locations.locations[i].id,));
+      // _bottonInfoPanels.add(BottomInfoPanel(title :_locations.locations[i].name, index: i, id: _locations.locations[i].id,));
     } 
       
       
+  }
+  void findNearestMarkers(){
+    _isSinglePoint = true;
+    _destinationName = _nearstMarkerName;
+    _destinationLocation = _nearestMarkerCoordinates;
+    _destSelected = true;
+    removeMarkersExcept(_nearestMarkerId);
+    // getDetails();
+    setPolylines();
+
+    //show destination marker info window
+    _googleMapController?.showMarkerInfoWindow(MarkerId(_nearestMarkerId));
+  }
+  Future<String> getDetails(int index) async {
+    //get approximate time
+    // String _orgLat = _currentLocation.latitude.toString();
+    // String _orgLng = _currentLocation.longitude.toString();
+    // String _destLat = _destinationLocation.latitude.toString();
+    // String _destLng = _destinationLocation.longitude.toString();
+
+    String _orgLat = _locations.locations[index].coordinates.latitude.toString();
+    String _orgLng = _locations.locations[index].coordinates.longitude.toString();
+    String _destLat = _currentLocation.latitude.toString();
+    String _destLng = _currentLocation.longitude.toString();
+    String api = googleApiKey.toString();
+
+    Response response=await _dio.get(
+      "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=$_orgLat,$_orgLng&destinations=$_destLat,$_destLng&key=$api");
+    if(response.statusCode == 200){
+      
+      String _data = response.data.toString();
+      String _time = _data.substring(_data.indexOf('duration: {text:') + 16, _data.indexOf('mins') + 4);
+      String _distance = _data.substring(_data.indexOf('distance: {text:') + 15, _data.indexOf('mi') + 3);
+      // print('status : time - $_time');
+      // print('status : distance - $_distance');
+      // _arrival = 'Arrival(hahha)';
+      return _time;
+    }
+    else{
+      print('status :  can\'t gather data from google api');
+      return '0';
+    }
   }
 
   void removeMarkers(){
     setState(() {
       _markers.removeWhere((m) => m.markerId.value != 'sourcePin');
+    });
+  }
+  void removeMarkersExcept(String marker){
+    setState(() {
+      _markers.removeWhere((m) => [marker, 'sourcePin'].contains(m.markerId.value) == false);
     });
   }
   changeMapMode(){
@@ -307,7 +374,7 @@ class _HomePageState extends State<HomePage> {
   void setPolylines() async{
     
     removePolylines(); // clear polylines
-
+    // getDetails();
     //change origin icon
     // _sourceIcon = await BitmapDescriptor.fromAssetImage(
     //   ImageConfiguration(devicePixelRatio: 2.0),
@@ -406,6 +473,9 @@ class _HomePageState extends State<HomePage> {
        });
        animateCamera(_polylines);
     }
+    else{
+      print('status : cant find route');
+    }
   }
 
  void animateCamera(Set<Polyline> polylines) { 
@@ -443,15 +513,19 @@ class _HomePageState extends State<HomePage> {
       child: Icon(icon, size: 24.0,),
     );
   }
-
+  void gatherArrivals(){
+    for(int i = 0; i < _locations.locations.length; i++){
+      getDetails(i).then((_time) {
+            // _arrivalList.add(_time);
+            _locations.locations[i].time = _time;
+          });
+    }
+  }
   void _drowRoute(String msg) async{
+    _isSinglePoint = false;
+    removeMarkers();
     _routeFound = true;
-    if(globals.travelRoute.length > 38){
-      _searchController.text = globals.travelRoute.substring(0, 38) + '...';
-    }
-    else{
       _searchController.text = globals.travelRoute;
-    }
     setPolylinesRoute();
     //drow route
   }
@@ -469,12 +543,12 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       body: InkWell(
-        onLongPress: (){
-         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) => super.widget));
-        },
+        // onLongPress: (){
+        //  Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (BuildContext context) => super.widget));
+        // },
         child: Stack(
           children : [
             Positioned.fill(
@@ -592,6 +666,10 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: new BorderRadius.circular(15.0),
                             ),),
                           onPressed:() {
+
+                            setState(() {
+                              _arrival = 'updated';
+                            });
                             networkCheck();
                             Future.delayed(Duration(milliseconds: 200), () {
                               if(_isOnline){
@@ -671,12 +749,10 @@ class _HomePageState extends State<HomePage> {
                       Expanded(
                         child: SizedBox()),
                       Center(
-                        child: !_canShowButton
-                          ? const SizedBox.shrink()
-                          : AnimatedButton(
+                        child:AnimatedButton(
                               height: 45,
                               width: 200,
-                              text: 'Find Nearest',
+                              text: _canShowButton ?'Show Markers' : ' Find nearest markers',
                               isReverse: true,
                               selectedTextColor: Colors.black,
                               textStyle: TextStyle(
@@ -691,7 +767,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: 50,
                               borderWidth: 0,
                                   onPress: () { 
-                                    showPinsOnMap();
+                                    _canShowButton ? showPinsOnMap() : findNearestMarkers();
                                     _canShowButton = false;
                                     
                                   },
@@ -847,8 +923,8 @@ class _HomePageState extends State<HomePage> {
   void CustomDialogFilterMenu() {
     bool? _restaurant = false;
     bool? _parking = false;
-    int _rangeFrom = 1;
-    int _rangeTo = 3;
+    int _rangeFrom = globals.minDistance;
+    int _rangeTo = globals.maxDistance;
 
     bool _isAvailable = true;
     bool _isOccupied = false;
@@ -861,7 +937,7 @@ class _HomePageState extends State<HomePage> {
     Color _pressed = Color(0xFF2B2D41);
     Color _unpressed = Color(0xFFF6F7F6);
 
-    SfRangeValues _values = SfRangeValues(20.0, 60.0);
+    SfRangeValues _values = SfRangeValues(globals.minDistance * 20, globals.maxDistance * 20);
     showDialog(
         barrierDismissible: false,
         barrierColor: Colors.black.withOpacity(0.0),
@@ -1235,6 +1311,8 @@ class _HomePageState extends State<HomePage> {
                                   padding: const EdgeInsets.only(top: 23),
                                   child: ElevatedButton(
                                     onPressed: () {
+                                      globals.minDistance = _rangeFrom;
+                                      globals.maxDistance = _rangeTo;
                                       Navigator.of(ctx).pop();
                                     },
                                     style: ElevatedButton.styleFrom(

@@ -22,6 +22,11 @@ LatLng startLocation = LatLng(0, 0);
 LatLng endLocation = LatLng(0, 0);
 LatLng currentLocation = LatLng(0, 0);
 String travelRoute = '';
+num distance = 0;
+
+int minDistance = 1; //filters
+int maxDistance = 3; 
+
 
 //manual editings
 bool canExit = false;

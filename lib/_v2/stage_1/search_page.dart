@@ -7,6 +7,7 @@ import 'package:google_place/google_place.dart';
 import '../componets/globals.dart' as globals;
 import '../componets/Geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import '../componets/Distance.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -54,7 +55,7 @@ class _SearchPageState extends State<SearchPage> {
 
   void _update(String place) async {
 
-    if(_destSelected){
+    if(_destSelected){ //start location
       _clearIconVisibleD = false;
       FocusManager.instance.primaryFocus?.unfocus();
       _recentVisible = false;
@@ -66,9 +67,14 @@ class _SearchPageState extends State<SearchPage> {
       _searchIconVisibleS = false;
       locating(place,true);
 
-      globals.travelRoute = place.toString().split(',')[0] + '  ➔  ' + globals.travelRoute;
+      String _place = place.toString().split(',')[0];
+      if(_place.length > 12){
+        _place = _place.substring(0,9) + '...';
+      }
+      findDistance();
+      globals.travelRoute = _place + '  ➔  ' + globals.travelRoute + '  |  ' + globals.distance.toString() + ' km';
     }
-    else{
+    else{ // end location
       // _searchIconVisibleS = false;
       _clearIconVisibleS = false;
       _searchVisible = false;
@@ -77,6 +83,9 @@ class _SearchPageState extends State<SearchPage> {
       locating(place,false);
 
       globals.travelRoute = place.toString().split(',')[0];
+      if(globals.travelRoute.length > 12){
+        globals.travelRoute = globals.travelRoute.substring(0,9) + '...';
+      }
     }
     setState(() {
       if(_destSelected){
@@ -592,6 +601,7 @@ class _SearchPageState extends State<SearchPage> {
                                 margin: EdgeInsets.all(10),
                                 child: ElevatedButton(
                                         onPressed: () {
+                                          // findDistance();
                                           widget.drowRoute('success');
                                           Navigator.pop(context);
                                         },
@@ -629,6 +639,13 @@ class _SearchPageState extends State<SearchPage> {
           ],
         ),
       ),);
+  }
+
+  void findDistance(){
+    num distance = getDistance([
+            globals.endLocation.latitude,
+            globals.endLocation.longitude],isCurrentLocation: false);
+    globals.distance = double.parse((distance/1000).toStringAsFixed(2));
   }
   
   void autoCompleteSearch(String value) async {
