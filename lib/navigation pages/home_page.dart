@@ -74,6 +74,7 @@ class _HomePageState extends State<HomePage> {
   bool _onSlider = false;
 
   bool _canShowButton = true;
+  String _buttonText = 'Show Markers';
 
   List<BottomInfoPanel> _bottonInfoPanels =[];
   
@@ -567,7 +568,7 @@ class _HomePageState extends State<HomePage> {
                   
                   if(_destSelected){
                     if(_polylines.isEmpty){
-                      removeDestinationMarker(); // remove dest marker when tapped
+                      // removeDestinationMarker(); // remove dest marker when tapped
                     }
                     else{
                       animateCamera(_polylines);  //animate camera to initial position from top
@@ -578,10 +579,10 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   if(_polylines.isEmpty){
-                    removeDestinationMarker(); // remove dest marker when tapped
+                    // removeDestinationMarker(); // remove dest marker when tapped
                   }
                   _sourcSelected = false;
-                  _onSlider = false;
+                  // _onSlider = false;
                   //removePolylines();
                   //tapping on the map will dismiss the bottom pill
                   setState(() {
@@ -750,9 +751,10 @@ class _HomePageState extends State<HomePage> {
                         child: SizedBox()),
                       Center(
                         child:AnimatedButton(
+                              
                               height: 45,
                               width: 200,
-                              text: _canShowButton ?'Show Markers' : ' Find nearest markers',
+                              text: _buttonText,
                               isReverse: true,
                               selectedTextColor: Colors.black,
                               textStyle: TextStyle(
@@ -764,12 +766,26 @@ class _HomePageState extends State<HomePage> {
                               backgroundColor: Colors.black,
                               selectedBackgroundColor: Colors.white,
                               borderColor: Colors.white,
-                              borderRadius: 50,
+                              borderRadius: 20,
                               borderWidth: 0,
                                   onPress: () { 
-                                    _canShowButton ? showPinsOnMap() : findNearestMarkers();
-                                    _canShowButton = false;
+                                    //_canShowButton ? showPinsOnMap() : findNearestMarkers();
+                                    if(_buttonText == 'Show Markers'){
+                                      //clean up
+                                        removeMarkersExcept('sourcePin');
+                                        removePolylines();
+                                      //done
+                                      showPinsOnMap();
+                                      _buttonText = 'Find nearest markers';
+                                    }
+                                    else if(_buttonText == 'Find nearest markers')
+                                    {
+                                      findNearestMarkers();
+                                      _buttonText = 'Show Markers';
+                                      _canShowButton = false;
+                                    }
                                     
+
                                   },
                               ),
                       ),
