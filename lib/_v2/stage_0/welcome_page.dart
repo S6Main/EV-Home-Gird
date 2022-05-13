@@ -3,9 +3,10 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ev_homegrid/_v2/componets/locations.dart';
 import 'package:ev_homegrid/_v2/stage_0/credentials_page.dart';
 import 'package:ev_homegrid/_v2/stage_0/wallet_page.dart';
-import 'package:ev_homegrid/navigation%20pages/home_page.dart';
+import 'package:ev_homegrid/_v2/stage_1/home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
@@ -41,6 +42,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   initState() {
     super.initState();
+    setUpLocations();
     addQuotes();
     checkNetwork();
     getCurrentLocation();

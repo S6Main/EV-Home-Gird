@@ -1,6 +1,7 @@
 library my_prj.globals;
 
 import 'dart:collection';
+import 'dart:ui';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -13,6 +14,9 @@ bool isFirstTime = true;
 bool isNameAsked = false;
 bool termsAccepted = false;
 String name = '';
+//color properties
+Color MAIN_COLOR = Color(0xFF70e000);
+
 
 //google map
 Queue queueID = new Queue();
@@ -36,3 +40,4 @@ int cutOff = 20; // 20%
 bool canExit = false;
 bool accessPermision = true;
 bool askRange = true;
+bool needToUplocadLocations = true;

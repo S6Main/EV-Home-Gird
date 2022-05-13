@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:ev_homegrid/main.dart';
-import 'package:ev_homegrid/navigation%20pages/history_page.dart';
-import 'package:ev_homegrid/navigation%20pages/home_page.dart';
+import 'package:ev_homegrid/_v2/stage_2/history_page.dart';
+import 'package:ev_homegrid/_v2/stage_1/home_page.dart';
 import 'package:ev_homegrid/navigation%20pages/profile/profile_page.dart';
 import 'package:ev_homegrid/navigation pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';

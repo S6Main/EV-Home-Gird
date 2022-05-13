@@ -1,3 +1,4 @@
+import 'package:code_builder/code_builder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Location {
@@ -9,6 +10,10 @@ class Location {
   Location(this.coordinates, this.name, this.id, {this.time = '0'});
 
   get location => null;
+}
+
+void setUpLocations() {
+  print('status : setup locations');
 }
 
 // List<Location> locations = [

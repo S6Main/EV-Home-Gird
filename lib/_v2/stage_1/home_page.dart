@@ -6,7 +6,6 @@ import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ev_homegrid/_v2/stage_1/search_page.dart';
-import 'package:ev_homegrid/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -15,17 +14,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
-import '../_v2/_widgets/CustomWindow.dart';
-import '../_v2/componets/Distance.dart';
-import '../_v2/componets/MapUtils.dart';
-import '../_v2/componets/locations.dart' as _locations;
+import '../_widgets/CustomWindow.dart';
+import '../componets/Distance.dart';
+import '../componets/MapUtils.dart';
+import '../componets/locations.dart' as _locations;
 //import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 //v2
-import '../widgets/BottomInfoPanel.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
-import '../_v2/componets/FadeRoute.dart';
-import '../_v2/componets/globals.dart' as globals;
+import '../componets/FadeRoute.dart';
+import '../componets/globals.dart' as globals;
 import 'package:custom_info_window/custom_info_window.dart';
 
 
@@ -77,7 +75,7 @@ class _HomePageState extends State<HomePage> {
   bool _canShowButton = true;
   String _buttonText = 'Show Markers';
 
-  List<BottomInfoPanel> _bottonInfoPanels =[];
+  // List<BottomInfoPanel> _bottonInfoPanels =[];
   
   String googleApiKey = 'AIzaSyCV_x2q82h5TjN5py9HS7Fx7bxV1Wgr_K8';
 
@@ -306,8 +304,6 @@ class _HomePageState extends State<HomePage> {
             });
           } 
 
-      //add bottom info panel set
-      // _bottonInfoPanels.add(BottomInfoPanel(title :_locations.locations[i].name, index: i, id: _locations.locations[i].id,));
     } 
       
       
@@ -405,7 +401,7 @@ class _HomePageState extends State<HomePage> {
            Polyline(
              width: 3,
              polylineId: PolylineId('polyline'),
-             color: Globals.MAIN_COLOR,
+             color: globals.MAIN_COLOR,
              points: _polylineCoordinates,
              startCap: Cap.buttCap,
               endCap: Cap.buttCap,
@@ -418,24 +414,24 @@ class _HomePageState extends State<HomePage> {
     _polylineCoordinates.clear(); //prevent from forming a loop
     _polylines.clear();
   }
-  void changeMarkerSelection(){
+  // void changeMarkerSelection(){
     
-    Future.delayed(Duration(milliseconds: 150), () {
-      Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPanels[_currentMarkerIndex].id);
-      _marker.onTap!();
+  //   Future.delayed(Duration(milliseconds: 150), () {
+  //     Marker _marker = _markers.firstWhere((marker) => marker.markerId.value == _bottonInfoPanels[_currentMarkerIndex].id);
+  //     _marker.onTap!();
 
-      _googleMapController
-            ?.animateCamera(CameraUpdate.newCameraPosition(
-              CameraPosition(
-                  target: _marker.position,
-                  zoom: CAMERA_ZOOM,
-                  tilt: CAMERA_TILT,
-                  bearing: CAMERA_BEARING,
-                ),
-              ));
-    });
+  //     _googleMapController
+  //           ?.animateCamera(CameraUpdate.newCameraPosition(
+  //             CameraPosition(
+  //                 target: _marker.position,
+  //                 zoom: CAMERA_ZOOM,
+  //                 tilt: CAMERA_TILT,
+  //                 bearing: CAMERA_BEARING,
+  //               ),
+  //             ));
+  //   });
 
-  }
+  // }
   void setPolylinesRoute() async{
     
     //change positions of markers
@@ -473,7 +469,7 @@ class _HomePageState extends State<HomePage> {
            Polyline(
              width: 3,
              polylineId: PolylineId('polyline'),
-             color: Globals.MAIN_COLOR,
+             color: globals.MAIN_COLOR,
              points: _polylineCoordinates,
              startCap: Cap.buttCap,
               endCap: Cap.buttCap,

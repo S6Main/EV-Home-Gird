@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:ev_homegrid/_v2/componets/globals.dart' as globals;
 import 'package:flutter/rendering.dart';
 
-import '../_v2/componets/SlideLeftRoute.dart';
-import '../_v2/stage_0/wallet_page.dart';
+import '../componets/SlideLeftRoute.dart';
+import '../stage_0/wallet_page.dart';
 import 'package:expansion_widget/expansion_widget.dart';
 import 'dart:math' as math;
 import 'package:styled_text/styled_text.dart';
