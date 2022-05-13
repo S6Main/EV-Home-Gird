@@ -1,4 +1,5 @@
 import 'package:ev_homegrid/_v2/stage_0/wallet_page.dart';
+import 'package:ev_homegrid/_v2/web3dart/test_page.dart';
 import 'package:ev_homegrid/front_screen.dart';
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/navigation%20pages/home_page.dart';
@@ -14,10 +15,13 @@ import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
 import 'package:ev_homegrid/_v2/stage_0/welcome_page.dart';
 
 import 'navigation pages/main_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+
+void main() async{
   // lock device orientation
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "assets/.env");
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
@@ -55,9 +59,10 @@ class MyApp extends StatelessWidget {
       //home: MyHomePage(),
       //home: MainPage(), // screen
       //home: mainApp()
-      home: WelcomePage(), //v2 version
+      // home: WelcomePage(), //v2 version
       //home: WalletPage(),
       //home: CredentialsPage(),
+      home: TestPage(), // web3dart
     );
   }
 }

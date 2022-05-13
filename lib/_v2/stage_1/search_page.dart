@@ -66,13 +66,16 @@ class _SearchPageState extends State<SearchPage> {
       _searchIconVisibleD = false;
       _searchIconVisibleS = false;
       locating(place,true);
-
-      String _place = place.toString().split(',')[0];
-      if(_place.length > 12){
-        _place = _place.substring(0,9) + '...';
-      }
-      findDistance();
-      globals.travelRoute = _place + '  ➔  ' + globals.travelRoute + '  |  ' + globals.distance.toString() + ' km';
+      
+      Future.delayed(Duration(milliseconds: 0), () {
+        String _place = place.toString().split(',')[0];
+        if(_place.length > 12){
+          _place = _place.substring(0,9) + '...';
+        }
+      
+        //  findDistance();
+        globals.travelRoute = _place + '  ➔  ' + globals.travelRoute + '  |  ';
+      });
     }
     else{ // end location
       // _searchIconVisibleS = false;
@@ -645,7 +648,7 @@ class _SearchPageState extends State<SearchPage> {
     num distance = getDistance([
             globals.endLocation.latitude,
             globals.endLocation.longitude],isCurrentLocation: false);
-    globals.distance = double.parse((distance/1000).toStringAsFixed(2));
+    distance = double.parse((distance/1000).toStringAsFixed(2));
   }
   
   void autoCompleteSearch(String value) async {

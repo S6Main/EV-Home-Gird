@@ -27,7 +27,12 @@ num distance = 0;
 int minDistance = 1; //filters
 int maxDistance = 3; 
 
+//ev
+num currentRange = 5;
+num maxRange = 8;
+int cutOff = 20; // 20%
 
 //manual editings
 bool canExit = false;
 bool accessPermision = true;
+bool askRange = true;

@@ -2,12 +2,12 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
+				"internalType": "int256",
+				"name": "amt",
+				"type": "int256"
 			}
 		],
-		"name": "sentBalance",
+		"name": "depositBalance",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -20,9 +20,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
+				"internalType": "int256",
+				"name": "amt",
+				"type": "int256"
 			}
 		],
 		"name": "withdrawBalance",
@@ -35,9 +35,9 @@
 		"name": "getBalance",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "int256",
 				"name": "",
-				"type": "uint256"
+				"type": "int256"
 			}
 		],
 		"stateMutability": "view",

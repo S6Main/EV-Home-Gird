@@ -17,6 +17,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import '../_v2/_widgets/CustomWindow.dart';
 import '../_v2/componets/Distance.dart';
+import '../_v2/componets/MapUtils.dart';
 import '../_v2/componets/locations.dart' as _locations;
 //import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -83,6 +84,7 @@ class _HomePageState extends State<HomePage> {
 
   Set<Polyline> _polylines = Set<Polyline>();
   List<LatLng> _polylineCoordinates = [];
+  List<LatLng> _polylineCoordinatesSelected = [];
   late PolylinePoints _polylinePoints;
 
   CarouselController bottonCarouselController = CarouselController();
@@ -97,6 +99,9 @@ class _HomePageState extends State<HomePage> {
   bool _isSinglePoint = true;
   String _arrival = 'Arrival(0 mins)';
   List<String> _arrivalList = [];
+
+  LatLng _divertionCoordinates = LatLng(0, 0);
+  LatLng _intermediateCharger = LatLng(0, 0);
 
 
   CustomInfoWindowController controller = CustomInfoWindowController();
@@ -226,7 +231,7 @@ class _HomePageState extends State<HomePage> {
     _sourcSelected = false;
     setState(() {
       _markers.add(Marker(
-        markerId: MarkerId(_currentMarkerId),
+        markerId: MarkerId('destPin'),
         position: _destinationLocation,
         icon: _destinationIcon,
         infoWindow: InfoWindow(title: _destinationName),
@@ -265,7 +270,7 @@ class _HomePageState extends State<HomePage> {
           int distanceInMeters = distance.toInt();
           bool test = (distanceInMeters < (globals.maxDistance * 1000) && distanceInMeters > (globals.minDistance * 1000));
           // print('status : distance of ${_locations.locations[i].name} is $distanceInMeters');
-          if(distanceInMeters < minDistance) {
+          if(distanceInMeters < minDistance && test) {
             minDistance = distanceInMeters;
             _nearestMarkerCoordinates = _locations.locations[i].coordinates;
             _nearstMarkerName = _locations.locations[i].name;
@@ -275,7 +280,7 @@ class _HomePageState extends State<HomePage> {
           if (test) {
             resultMarker.add(Marker(
             markerId: MarkerId(_locations.locations[i].id),
-            infoWindow: InfoWindow(title: _locations.locations[i].name,
+            infoWindow: InfoWindow(title: 'Ather   '+_locations.locations[i].name,
             snippet: 'Arrival(${_locations.locations[i].time})'
             ),
             position: _locations.locations[i].coordinates,
@@ -309,15 +314,16 @@ class _HomePageState extends State<HomePage> {
   }
   void findNearestMarkers(){
     _isSinglePoint = true;
-    _destinationName = _nearstMarkerName;
-    _destinationLocation = _nearestMarkerCoordinates;
+    _destinationName = _nearstMarkerName; // no issue
+    _destinationLocation = _nearestMarkerCoordinates; //no issue
+    print('status : nearest marker id is $_nearestMarkerId');
     _destSelected = true;
-    removeMarkersExcept(_nearestMarkerId);
+    removeMarkersExcept([_nearestMarkerId]);
     // getDetails();
     setPolylines();
 
     //show destination marker info window
-    _googleMapController?.showMarkerInfoWindow(MarkerId(_nearestMarkerId));
+    _googleMapController?.showMarkerInfoWindow(MarkerId(_nearestMarkerId)); //issue
   }
   Future<String> getDetails(int index) async {
     //get approximate time
@@ -355,9 +361,10 @@ class _HomePageState extends State<HomePage> {
       _markers.removeWhere((m) => m.markerId.value != 'sourcePin');
     });
   }
-  void removeMarkersExcept(String marker){
+  void removeMarkersExcept(List<String> marker){
+    marker.add('sourcePin');
     setState(() {
-      _markers.removeWhere((m) => [marker, 'sourcePin'].contains(m.markerId.value) == false);
+      _markers.removeWhere((m) => marker.contains(m.markerId.value) == false);
     });
   }
   changeMapMode(){
@@ -392,7 +399,7 @@ class _HomePageState extends State<HomePage> {
       _results.points.forEach((PointLatLng _point) {
         _polylineCoordinates.add(LatLng(_point.latitude, _point.longitude));
        });
-
+      // print('status : polyline coordinates is $_polylineCoordinates');
        setState(() {
          _polylines.add(
            Polyline(
@@ -460,6 +467,7 @@ class _HomePageState extends State<HomePage> {
         _polylineCoordinates.add(LatLng(_point.latitude, _point.longitude));
        });
 
+       globals.askRange ? null : setUpChargersInRoute();
        setState(() {
          _polylines.add(
            Polyline(
@@ -478,7 +486,120 @@ class _HomePageState extends State<HomePage> {
       print('status : cant find route');
     }
   }
+  void ConnectNearbyChargerInRoute(){
+    // _divertionCoordinates
+    // _intermediateCharger
+    int minDistance = 100000;
+    String _closestCharger = '';
 
+    List _start = [_divertionCoordinates.latitude, _divertionCoordinates.longitude];
+    List _end = [];
+    for(int i = 0; i < _locations.locations.length; i++){
+
+      _end = [_locations.locations[i].coordinates.latitude, _locations.locations[i].coordinates.longitude];
+      num _distance = distanceToFrom(_start, _end);
+      if(_distance < minDistance){
+        minDistance = _distance.toInt();
+        _intermediateCharger = _locations.locations[i].coordinates;
+        _closestCharger = _locations.locations[i].id;
+      }
+    }
+    //remove chargers that not being used ,'destPin'
+    removeMarkersExcept([_closestCharger]);
+    LatLng tempDest = _destinationLocation;
+    _destinationLocation = _intermediateCharger;
+    setPolylines();
+    _destinationLocation = tempDest;
+    setState(() {
+      _buttonText = 'Reached';
+    });
+    
+  }
+  void redirectToGoogleMap(LatLng _location){
+    
+
+    MapUtils.openMap(_location, _currentLocation);
+  }
+  void setUpChargersInRoute(){
+    // print('status : length of coordinates is ${_polylineCoordinates.length}');
+    // print('status : length of coordinates is ${_polylineCoordinates.toString()}');
+    _buttonText = 'Connect Charger';
+
+    LatLng _firstLatLng = _polylineCoordinates.first;
+    LatLng _lastLatLng = _polylineCoordinates.last;
+    
+    LatLng _currentLatLng = _firstLatLng;
+
+    _polylineCoordinatesSelected = [];
+    List _start = [];
+    List _end = [];
+    List _s = [];
+    List _e = [];
+    bool _selected = false;
+
+    for(int i = 0; i < _polylineCoordinates.length; i++){
+      
+      _start = [ _currentLatLng.latitude, _currentLatLng.longitude ];
+      _end = [ _polylineCoordinates[i].latitude, _polylineCoordinates[i].longitude ];
+
+      if(distanceToFrom(_start,_end) >= 1500){
+        // _polylineCoordinatesSelected.add(LatLng(_end[0], _end[1]));
+        _currentLatLng = LatLng(_end[0], _end[1]);
+
+        num range = globals.currentRange - (globals.maxRange * (globals.cutOff / 100));
+
+        // print('status : current distance is ${1500*(_polylineCoordinatesSelected.length)}');
+        if(1500*(_polylineCoordinatesSelected.length +1 ) >= range*1000 && !_selected){
+          _selected = true;
+          _divertionCoordinates = _polylineCoordinatesSelected.last;
+          // print('status : divertion coordinates is $_divertionCoordinates');
+        }
+        _polylineCoordinatesSelected.add(LatLng(_end[0], _end[1]));
+      }
+      else if (_end == [_lastLatLng.latitude, _lastLatLng.longitude]){
+        _polylineCoordinatesSelected.add(LatLng(_end[0], _end[1]));
+      }
+    }
+
+    // print('status : length of coordinates selected is ${_polylineCoordinatesSelected.length}');
+
+    //code for adding markers
+    List<Marker> resultMarker = [];
+    for(int i = 0; i < _polylineCoordinatesSelected.length; i++){
+      for(int j = 0; j < _locations.locations.length; j++){
+        _s = [ _polylineCoordinatesSelected[i].latitude, _polylineCoordinatesSelected[i].longitude ];
+        _e = [ _locations.locations[j].coordinates.latitude, _locations.locations[j].coordinates.longitude ];
+        num _distance = distanceToFrom(_s,_e);
+        if(_distance < 1000){
+          resultMarker.add(
+            Marker(
+              markerId: MarkerId(_locations.locations[j].id),
+              position: _locations.locations[j].coordinates,
+              icon: _markerIcon,
+              onTap: (){
+                if(_locations.locations[j].coordinates == _intermediateCharger){
+                  CustomDialogDetails();
+                }
+              }
+            ));
+        }
+      }
+      // resultMarker.add(Marker(
+      //       markerId: MarkerId('00$i'),
+      //       position: _polylineCoordinatesSelected[i],
+      //       icon: _markerIcon,
+      //       // anchor: Offset(0.5, 0.5), 
+      //       onTap:(){
+      //       }
+      //       ));
+    }
+    if(_polylineCoordinatesSelected.length > 0){
+            setState(() {
+              _markers.addAll(resultMarker);
+            });
+          } 
+
+  }
  void animateCamera(Set<Polyline> polylines) { 
    
     if(_polylines != null){
@@ -515,6 +636,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
   void gatherArrivals(){
+    print('gather arrivals');
     for(int i = 0; i < _locations.locations.length; i++){
       getDetails(i).then((_time) {
             // _arrivalList.add(_time);
@@ -522,15 +644,35 @@ class _HomePageState extends State<HomePage> {
           });
     }
   }
+  void findDistance(){
+    num distance = getDistance([
+            globals.endLocation.latitude,
+            globals.endLocation.longitude],isCurrentLocation: false);
+    distance = double.parse((distance/1000).toStringAsFixed(2));
+
+    globals.travelRoute = globals.travelRoute + globals.distance.toString() + ' km';
+
+  }
   void _drowRoute(String msg) async{
     _isSinglePoint = false;
+    _destSelected = true;
+    findDistance();
     removeMarkers();
     _routeFound = true;
       _searchController.text = globals.travelRoute;
     setPolylinesRoute();
+    
+    //code to show markers and connect
+    Future.delayed(Duration(milliseconds: 150), () {
+      globals.askRange ?  CustomDialogAskRange() : null;
+    });
+      _buttonText = 'Show Markers';
+    //done
     //drow route
   }
- 
+  void _showChargers(){
+    
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -769,11 +911,23 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: 20,
                               borderWidth: 0,
                                   onPress: () { 
+                                    _searchController.text = '';
                                     //_canShowButton ? showPinsOnMap() : findNearestMarkers();
                                     if(_buttonText == 'Show Markers'){
                                       //clean up
-                                        removeMarkersExcept('sourcePin');
+                                        // _currentLocation = globals.currentLocation;
+                                        if(_isSinglePoint){
+                                          setIntitialLocation();
+                                        showCurrentPinOnMap();
+                                        removeMarkersExcept(['sourcePin']);
                                         removePolylines();
+                                        }
+                                        else{
+                                          //code to show rearby markers
+                                          _buttonText = 'Connect Markers';
+                                          _showChargers();
+                                        }
+                                        
                                       //done
                                       showPinsOnMap();
                                       _buttonText = 'Find nearest markers';
@@ -783,6 +937,9 @@ class _HomePageState extends State<HomePage> {
                                       findNearestMarkers();
                                       _buttonText = 'Show Markers';
                                       _canShowButton = false;
+                                    }
+                                    else if(_buttonText == 'Connect Charger'){
+                                      ConnectNearbyChargerInRoute();
                                     }
                                     
 
@@ -1407,6 +1564,400 @@ class _HomePageState extends State<HomePage> {
           );
         });
   }
+  void CustomDialogAskRange() {
+    TextEditingController _rangeController = new TextEditingController();
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return Stack(
+            children :<Widget>[
 
+            Container(
+              child: BackdropFilter(
+                blendMode: BlendMode.srcOver,
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Color(0xFFC4C4C4).withOpacity(0.5),
+                  child: StatefulBuilder(builder: (context, _setState) => AlertDialog(
+                      titlePadding: EdgeInsets.zero,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                              32.0,
+                            ),
+                          ),
+                        ),
+
+                      title:  Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Range',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          // Positioned(
+                          //   top: 0,
+                          //   right: 0,
+                          //   child: Container(color: Colors.transparent, height: 40,width: 40,
+                          //   child: Stack(
+                          //     children: [
+                          //       Positioned(
+                          //         right: 0,
+                          //         child:  Material(
+                          //         color: Colors.transparent,
+                          //         child: InkWell(
+                          //           borderRadius: new BorderRadius.circular(20.0),
+                          //           onTap: (() {
+                          //             Navigator.of(context).pop();
+                          //           }),
+                          //           child: Container(
+                          //             width: 40,
+                          //             height: 40,
+                          //             color: Colors.transparent,
+                          //             child: Image.asset('assets/images/closeIcon_v2.png')
+                          //           ),
+                          //         ),
+                          //       ),)
+                          //     ],
+                          //   ),),)
+                        ],
+                      ),
+                      content: Builder(
+                        builder: (context) {
+
+                          return Container(
+                            height: 150,
+                            width: 280,
+                            child: Column(children: [
+                              Container(height: 45,
+                              width: 260,
+                              decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius:  BorderRadius.circular(5),
+                                  border: Border.all(color: Color.fromARGB(255, 0, 0, 0), width: 1)
+                                ),
+                              child: TextField(
+                                maxLength: 10,
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                readOnly: false,
+                                controller: _rangeController,
+                                style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
+                                onTap: (){
+                                },
+                          decoration: InputDecoration(
+                            hintStyle: TextStyle(fontSize: 15,color: Color(0xFFBFBFBF)),
+                            hintText: 'may I know the current range?',
+                            suffixText: ' Km        ',
+                               
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.only(left: 20,top: 7,bottom: 15),
+                            counterText: '',
+                          ),
+                        ),
+                              ),
+                              
+                              SizedBox(height: 20),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    globals.currentRange = int.parse(_rangeController.text); 
+                                    setUpChargersInRoute();
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFFFEDE00),
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 50,
+                                      right: 50,
+                                      top: 18,
+                                      bottom: 18
+                                    ),
+                                    child: const Text(
+                                      'Show Chargers',
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Colors.black,
+                                        fontFamily: 'Comfortaa',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      ),
+                                  ),
+                                  ),
+                              ),
+                            ],),
+                          );
+                        },
+                      ),
+                      
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            ]);
+        }
+        );
+  }
+
+  void CustomDialogDetails() {
+    TextEditingController _nameController = new TextEditingController();
+    String _text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Volutpat eu, consectetur sed in tincidunt turpis volutpat, nunc. Purus suspendisse purus nibh nam nisl egestas sed. Facilisis enim urna morbi.';
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return Stack(
+            children :<Widget>[
+
+            Container(
+              child: BackdropFilter(
+                blendMode: BlendMode.srcOver,
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Color(0xFFC4C4C4).withOpacity(0.5),
+                  child: StatefulBuilder(builder: (context, _setState) => AlertDialog(
+                      titlePadding: EdgeInsets.zero,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                              32.0,
+                            ),
+                          ),
+                        ),
+
+                      title:  Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('Ather Dot 1007',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(color: Colors.transparent, height: 40,width: 40,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  child:  Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: new BorderRadius.circular(20.0),
+                                    onTap: (() {
+                                      Navigator.of(context).pop();
+                                    }),
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      color: Colors.transparent,
+                                      child: Image.asset('assets/images/closeIcon_v2.png')
+                                    ),
+                                  ),
+                                ),)
+                              ],
+                            ),),)
+                        ],
+                      ),
+                      content: Builder(
+                        builder: (context) {
+
+                          return Container(
+                            height: 278,
+                            width: 280,
+                            child: Column(children: [
+                               SizedBox(height: 5,),
+                              Container(
+                                height: 35,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Container(
+                                  height: 35,
+                                  width: double.infinity,
+                                  color: Colors.transparent,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 50,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Colors.transparent,
+                                          border: Border.all(color: Color(0xFF2A2A2A).withOpacity(0.25), width: 1.2),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(width: 2,),
+                                            Icon(Icons.star, color: Color(0xFFFFE033), size: 20,),
+                                            Text('4.3', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,color: Colors.black.withOpacity(0.5)),),
+                                            SizedBox(width: 2,),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 15,),
+                                      Container(
+                                        width: 50,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Colors.transparent,
+                                          border: Border.all(color: Color(0xFF2A2A2A).withOpacity(0.25), width: 1.2),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text('\$0.99', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,color: Colors.black.withOpacity(0.5)),),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 15,),
+                              Container(
+                                height: 20,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Text('0xB...b8', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500,color: Colors.black.withOpacity(0.3)),),
+                              ),
+                              SizedBox(height: 5,),
+                              Container(
+                                height: 88,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Text(_text, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.8)),),
+                              ),
+                              SizedBox(height: 8,),
+                              Container(
+                                height: 20,
+                                width: double.infinity,
+                                color: Colors.transparent,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(width: 5,),
+                                    Container(
+                                      width: 60,
+                                      height: double.infinity,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: Text('parking', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),)),
+                                    SizedBox(width: 5,
+                                    child: VerticalDivider(
+                                      color: Colors.black.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),),
+                                      Container(
+                                      width: 60,
+                                      height: double.infinity,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: Text('restaurant', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),)),
+                                    SizedBox(width: 5,
+                                    child: VerticalDivider(
+                                      color: Colors.black.withOpacity(0.1),
+                                      thickness: 1,
+                                    ),),
+                                      Container(
+                                      width: 60,
+                                      height: double.infinity,
+                                      alignment: Alignment.center,
+                                      color: Colors.transparent,
+                                      child: Text('24/7', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),)),
+                                       SizedBox(width: 5,),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 8,),
+                             
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                child: ElevatedButton(
+                                  onPressed:() {
+                                      setState(() {
+                                        
+                                      });
+                                      redirectToGoogleMap(_intermediateCharger);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFFFEDE00),
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 60,
+                                      right: 60,
+                                      top: 18,
+                                      bottom: 18
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'Start',
+                                        style: TextStyle(
+                                          fontSize: 18.0,
+                                          color: Colors.black,
+                                          fontFamily: 'Comfortaa',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        ),
+                                    ),
+                                  ),
+                                  ),
+                              ),
+                            ],),
+                          );
+                        },
+                      ),
+                      
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            ]);
+        }
+        );
+  }
 }
 
