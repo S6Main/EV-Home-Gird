@@ -19,6 +19,7 @@ import '../../navigation pages/main_page.dart';
 import '../../_v2/componets/SlideLeftRoute.dart';
 import '../../_v2/componets/SlideRightRoute.dart';
 import '../componets/globals.dart' as globals;
+import '../web3dart/ethereum_utils.dart';
 
  Color _one = Color(0xFF000000);
  Color _two = Color(0xFFC4C4C4);
@@ -35,6 +36,9 @@ class WelcomePage extends StatefulWidget {
 
 class _WelcomePageState extends State<WelcomePage> {
 
+  EthereumUtils ethUtils = EthereumUtils(); //web3dart
+  var _data;
+
   CarouselController textCarouselController = CarouselController();
   List<QuotesPanel> _quotesList =[];
   int _currentIndex = 1;
@@ -42,10 +46,44 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   initState() {
     super.initState();
-    setUpLocations();
+    ethUtils.initial(); //web3dart
+    
+    // setUpLocations('4',"G03",LatLng(10.039975, 76.440208));
     addQuotes();
     checkNetwork();
     getCurrentLocation();
+  }
+  void getChargerData(){
+    ethUtils.getChargerDetails().then((value) {
+          _data = value;
+          if(_data != null){
+            var _ids = _data[0];
+            var _names = _data[1];
+            var _coordinates = _data[2];
+
+            for(int i = 0; i < _ids.length; i++){
+              var coordinates = _coordinates[i].split(',');
+              double lat = double.parse(coordinates.toString().substring(1, coordinates.toString().indexOf('-')));
+              double long = double.parse(coordinates.toString().substring(coordinates.toString().indexOf('-')+1, coordinates.toString().length-1));
+
+              //  print('coordinates: $coordinates');
+              // print('lat: $lat');
+              // print('long: $long');
+              // print('name: ${_names[i]}');
+              // print('id: ${_ids[i]}');
+
+              setUpLocations(_ids[i].toString(),_names[i],LatLng(lat, long));
+            }
+
+          }
+          else{
+            print('status : data is null');
+          }
+          
+        });
+  }
+  void setData() async{
+    await ethUtils.setChargerDetails();
   }
   void checkNetwork() async{
     globals.isOnline = await hasNetwork();
@@ -243,6 +281,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        getChargerData();
                         checkNetwork();
                         Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
                           Navigator.push(context, SlideLeftRoute(page: MainPage())),

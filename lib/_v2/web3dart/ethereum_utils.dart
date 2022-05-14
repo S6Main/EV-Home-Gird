@@ -58,7 +58,31 @@ class EthereumUtils {
 
   }
 
+  Future<String> setChargerDetails() async {
+    var id = BigInt.from(4);
+    EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(dotenv.env['METAMASK_PRIVATE_KEY']!);
+    DeployedContract contract = await getDeployedContract();
+    final etherFunction = contract.function("StoreData");
+    final result = await web3client.sendTransaction(
+        privateKeyCred,
+        Transaction.callContract(
+          contract: contract,
+          function: etherFunction,
+          parameters: [id,'b'],
+          maxGas: 100000,
+        ),chainId: 3,
+        fetchChainIdFromNetworkId: false);
+    return result;
 
+  }
+
+  Future getChargerDetails() async {
+    final contract = await getDeployedContract();
+    final etherFunction = contract.function("getData");
+    final result = await web3client.call(contract: contract, function: etherFunction, params: []);
+    List<dynamic> res = result;
+    return res;
+  }
 
   Future<DeployedContract> getDeployedContract() async {
     String abi = await rootBundle.loadString("assets/web3dart/abi.json");

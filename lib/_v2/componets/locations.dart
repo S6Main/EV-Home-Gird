@@ -1,5 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../componets/globals.dart' as globals;
 
 class Location {
   final LatLng coordinates;
@@ -11,9 +12,17 @@ class Location {
 
   get location => null;
 }
+// List<Location> locations = [];
 
-void setUpLocations() {
-  print('status : setup locations');
+void setUpLocations(String id, String name, LatLng coordinates) {
+  // print('status : setup locations');
+  if(globals.needToUplocadLocations){
+    //code to upload locations to blockchain
+  }
+  //code to get locations from blockchain - later called
+  locations.add(Location(coordinates, name, id));
+  print('status : length - ${locations.length}');
+
 }
 
 // List<Location> locations = [
@@ -24,22 +33,23 @@ void setUpLocations() {
 // ];
 
 List<Location> locations = [
-  Location(LatLng(10.015768, 76.341449), "G01",'1000'),
-  Location(LatLng(10.036774, 76.408665), "G02",'1001'),
-  Location(LatLng(10.025036, 76.449896), "G03",'1002'),
-  Location(LatLng(10.039975, 76.440208), "G04",'1003'),
+  Location(LatLng(10.015768, 76.341449), "G01",'0'),
+  Location(LatLng(10.036774, 76.408665), "G02",'1'),
+  Location(LatLng(10.025036, 76.449896), "G03",'2'),
+  Location(LatLng(10.039975, 76.440208), "G04",'3'),
 
   //home to kolenchery points
-  Location(LatLng(10.029139, 76.437242 ), "D01",'1004'),
-  Location(LatLng(10.029731, 76.449688 ), "D02",'1005'),
-  Location(LatLng(10.020349, 76.445654 ), "D03",'1006'),
-  Location(LatLng(10.016376, 76.457155 ), "D04",'1007'),
-  Location(LatLng(10.004881, 76.453378 ), "D05",'1008'),
-  Location(LatLng(10.002176, 76.462133 ), "D06",'1009'),
-  Location(LatLng(9.992287, 76.471231 ), "D07",'1010'),
-  Location(LatLng(9.985102, 76.468828 ), "D08",'1011'),
+  // Location(LatLng(10.029139, 76.437242 ), "D01",'4'),
+  // Location(LatLng(10.029731, 76.449688 ), "D02",'5'),
+  Location(LatLng(10.020349, 76.445654 ), "D03",'6'),
+  Location(LatLng(10.016376, 76.457155 ), "D04",'7'),
+  Location(LatLng(10.004881, 76.453378 ), "D05",'8'),
+  Location(LatLng(10.002176, 76.462133 ), "D06",'9'),
+  Location(LatLng(9.992287, 76.471231 ), "D07",'10'),
+  Location(LatLng(9.985102, 76.468828 ), "D08",'11'),
 
 ];
+
 // 10.029139, 76.437242 
 //10.029731, 76.449688
 //10.020349, 76.445654
