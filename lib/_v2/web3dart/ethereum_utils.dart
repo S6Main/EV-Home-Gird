@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
+import '../componets/globals.dart' as globals;
 
 class EthereumUtils {
   late Web3Client web3client;
@@ -20,10 +21,11 @@ class EthereumUtils {
     final etherFunction = contract.function("getBalance");
     final result = await web3client.call(contract: contract, function: etherFunction, params: []);
     List<dynamic> res = result;
+    print('result is $result');
     return res[0];
   }
 
-  Future<String> sendBalance(int amount) async {
+  Future<String> sendBalance(int amount) async { //working
     var bigAmount = BigInt.from(amount);
     EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(dotenv.env['METAMASK_PRIVATE_KEY']!);
     DeployedContract contract = await getDeployedContract();
@@ -37,6 +39,7 @@ class EthereumUtils {
           maxGas: 100000,
         ),chainId: 3,
         fetchChainIdFromNetworkId: false);
+        print('result is $result');
     return result;
   }
 
@@ -54,6 +57,7 @@ class EthereumUtils {
           maxGas: 100000,
         ),chainId: 3,
         fetchChainIdFromNetworkId: false);
+        print('result is $result');
     return result;
 
   }
@@ -80,6 +84,35 @@ class EthereumUtils {
     final contract = await getDeployedContract();
     final etherFunction = contract.function("getData");
     final result = await web3client.call(contract: contract, function: etherFunction, params: []);
+    List<dynamic> res = result;
+    return res;
+  }
+  Future<String> setUserDetails() async {
+    var id = BigInt.from(globals.userId);
+    var credentials = EthereumAddress.fromHex(globals.publicKey);
+    var name = globals.userName;
+    EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(globals.privateKey);
+    DeployedContract contract = await getDeployedContract();
+    final etherFunction = contract.function("StoreUserData");
+    final result = await web3client.sendTransaction(
+        privateKeyCred,
+        Transaction.callContract(
+          contract: contract,
+          function: etherFunction,
+          parameters: [id,name,credentials],
+          maxGas: 3000000,
+        ),chainId: 3,
+        fetchChainIdFromNetworkId: false);
+        print('transaction key is  $result');
+    return result;
+
+  }
+  Future getUserDetails(String address_) async {
+    var credentials = EthereumAddress.fromHex(address_);
+    print('address_ $credentials');
+    final contract = await getDeployedContract();
+    final etherFunction = contract.function("getUserData");
+    final result = await web3client.call(contract: contract, function: etherFunction, params: [credentials]);
     List<dynamic> res = result;
     return res;
   }

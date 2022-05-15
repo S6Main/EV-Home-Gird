@@ -63,7 +63,7 @@ class _MainPageState extends State<MainPage> {
   
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(milliseconds: 1000), () => _canShow ? CustomDialogAskName() : null);
+    // Future.delayed(Duration(milliseconds: 1000), () => _canShow ? CustomDialogAskName() : null);
     //Future.delayed(Duration(milliseconds: 200), () => CustomDialogDetails());
     Future<bool> _onWillPop() async {
     return (await showDialog(
@@ -414,7 +414,7 @@ class _MainPageState extends State<MainPage> {
                                       setState(() {
                                         globals.isFirstTime = false;
                                         globals.termsAccepted = true;
-                                        globals.name = _nameController.text;
+                                        globals.userName = _nameController.text;
                                         _canShow = false;
                                       });
                                       Navigator.of(ctx).pop();

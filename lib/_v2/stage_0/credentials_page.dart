@@ -63,7 +63,7 @@ class _CredentialsPageState extends State<CredentialsPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    randomCredential();
+    // randomCredential();
   }
 
   void randomCredential(){
@@ -137,23 +137,46 @@ class _CredentialsPageState extends State<CredentialsPage> {
                         ElevatedButton(
                                     onPressed: (){
                                       checkNetwork();
-                                      Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
-                                          setState(() {
+                                      Future.delayed(Duration(milliseconds: 200), () => globals.isOnline 
+                                      ? {
+                                        setState(() {
                                             _message = validateWalletAddress(_keyController.text);
                                           }),
-                                          if(_message == ''){
-                                            _walletkey = _keyController.text,
-                                            //true stage
-                                            CustomLoading(),
-                                          },
-                                        print('place one'),
-                                        // Navigator.push(context, SlideRightRoute(page: WalletPage())),
-                                      } : {
+                                        if(_message == ''){
+                                          //store public and private key
+                                          globals.privateKey = _keyController.text,
+                                          globals.publicKey = widget.walletAddress,
+                                          globals.isLoggedIn = true,
+                                          //redirect to main_page
+                                          Navigator.push(context, 
+                                                SlideLeftRoute(page: MainPage(
+                                                  ))),
+                                        },
+                                        
+                                      }
+                                      :{
+                                        //show Network error
                                         setState(() {
-                                            CustomDialog();
-                                          }),
-                                        print('place two'),
+                                          CustomDialog();
+                                        }),
                                       });
+                                      // Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
+                                      //     setState(() {
+                                      //       _message = validateWalletAddress(_keyController.text);
+                                      //     }),
+                                      //     if(_message == ''){
+                                      //       _walletkey = _keyController.text,
+                                      //       //true stage
+                                      //       CustomLoading(),
+                                      //     },
+                                      //   print('place one'),
+                                      //   // Navigator.push(context, SlideRightRoute(page: WalletPage())),
+                                      // } : {
+                                      //   setState(() {
+                                      //       CustomDialog();
+                                      //     }),
+                                      //   print('place two'),
+                                      // });
 
                                       // Future.delayed(Duration(milliseconds: 300), () => globals.isOnline ? {
                                       //   print('globals.isOnline: ' + globals.isOnline.toString()),

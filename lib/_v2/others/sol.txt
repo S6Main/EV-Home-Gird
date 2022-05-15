@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract basicDapp{
+
+	 uint balance;
+
+    constructor(){
+        balance = 0;
+    }
+
+struct ChargerData{ 
+	uint charger_id;
+	string charger_name;
+	string charger_coordinates;
+	uint charger_status; 	//[1,2,3]
+	uint charger_rp;	//[1,2,3] 1, 1+2, 2
+	address charger_address;
+}
+struct UserData{
+	uint user_id;
+	string user_name;
+	address user_address;
+}
+
+UserData [] users;
+ChargerData []datas;
+
+	//function to store user data
+	function StoreUserData(
+		uint id,
+		string memory name,
+		address u_address)public{
+		UserData memory u  = UserData(id,name,u_address);
+		users.push(u);
+	}
+
+	// Function to Store charger data
+	function StoreData(
+		uint id,
+		string memory name,
+		string memory coordinates,
+		uint status,
+		uint rp,
+		address c_address) public{
+		ChargerData memory d = ChargerData(id,name,coordinates,status,rp,c_address);
+		datas.push(d);
+	}
+
+	//function to check user data
+	function getUserData(address _address) public view returns(bool,uint,string memory){
+		for(uint i  = 0; i < users.length; i++){
+			UserData memory _u = users[i];
+			if(_u.user_address == _address){
+				string memory name  = _u.user_name;
+				return(true,users.length,name);
+			}
+		}
+		return (false,users.length,'');
+	}
+
+	// Function to Retrieve charger data
+	function getData() public view returns(uint[] memory,string[] memory,string[] memory,uint[] memory,uint[] memory,address[] memory){
+		
+		uint[] memory _id = new uint[](datas.length);
+		string[] memory _name = new string[](datas.length);
+		string[] memory _coordinates = new string[](datas.length);
+		uint[] memory _status = new uint[](datas.length);
+		uint[] memory _rp = new uint[](datas.length);
+		address[] memory _address = new address[](datas.length);
+
+		for(uint i = 0; i < datas.length; i++){
+
+			_id[i] = datas[i].charger_id;
+			_name[i] = datas[i].charger_name;
+			_coordinates[i] = datas[i].charger_coordinates;
+			_status[i] = datas[i].charger_status;
+			_rp[i] = datas[i].charger_rp;
+			_address[i] = datas[i].charger_address;
+		}
+		return(_id,_name,_coordinates,_status,_rp,_address);
+	}
+	function sentBalance(uint amount) public{
+        balance += amount;
+    }
+
+    function withdrawBalance(uint amount) public{
+        require(balance > amount, "Not Enough Balance");
+        balance -= amount; 
+    }
+
+    function getBalance() public view returns(uint) {
+        return balance;
+    }
+}

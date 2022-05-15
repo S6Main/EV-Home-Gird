@@ -57,23 +57,36 @@ class _WelcomePageState extends State<WelcomePage> {
     ethUtils.getChargerDetails().then((value) {
           _data = value;
           if(_data != null){
-            var _ids = _data[0];
-            var _names = _data[1];
-            var _coordinates = _data[2];
+            var _ids = _data[0]; //done
+            var _names = _data[1]; //done
+            var _coordinates = _data[2]; //done
+            var _status = _data[3]; //done
+            var _rp = _data[4];
+            var _address = _data[5]; //done
+            String  _type = ''; //done
 
             for(int i = 0; i < _ids.length; i++){
               var coordinates = _coordinates[i].split(',');
               double lat = double.parse(coordinates.toString().substring(1, coordinates.toString().indexOf('-')));
               double long = double.parse(coordinates.toString().substring(coordinates.toString().indexOf('-')+1, coordinates.toString().length-1));
-
-              //  print('coordinates: $coordinates');
-              // print('lat: $lat');
-              // print('long: $long');
-              // print('name: ${_names[i]}');
-              // print('id: ${_ids[i]}');
-
-              setUpLocations(_ids[i].toString(),_names[i],LatLng(lat, long));
+              
+              //charger type
+              if(_names[i][0] == 'G'){
+                print('type: Ather Grid');
+                _type = 'Ather Grid';
+              }
+              else if(_names[i][0] == 'D'){
+                print('type: Ather Dot');
+                _type = 'Ather Dot';
+              }
+              else{
+                print('type: Other');
+                _type = 'Other';
+              }
+              
+              setUpLocations(_ids[i].toString(),_names[i],LatLng(lat, long),_type,_address[i].toString(),int.parse(_status[i].toString()),int.parse(_rp[i].toString()));
             }
+            //charger status
 
           }
           else{

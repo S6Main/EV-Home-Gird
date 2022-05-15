@@ -37,7 +37,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     });
     this.widget.callback(index); //
 
-    if(index == 1 && !globals.isLoggedIn){
+    if((index > 0 ) && !globals.isLoggedIn){
       CustomDialogAccessIssue();
     }
   }
@@ -227,9 +227,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                     ),
                                     ),
                                   ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(context, SlideLeftRoute(page: WalletPage()),);
-                                    },
+                                    onPressed: !globals.isWaiting ? () {
+                                      // Navigator.of(context).pop(true);//move to sign in page
+                                      // Navigator.push(context, SlideLeftRoute(page: WalletPage()),);
+                                      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                                                WalletPage()), (Route<dynamic> route) => false);
+                                    }
+                                    : null,
                                     style: ElevatedButton.styleFrom(
                                       primary: Color(0xFFFEDE00),
                                       shadowColor: Colors.transparent,
@@ -244,8 +248,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                         top: 18,
                                         bottom: 18
                                       ),
-                                      child: const Text(
-                                        'Sign in',
+                                      child: Text(
+                                        globals.isWaiting ? "wait..." : 'Sign in',
                                         style: TextStyle(
                                           fontSize: 18.0,
                                           color: Colors.black,

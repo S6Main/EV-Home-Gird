@@ -6,21 +6,25 @@ class Location {
   final LatLng coordinates;
   final String name;
   final String id;
+  final String address;
+  final String type;
+  final int status;
+  final int rp;
   String time;
 
-  Location(this.coordinates, this.name, this.id, {this.time = '0'});
+  Location(this.coordinates, this.name, this.id,  {this.type = 'Ather Dot',this.address = '0x..hd',this.time = '0',this.status = 1,this.rp = 3,});
 
   get location => null;
 }
 // List<Location> locations = [];
 
-void setUpLocations(String id, String name, LatLng coordinates) {
+void setUpLocations(String id, String name, LatLng coordinates,String _type,String _address,int _status,int _rp) {
   // print('status : setup locations');
   if(globals.needToUplocadLocations){
     //code to upload locations to blockchain
   }
   //code to get locations from blockchain - later called
-  locations.add(Location(coordinates, name, id));
+  locations.add(Location(coordinates, name, id, type: _type,address: _address,status: _status,rp: _rp));
   print('status : length - ${locations.length}');
 
 }
@@ -33,10 +37,10 @@ void setUpLocations(String id, String name, LatLng coordinates) {
 // ];
 
 List<Location> locations = [
-  Location(LatLng(10.015768, 76.341449), "G01",'0'),
-  Location(LatLng(10.036774, 76.408665), "G02",'1'),
-  Location(LatLng(10.025036, 76.449896), "G03",'2'),
-  Location(LatLng(10.039975, 76.440208), "G04",'3'),
+  // Location(LatLng(10.015768, 76.341449), "G01",'0'),
+  Location(LatLng(10.036774, 76.408665), "D02",'1'), //kzm
+  Location(LatLng(10.025036, 76.449896), "D03",'2'), //ptm
+  // Location(LatLng(10.039975, 76.440208), "G04",'3'),
 
   //home to kolenchery points
   // Location(LatLng(10.029139, 76.437242 ), "D01",'4'),

@@ -17,6 +17,7 @@ import 'package:flutter_animated_button/flutter_animated_button.dart';
 import '../_widgets/CustomWindow.dart';
 import '../componets/Distance.dart';
 import '../componets/MapUtils.dart';
+import '../componets/SlideRightRoute.dart';
 import '../componets/locations.dart' as _locations;
 //import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -25,6 +26,9 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../componets/FadeRoute.dart';
 import '../componets/globals.dart' as globals;
 import 'package:custom_info_window/custom_info_window.dart';
+
+import '../web3dart/ethereum_utils.dart';
+import 'terms_page.dart';
 
 
 
@@ -105,14 +109,14 @@ class _HomePageState extends State<HomePage> {
   CustomInfoWindowController controller = CustomInfoWindowController();
 
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
-
+  EthereumUtils ethUtils = EthereumUtils(); //web3dart
   
   @override
   initState() {
     super.initState();
     // set initial locations
     this.setIntitialLocation();
-
+    ethUtils.initial(); //web3dart
     //set custom marker icons
     this.setSourceAndDestinationMarker();
 
@@ -120,6 +124,45 @@ class _HomePageState extends State<HomePage> {
     _polylinePoints = PolylinePoints();
     networkCheck();
     gatherArrivals();
+    if(globals.isLoggedIn)createUser();
+  }
+  void createUser(){
+    bool _status = checkUserExist();
+  }
+  bool checkUserExist(){
+    //recieve max(userid) from web3
+    //receive exist or not from web3
+    // ethUtils.getUserDetails(globals.publicKey);
+    ethUtils.getUserDetails(globals.publicKey).then((value) {
+      if(value != null){
+        print(value[0]);
+        if(value[0] == true){
+          globals.userName = value[2];
+          print('status :  welcome back ${globals.userName}');
+          setState(() {
+            globals.isFirstTime = false;
+          });
+          globals.canAskName = false;
+          return true;
+        }
+        else{
+          int val = int.parse(value[1].toString());
+          globals.userId = val+1;
+          setUpUser();
+          print('status :  user not exist');
+          globals.canAskName = true;
+          return false;
+        }
+      }
+    });
+
+    return false;
+    
+  }
+  void setUpUser(){
+    //pass [id,name,address] to web3dart
+    print('calling setUpUser');
+    globals.canAskName ? CustomDialogAskName() :null;
   }
 
   void networkCheck()async{
@@ -267,15 +310,28 @@ class _HomePageState extends State<HomePage> {
 
           int distanceInMeters = distance.toInt();
           bool test = (distanceInMeters < (globals.maxDistance * 1000) && distanceInMeters > (globals.minDistance * 1000));
+          // bool test2 = (_locations.locations[i].type.toString() == globals.chargerType.toString()); 
+          bool test2 = false;
+          String value = _locations.locations[i].type;
+          switch(globals.chargerType){
+            case 7: test2 = true; break;
+            case 6: if(value == 'Ather Grid' ||  value == 'Other'){test2 = true;} break;
+            case 5: if(value == 'Ather Dot' ||  value == 'Other'){test2 = true;} break;
+            case 4: if(value == 'Other'){test2 = true;} break;
+            case 3: if(value == 'Ather Dot' ||  value == 'Ather Grid'){test2 = true;} break;
+            case 2: if(value == 'Ather Grid'){test2 = true;} break;
+            case 1: if(value == 'Ather Dot'){test2 = true;} break;
+          }
+          
           // print('status : distance of ${_locations.locations[i].name} is $distanceInMeters');
-          if(distanceInMeters < minDistance && test) {
+          if(distanceInMeters < minDistance && test && test2) {
             minDistance = distanceInMeters;
             _nearestMarkerCoordinates = _locations.locations[i].coordinates;
             _nearstMarkerName = _locations.locations[i].name;
             _nearestMarkerId = _locations.locations[i].id;
           }
           
-          if (test) {
+          if (test && test2) {
             resultMarker.add(Marker(
             markerId: MarkerId(_locations.locations[i].id),
             infoWindow: InfoWindow(title: 'Ather   '+_locations.locations[i].name,
@@ -574,6 +630,10 @@ class _HomePageState extends State<HomePage> {
               icon: _markerIcon,
               onTap: (){
                 if(_locations.locations[j].coordinates == _intermediateCharger){
+                  setState(() {
+                    globals.chargerName = _locations.locations[j].name;
+                    globals.chargerAddress = _locations.locations[j].address;
+                  });
                   CustomDialogDetails();
                 }
               }
@@ -1102,6 +1162,17 @@ class _HomePageState extends State<HomePage> {
     bool _isAtherDot = true;
     bool _isAtherGrid = true;
     bool _isOther = false;
+    
+      switch (globals.chargerType){
+        case 1: _isAtherDot = true; break;
+        case 2: _isAtherGrid = true; break;
+        case 4: _isOther = true; break;
+        case 5: _isOther = true; _isAtherDot = true; break;
+        case 6: _isOther = true; _isAtherGrid = true; break;
+        case 7: _isOther = true; _isAtherDot = true; _isAtherGrid = true; break;
+      }
+    
+    
 
     Color _pressed = Color(0xFF2B2D41);
     Color _unpressed = Color(0xFFF6F7F6);
@@ -1482,6 +1553,13 @@ class _HomePageState extends State<HomePage> {
                                     onPressed: () {
                                       globals.minDistance = _rangeFrom;
                                       globals.maxDistance = _rangeTo;
+                                      //charger type filter
+                                      globals.chargerType = 0;
+                                      if(_isAtherDot)globals.chargerType += 1;
+                                      if(_isAtherGrid)globals.chargerType += 2;
+                                      if(_isOther)globals.chargerType += 4;
+
+                                      // done
                                       Navigator.of(ctx).pop();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -1715,7 +1793,201 @@ class _HomePageState extends State<HomePage> {
         }
         );
   }
+  void CustomDialogAskName() {
+    TextEditingController _nameController = new TextEditingController();
+    showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.black.withOpacity(0.0),
+        context: context,
+        builder: (BuildContext ctx) {
+          return Stack(
+            children :<Widget>[
 
+            Container(
+              child: BackdropFilter(
+                blendMode: BlendMode.srcOver,
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  color: Color(0xFFC4C4C4).withOpacity(0.5),
+                  child: StatefulBuilder(builder: (context, _setState) => AlertDialog(
+                      titlePadding: EdgeInsets.zero,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(
+                              32.0,
+                            ),
+                          ),
+                        ),
+
+                      title:  Stack(
+                        children: [
+                          
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text('About you',
+                                          style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
+                                          )),
+                              ),
+                            ],
+                          ),
+                          // Positioned(
+                          //   top: 0,
+                          //   right: 0,
+                          //   child: Container(color: Colors.transparent, height: 40,width: 40,
+                          //   child: Stack(
+                          //     children: [
+                          //       Positioned(
+                          //         right: 0,
+                          //         child:  Material(
+                          //         color: Colors.transparent,
+                          //         child: InkWell(
+                          //           borderRadius: new BorderRadius.circular(20.0),
+                          //           onTap: (() {
+                          //             Navigator.of(context).pop();
+                          //           }),
+                          //           child: Container(
+                          //             width: 40,
+                          //             height: 40,
+                          //             color: Colors.transparent,
+                          //             child: Image.asset('assets/images/closeIcon_v2.png')
+                          //           ),
+                          //         ),
+                          //       ),)
+                          //     ],
+                          //   ),),)
+                        ],
+                      ),
+                      content: Builder(
+                        builder: (context) {
+
+                          return Container(
+                            height: 170,
+                            width: 280,
+                            child: Column(children: [
+                              Container(height: 45,
+                              decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius:  BorderRadius.circular(5),
+                                  border: Border.all(color: Color.fromARGB(255, 0, 0, 0), width: 1)
+                                ),
+                              child: TextField(
+                                maxLength: 42,
+                                readOnly: false,
+                                controller: _nameController,
+                                style: TextStyle(fontSize: 15.5,color: Color.fromARGB(255, 0, 0, 0)),
+                                onTap: () async {
+
+                                },
+                          decoration: InputDecoration(
+                            hintStyle: TextStyle(fontSize: 15,color: Color(0xFFBFBFBF)),
+                            hintText: 'what do we call you ?',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.only(left: 20,top: 7,bottom: 15),
+                            counterText: '',
+                          ),
+                        ),
+                              ),
+                              
+                              Padding(
+                                padding: const EdgeInsets.only(top: 25),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: Container(width: 25,height: 25, color: Colors.transparent,
+                                      child: Checkbox(
+                                              shape:RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(4),
+                                                  side: BorderSide(color: Colors.black54)
+                                                ),
+                                              checkColor: Colors.transparent,
+                                              value: globals.terms,
+                                              activeColor: Colors.black,
+                                              onChanged: (bool? value) {
+                                                _setState(() {
+                                                  globals.terms = value;
+                                                });
+                                              },
+                                            ),
+                                      ),
+                                    ),
+                                    Material(
+                                      child: InkWell(
+                                        onTap: () {
+                                          print('tapped on terms');
+                                          Navigator.push(context, SlideRightRoute(page: TermsPage()),);
+                                        },
+                                        child: Text('Terms and Conditions',
+                                            style: TextStyle(decoration: TextDecoration.underline,
+                                              fontSize: 14,fontWeight: FontWeight.normal, color: Color.fromARGB(255, 0, 0, 0)),),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                child: ElevatedButton(
+                                  onPressed: globals.terms! ? () async{
+                                      setState(() {
+                                        globals.isFirstTime = false;
+                                        globals.termsAccepted = true;
+                                        globals.userName = _nameController.text;
+                                        globals.canAskName = false;
+                                        // _canShow = false;
+                                      });
+                                      
+                                        await ethUtils.setUserDetails();
+                                      Navigator.of(ctx).pop();
+                                  } : null,
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFFFEDE00),
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 50,
+                                      right: 50,
+                                      top: 18,
+                                      bottom: 18
+                                    ),
+                                    child: const Text(
+                                      'Lets start...',
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Colors.black,
+                                        fontFamily: 'Comfortaa',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      ),
+                                  ),
+                                  ),
+                              ),
+                            ],),
+                          );
+                        },
+                      ),
+                      
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            ]);
+        }
+        );
+  }
   void CustomDialogDetails() {
     TextEditingController _nameController = new TextEditingController();
     String _text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Volutpat eu, consectetur sed in tincidunt turpis volutpat, nunc. Purus suspendisse purus nibh nam nisl egestas sed. Facilisis enim urna morbi.';
@@ -1753,7 +2025,7 @@ class _HomePageState extends State<HomePage> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 20),
                                 child: Center(
-                                  child: Text('Ather Dot 1007',
+                                  child: Text('Ather ${globals.chargerName}',
                                           style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 0, 0)),
                                           )),
                               ),
@@ -1848,7 +2120,7 @@ class _HomePageState extends State<HomePage> {
                                 height: 20,
                                 width: double.infinity,
                                 color: Colors.transparent,
-                                child: Text('0xB...b8', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500,color: Colors.black.withOpacity(0.3)),),
+                                child: Text(globals.chargerAddress, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500,color: Colors.black.withOpacity(0.3)),),
                               ),
                               SizedBox(height: 5,),
                               Container(
