@@ -11,6 +11,8 @@ import 'package:expansion_widget/expansion_widget.dart';
 import 'dart:math' as math;
 import 'package:styled_text/styled_text.dart';
 
+import '../web3dart/ethereum_utils.dart';
+
 
 
 class HistoryPage extends StatefulWidget {
@@ -33,13 +35,42 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   String _text3 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Leo sed aliquam diam ullamcorper elementum. Nisi, consequat amet enim quam lacus, curabitur nisi libero, vehicula. Placerat malesuada ut sit.';
 
   late final _tabController = new TabController(vsync: this, length: 3);
+  EthereumUtils ethUtils = EthereumUtils(); //web3dart
+  List<Widget> _notifications = [];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    
+    // _notifications.add(NotificationCard(text: _text2),);
+    // addNotifications();
+    ethUtils.initial(); //web3dart
+    getNotificationDetails();
   }
 
+  void getNotificationDetails(){
+    String title = '';
+    String address = '';
+    String text = '';
+    ethUtils.getNotifications(globals.publicKey).then((value) {
+      if(value[0].length > 1){
+        for(int i  = 0; i < value[0].length -1; i++){
+          title = value[0][i];
+          address = value[1][i].toString();
+          text = value[2][i];
+          addNotifications(title, address, text);
+        }
+      }
+    });
+  }
+
+  void addNotifications(String _title, String _address, String _text){
+
+    _address = _address.substring(0, 6) + '...' + _address.substring(_address.length - 4, _address.length);
+    _notifications.add(NotificationCard(title: _title, address: _address, text: _text));
+    setState(() {
+      
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,19 +104,35 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                       ],
                     )
                   ),
-                  new SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    // child: Text('History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal,color: Colors.black),),
-                    child:Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                  Container(
+                    child: Stack(
                       children: [
-                        NotificationCard(text: _text2),
-                        NotificationCard(text: _text2),
-                        NotificationCard(text: _text2),
-                        NotificationCard(text: _text2),
-                        NotificationCard(text: _text2),
+                        Visibility(
+                          visible: _notifications.length < 1,
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            alignment: Alignment.center,
+                            child: Text('empty', style: TextStyle(fontSize: 25, fontWeight: FontWeight.normal,color: Colors.black.withOpacity(0.1)),)),
+                        ),
+                        new SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          // child: Text('History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal,color: Colors.black),),
+                          child:
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: _notifications,
+                                //  [
+                                //   NotificationCard(text: _text2),
+                                //   NotificationCard(text: _text2),
+                                //   NotificationCard(text: _text2),
+                                //   NotificationCard(text: _text2),
+                                //   NotificationCard(text: _text2),
+                                // ],
+                              ),
+                        ),
                       ],
-                    )
+                    ),
                   ),
                   new SingleChildScrollView(
                     scrollDirection: Axis.vertical,
@@ -291,10 +338,12 @@ class HistoryCard extends StatelessWidget {
 class NotificationCard extends StatefulWidget {
   const NotificationCard({
     Key? key,
-    required String text,
-  }) : _text2 = text, super(key: key);
+     required this.title, required this.address,required this.text,
+  }) :super(key: key);
 
-  final String _text2;
+  final String address;
+  final String title;
+  final String text;
 
   @override
   State<NotificationCard> createState() => _NotificationCardState();
@@ -364,13 +413,13 @@ class _NotificationCardState extends State<NotificationCard> {
                                           Positioned(
                                             top: 5,
                                             left: 5,
-                                            child: Text('Boring Girls',style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600,
+                                            child: Text(widget.title,style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600,
                                             color: _isOpened ? _openedColor : _unopenedColor 
                                             ))),
                                           Positioned(
                                             top: 35,
                                             left: 5,
-                                            child: Text('Sara Taylor',style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300,color: Colors.black.withOpacity(0.6))))
+                                            child: Text(widget.address,style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300,color: Colors.black.withOpacity(0.6))))
                                         ],
                                       ),
                                     )
@@ -385,7 +434,7 @@ class _NotificationCardState extends State<NotificationCard> {
                             width: double.infinity,
                             height: 80,
                             color: Colors.transparent,
-                            child: Text(widget._text2, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),),
+                            child: Text(widget.text, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w400,color: Colors.black.withOpacity(0.4)),),
                             )
                   ),
             ),

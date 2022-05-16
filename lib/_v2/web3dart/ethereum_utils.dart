@@ -62,6 +62,16 @@ class EthereumUtils {
 
   }
 
+  Future getNotifications(String address_) async {
+    var credentials = EthereumAddress.fromHex(address_);
+    print('address_ $credentials');
+    final contract = await getDeployedContract();
+    final etherFunction = contract.function("getNotifications");
+    final result = await web3client.call(contract: contract, function: etherFunction, params: [credentials]);
+    List<dynamic> res = result;
+    return res;
+  }
+
   Future<String> setChargerDetails() async {
     var id = BigInt.from(4);
     EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(dotenv.env['METAMASK_PRIVATE_KEY']!);
