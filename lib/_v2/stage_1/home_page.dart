@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:developer' as dev;
@@ -26,6 +27,8 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../componets/FadeRoute.dart';
 import '../componets/globals.dart' as globals;
 import 'package:custom_info_window/custom_info_window.dart';
+import 'package:another_flushbar/flushbar.dart'; //snackbar custom
+
 
 import '../web3dart/ethereum_utils.dart';
 import 'terms_page.dart';
@@ -104,13 +107,13 @@ class _HomePageState extends State<HomePage> {
 
   LatLng _divertionCoordinates = LatLng(0, 0);
   LatLng _intermediateCharger = LatLng(0, 0);
-
+  
 
   CustomInfoWindowController controller = CustomInfoWindowController();
 
   //ValueNotifier<int> _changeInIndex =ValueNotifier(0);  // used to notify the carousel to change the index
   EthereumUtils ethUtils = EthereumUtils(); //web3dart
-  
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>(); //for snackbar
   @override
   initState() {
     super.initState();
@@ -135,10 +138,14 @@ class _HomePageState extends State<HomePage> {
     // ethUtils.getUserDetails(globals.publicKey);
     ethUtils.getUserDetails(globals.publicKey).then((value) {
       if(value != null){
-        print(value[0]);
         if(value[0] == true){
           globals.userName = value[2];
           print('status :  welcome back ${globals.userName}');
+          // showInSnackBar('welcome back ${globals.userName}');
+          globals.isAutherized = true;
+          showFloatingFlushbar(context: context,
+                  title: 'Hey ${globals.userName}',
+                  message: 'welcome back :)');
           setState(() {
             globals.isFirstTime = false;
           });
@@ -163,8 +170,50 @@ class _HomePageState extends State<HomePage> {
     //pass [id,name,address] to web3dart
     print('calling setUpUser');
     globals.canAskName ? CustomDialogAskName() :null;
+    globals.canAskName ? startTimer() :null;
   }
-
+  void startTimer(){
+    print('started timer');
+    const Sec = Duration(seconds:10);
+    Timer.periodic(Sec, (timer)  {
+      if(!globals.canAskName && globals.letUserKnow){
+        showFloatingFlushbar(context: context,
+                  title: 'please wait.. ',
+                  message: 'it might take some time');
+        globals.letUserKnow = false;
+      }
+      if(!globals.canAskName && !globals.repeatCheck){
+        print('status : registration complete');
+        globals.isAutherized =true;
+              showFloatingFlushbar(context: context,
+                  title: 'success ',
+                  message: 'user registered');
+      }
+      checkStatus();
+      if(!globals.repeatCheck){
+        timer.cancel();
+      }
+    } 
+    );
+      
+    
+  }
+  void chooseAvatar(){
+    
+  }
+  
+  void checkStatus(){
+    print('checking user exist');
+      ethUtils.getUserDetails(globals.publicKey).then((value) {
+          if(value != null){
+            if(value[0] == true){
+              globals.repeatCheck = false;
+              
+            }
+          }
+        });
+      
+  }
   void networkCheck()async{
     _isOnline = await hasNetwork();
   }
@@ -729,6 +778,39 @@ class _HomePageState extends State<HomePage> {
   void _showChargers(){
     
   }
+  void showFloatingFlushbar({@required BuildContext? context,
+  @required String? title,
+  @required String? message,}){
+  Flushbar? flush;
+  bool? _wasButtonClicked;
+  flush = Flushbar<bool>(
+    title: title,
+    message: message,
+    duration: Duration(seconds: 3),
+    margin: EdgeInsets.all(8),
+    borderRadius: BorderRadius.circular(10),
+    backgroundGradient: LinearGradient(colors: [Colors.blue, Colors.teal]),
+    backgroundColor: Colors.red,
+    boxShadows: [BoxShadow(color: Colors.blue.withOpacity(0.4), offset: Offset(0.0, 2.0), blurRadius: 3.0,)]
+
+    // icon: Icon(
+    //   Icons.info_outline,
+    //   color: Colors.white,),
+    // mainButton: FlatButton(
+    //   onPressed: () {
+    //     flush!.dismiss(true); // result = true
+    //   },
+    //   child: Text(
+    //     "ADD",
+    //     style: TextStyle(color: Colors.amber),
+    //   ),
+    // )
+    ) // <bool> is the type of the result passed to dismiss() and collected by show().then((result){})
+    ..show(context!).then((result) {
+
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
 
@@ -741,6 +823,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
+      key: _scaffoldKey,
       body: InkWell(
         // onLongPress: (){
         //  Navigator.pushReplacement(
@@ -1941,6 +2024,8 @@ class _HomePageState extends State<HomePage> {
                                         globals.termsAccepted = true;
                                         globals.userName = _nameController.text;
                                         globals.canAskName = false;
+                                        globals.repeatCheck = true;
+                                        // FocusScope.of(context).unfocus();
                                         // _canShow = false;
                                       });
                                       
