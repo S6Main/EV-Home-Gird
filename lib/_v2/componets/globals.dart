@@ -18,7 +18,6 @@ bool termsAccepted = false;
 //color properties
 Color MAIN_COLOR = Color(0xFF70e000);
 
-
 //google map
 Queue queueID = new Queue();
 Queue queuePlace = new Queue();
@@ -32,8 +31,10 @@ bool? terms = false;
 bool canAskName = true;
 
 int minDistance = 1; //filters
-int maxDistance = 3; 
+int maxDistance = 3;
 int chargerType = 3;
+int chargerStatus = 1;
+int checkBoxs = 2;
 
 //charger
 String chargerName = '';
