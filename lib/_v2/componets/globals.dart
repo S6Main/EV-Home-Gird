@@ -47,7 +47,7 @@ int cutOff = 20; // 20%
 //web3dart
 String publicKey = '';
 String privateKey = '';
-bool repeatCheck = false;
+bool repeatCheck = true;
 bool letUserKnow = true;
 
 String userName = '';

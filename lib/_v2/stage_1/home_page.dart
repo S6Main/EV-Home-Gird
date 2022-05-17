@@ -143,13 +143,18 @@ class _HomePageState extends State<HomePage> {
           print('status :  welcome back ${globals.userName}');
           // showInSnackBar('welcome back ${globals.userName}');
           globals.isAutherized = true;
-          showFloatingFlushbar(context: context,
+          print('let user know ${globals.letUserKnow}');
+          if(globals.letUserKnow){
+            showFloatingFlushbar(context: context,
                   title: 'Hey ${globals.userName}',
                   message: 'welcome back :)');
+          }
+          
           setState(() {
             globals.isFirstTime = false;
           });
           globals.canAskName = false;
+          globals.letUserKnow = false;
           return true;
         }
         else{
@@ -174,13 +179,14 @@ class _HomePageState extends State<HomePage> {
   }
   void startTimer(){
     print('started timer');
-    const Sec = Duration(seconds:10);
-    Timer.periodic(Sec, (timer)  {
+    Duration sec = Duration(seconds:30);
+    Timer.periodic(sec, (timer)  {
       if(!globals.canAskName && globals.letUserKnow){
         showFloatingFlushbar(context: context,
                   title: 'please wait.. ',
                   message: 'it might take some time');
         globals.letUserKnow = false;
+        sec = Duration(seconds:10);
       }
       if(!globals.canAskName && !globals.repeatCheck){
         print('status : registration complete');
@@ -208,7 +214,7 @@ class _HomePageState extends State<HomePage> {
           if(value != null){
             if(value[0] == true){
               globals.repeatCheck = false;
-              
+              print('you got me');
             }
           }
         });
@@ -781,6 +787,7 @@ class _HomePageState extends State<HomePage> {
   void showFloatingFlushbar({@required BuildContext? context,
   @required String? title,
   @required String? message,}){
+    print('showed snack bar $title');
   Flushbar? flush;
   bool? _wasButtonClicked;
   flush = Flushbar<bool>(
@@ -1642,6 +1649,7 @@ class _HomePageState extends State<HomePage> {
                                       if(_isAtherGrid)globals.chargerType += 2;
                                       if(_isOther)globals.chargerType += 4;
 
+                                      
                                       // done
                                       Navigator.of(ctx).pop();
                                     },
@@ -2024,7 +2032,7 @@ class _HomePageState extends State<HomePage> {
                                         globals.termsAccepted = true;
                                         globals.userName = _nameController.text;
                                         globals.canAskName = false;
-                                        globals.repeatCheck = true;
+                                        // globals.repeatCheck = true;
                                         // FocusScope.of(context).unfocus();
                                         // _canShow = false;
                                       });

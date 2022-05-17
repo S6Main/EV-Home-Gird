@@ -50,9 +50,9 @@
 				"type": "address"
 			},
 			{
-				"internalType": "address",
+				"internalType": "string",
 				"name": "_from_address",
-				"type": "address"
+				"type": "string"
 			},
 			{
 				"internalType": "string",
@@ -142,9 +142,9 @@
 				"type": "string[]"
 			},
 			{
-				"internalType": "address[]",
+				"internalType": "string[]",
 				"name": "",
-				"type": "address[]"
+				"type": "string[]"
 			},
 			{
 				"internalType": "string[]",
