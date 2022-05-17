@@ -150,12 +150,13 @@ class _HomePageState extends State<HomePage> {
           // showInSnackBar('welcome back ${globals.userName}');
           globals.isAutherized = true;
           print('let user know ${globals.letUserKnow}');
-          if(globals.letUserKnow){
-            showFloatingFlushbar(context: context,
-                  title: 'Hey ${globals.userName}',
-                  message: 'welcome back :)');
+          if (globals.letUserKnow) {
+            showFloatingFlushbar(
+                context: context,
+                title: 'Hey ${globals.userName}',
+                message: 'welcome back :)');
           }
-          
+
           setState(() {
             globals.isFirstTime = false;
           });
@@ -185,14 +186,15 @@ class _HomePageState extends State<HomePage> {
 
   void startTimer() {
     print('started timer');
-    Duration sec = Duration(seconds:30);
-    Timer.periodic(sec, (timer)  {
-      if(!globals.canAskName && globals.letUserKnow){
-        showFloatingFlushbar(context: context,
-                  title: 'please wait.. ',
-                  message: 'it might take some time');
+    Duration sec = Duration(seconds: 30);
+    Timer.periodic(sec, (timer) {
+      if (!globals.canAskName && globals.letUserKnow) {
+        showFloatingFlushbar(
+            context: context,
+            title: 'please wait.. ',
+            message: 'it might take some time');
         globals.letUserKnow = false;
-        sec = Duration(seconds:10);
+        sec = Duration(seconds: 10);
       }
       if (!globals.canAskName && !globals.repeatCheck) {
         print('status : registration complete');
@@ -211,15 +213,14 @@ class _HomePageState extends State<HomePage> {
 
   void checkStatus() {
     print('checking user exist');
-      ethUtils.getUserDetails(globals.publicKey).then((value) {
-          if(value != null){
-            if(value[0] == true){
-              globals.repeatCheck = false;
-              print('you got me');
-            }
-          }
-        });
-      
+    ethUtils.getUserDetails(globals.publicKey).then((value) {
+      if (value != null) {
+        if (value[0] == true) {
+          globals.repeatCheck = false;
+          print('you got me');
+        }
+      }
+    });
   }
 
   void networkCheck() async {
@@ -827,24 +828,6 @@ class _HomePageState extends State<HomePage> {
     //done
     //drow route
   }
-  void _showChargers(){
-    
-  }
-  void showFloatingFlushbar({@required BuildContext? context,
-  @required String? title,
-  @required String? message,}){
-    print('showed snack bar $title');
-  Flushbar? flush;
-  bool? _wasButtonClicked;
-  flush = Flushbar<bool>(
-    title: title,
-    message: message,
-    duration: Duration(seconds: 3),
-    margin: EdgeInsets.all(8),
-    borderRadius: BorderRadius.circular(10),
-    backgroundGradient: LinearGradient(colors: [Colors.blue, Colors.teal]),
-    backgroundColor: Colors.red,
-    boxShadows: [BoxShadow(color: Colors.blue.withOpacity(0.4), offset: Offset(0.0, 2.0), blurRadius: 3.0,)]
 
   void _showChargers() {}
   void showFloatingFlushbar({
@@ -852,6 +835,7 @@ class _HomePageState extends State<HomePage> {
     @required String? title,
     @required String? message,
   }) {
+    print('showed snack bar $title');
     Flushbar? flush;
     bool? _wasButtonClicked;
     flush = Flushbar<bool>(
@@ -1399,9 +1383,30 @@ class _HomePageState extends State<HomePage> {
     // bool _isAtherGrid = true;
     // bool _isOther = false;
 
-    UpdateCheckboxs();
-    UpdateChargerStatus();
-    UpdateChargerType();
+    switch (globals.chargerType) {
+      case 1:
+        _isAtherDot = true;
+        break;
+      case 2:
+        _isAtherGrid = true;
+        break;
+      case 4:
+        _isOther = true;
+        break;
+      case 5:
+        _isOther = true;
+        _isAtherDot = true;
+        break;
+      case 6:
+        _isOther = true;
+        _isAtherGrid = true;
+        break;
+      case 7:
+        _isOther = true;
+        _isAtherDot = true;
+        _isAtherGrid = true;
+        break;
+    }
 
     Color _pressed = Color(0xFF2B2D41);
     Color _unpressed = Color(0xFFF6F7F6);
@@ -1994,6 +1999,7 @@ class _HomePageState extends State<HomePage> {
                                       if (_isClosed) globals.chargerStatus = 3;
                                       // if (_restaurant) globals.checkBoxs += 1;
                                       // if (_parking) globals.checkBoxs += 2;
+
                                       // done
                                       Navigator.of(ctx).pop();
                                     },
@@ -2402,10 +2408,11 @@ class _HomePageState extends State<HomePage> {
                                               globals.userName =
                                                   _nameController.text;
                                               globals.canAskName = false;
-                                              globals.repeatCheck = true;
+                                              // globals.repeatCheck = true;
                                               // FocusScope.of(context).unfocus();
                                               // _canShow = false;
                                             });
+
                                             await ethUtils.setUserDetails();
                                             Navigator.of(ctx).pop();
                                           }
