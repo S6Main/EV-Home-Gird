@@ -52,16 +52,17 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     String address = '';
     String text = '';
     ethUtils.getNotifications(globals.publicKey).then((value) {
-      if(value[0].length > 1){
-        for(int i  = 0; i < value[0].length -1; i++){
+      if(value[0].length > 0){
+        for(int i  = 0; i < value[0].length; i++){
           title = value[0][i];
-          address = value[1][i].toString();
+          address = value[1][i];
           text = value[2][i];
           addNotifications(title, address, text);
         }
       }
     });
   }
+  
 
   void addNotifications(String _title, String _address, String _text){
 
@@ -71,6 +72,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       
     });
   }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,22 +117,23 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                             alignment: Alignment.center,
                             child: Text('empty', style: TextStyle(fontSize: 25, fontWeight: FontWeight.normal,color: Colors.black.withOpacity(0.1)),)),
                         ),
+                        
                         new SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          // child: Text('History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal,color: Colors.black),),
-                          child:
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: _notifications,
-                                //  [
-                                //   NotificationCard(text: _text2),
-                                //   NotificationCard(text: _text2),
-                                //   NotificationCard(text: _text2),
-                                //   NotificationCard(text: _text2),
-                                //   NotificationCard(text: _text2),
-                                // ],
-                              ),
-                        ),
+                            scrollDirection: Axis.vertical,
+                            // child: Text('History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal,color: Colors.black),),
+                            child:
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: _notifications,
+                                  //  [
+                                  //   NotificationCard(text: _text2),
+                                  //   NotificationCard(text: _text2),
+                                  //   NotificationCard(text: _text2),
+                                  //   NotificationCard(text: _text2),
+                                  //   NotificationCard(text: _text2),
+                                  // ],
+                                ),
+                          ),
                       ],
                     ),
                   ),

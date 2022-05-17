@@ -37,7 +37,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     });
     this.widget.callback(index); //
 
-    if((index > 0 ) && !globals.isLoggedIn && !globals.isAutherized){
+    if((index > 0 ) && (!globals.isLoggedIn || !globals.isAutherized)){
       CustomDialogAccessIssue();
     }
   }

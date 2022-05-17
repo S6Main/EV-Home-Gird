@@ -149,14 +149,18 @@ class _HomePageState extends State<HomePage> {
           print('status :  welcome back ${globals.userName}');
           // showInSnackBar('welcome back ${globals.userName}');
           globals.isAutherized = true;
-          showFloatingFlushbar(
-              context: context,
-              title: 'Hey ${globals.userName}',
-              message: 'welcome back :)');
+          print('let user know ${globals.letUserKnow}');
+          if(globals.letUserKnow){
+            showFloatingFlushbar(context: context,
+                  title: 'Hey ${globals.userName}',
+                  message: 'welcome back :)');
+          }
+          
           setState(() {
             globals.isFirstTime = false;
           });
           globals.canAskName = false;
+          globals.letUserKnow = false;
           return true;
         } else {
           int val = int.parse(value[1].toString());
@@ -181,14 +185,14 @@ class _HomePageState extends State<HomePage> {
 
   void startTimer() {
     print('started timer');
-    const Sec = Duration(seconds: 10);
-    Timer.periodic(Sec, (timer) {
-      if (!globals.canAskName && globals.letUserKnow) {
-        showFloatingFlushbar(
-            context: context,
-            title: 'please wait.. ',
-            message: 'it might take some time');
+    Duration sec = Duration(seconds:30);
+    Timer.periodic(sec, (timer)  {
+      if(!globals.canAskName && globals.letUserKnow){
+        showFloatingFlushbar(context: context,
+                  title: 'please wait.. ',
+                  message: 'it might take some time');
         globals.letUserKnow = false;
+        sec = Duration(seconds:10);
       }
       if (!globals.canAskName && !globals.repeatCheck) {
         print('status : registration complete');
@@ -207,13 +211,15 @@ class _HomePageState extends State<HomePage> {
 
   void checkStatus() {
     print('checking user exist');
-    ethUtils.getUserDetails(globals.publicKey).then((value) {
-      if (value != null) {
-        if (value[0] == true) {
-          globals.repeatCheck = false;
-        }
-      }
-    });
+      ethUtils.getUserDetails(globals.publicKey).then((value) {
+          if(value != null){
+            if(value[0] == true){
+              globals.repeatCheck = false;
+              print('you got me');
+            }
+          }
+        });
+      
   }
 
   void networkCheck() async {
@@ -821,6 +827,24 @@ class _HomePageState extends State<HomePage> {
     //done
     //drow route
   }
+  void _showChargers(){
+    
+  }
+  void showFloatingFlushbar({@required BuildContext? context,
+  @required String? title,
+  @required String? message,}){
+    print('showed snack bar $title');
+  Flushbar? flush;
+  bool? _wasButtonClicked;
+  flush = Flushbar<bool>(
+    title: title,
+    message: message,
+    duration: Duration(seconds: 3),
+    margin: EdgeInsets.all(8),
+    borderRadius: BorderRadius.circular(10),
+    backgroundGradient: LinearGradient(colors: [Colors.blue, Colors.teal]),
+    backgroundColor: Colors.red,
+    boxShadows: [BoxShadow(color: Colors.blue.withOpacity(0.4), offset: Offset(0.0, 2.0), blurRadius: 3.0,)]
 
   void _showChargers() {}
   void showFloatingFlushbar({
@@ -2382,7 +2406,6 @@ class _HomePageState extends State<HomePage> {
                                               // FocusScope.of(context).unfocus();
                                               // _canShow = false;
                                             });
-
                                             await ethUtils.setUserDetails();
                                             Navigator.of(ctx).pop();
                                           }
