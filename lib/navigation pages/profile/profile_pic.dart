@@ -3,7 +3,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ev_homegrid/components/custom_profilepic_button.dart';
 
 class ProfilePic extends StatelessWidget {
-  const ProfilePic({Key? key}) : super(key: key);
+  final String image_url;
+
+  ProfilePic({
+    this.image_url = 'assets/images/femaleAvatar.png',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,7 @@ class ProfilePic extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: CircleAvatar(
-          backgroundImage: AssetImage('assets/images/femaleAvatar.png'),
+          backgroundImage: AssetImage(this.image_url),
           backgroundColor: Colors.blue,
           // radius: 60.0,
         ),
