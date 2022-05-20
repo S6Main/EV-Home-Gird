@@ -59,11 +59,11 @@ class MyApp extends StatelessWidget {
       //home: MyHomePage(),
       //home: MainPage(), // screen
       //home: mainApp()
-      // home: WelcomePage(), //v2 version
+      home: WelcomePage(), //v2 version
       //home: WalletPage(),
       //home: CredentialsPage(),
       // home: TestPage(), // web3dart
-      home: PaymentsPage(),
+      // home: PaymentsPage(),
       // home: ConfirmationPage(),
     );
   }

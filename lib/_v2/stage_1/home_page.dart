@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -146,6 +147,8 @@ class _HomePageState extends State<HomePage> {
       if (value != null) {
         if (value[0] == true) {
           globals.userName = value[2];
+          globals.userProfile = int.parse(value[3].toString());
+          print('user profile: ' + globals.userProfile.toString());
           print('status :  welcome back ${globals.userName}');
           // showInSnackBar('welcome back ${globals.userName}');
           globals.isAutherized = true;
@@ -167,6 +170,9 @@ class _HomePageState extends State<HomePage> {
           int val = int.parse(value[1].toString());
           globals.userId = val + 1;
           setUpUser();
+          Random random = new Random();
+          globals.userProfile = random.nextInt(10);
+          print('random profile: ' + globals.userProfile.toString());
           print('status :  user not exist');
           globals.canAskName = true;
           return false;

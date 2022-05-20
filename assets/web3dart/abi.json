@@ -81,6 +81,11 @@
 				"internalType": "address",
 				"name": "u_address",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "profile",
+				"type": "uint256"
 			}
 		],
 		"name": "StoreUserData",
@@ -179,6 +184,11 @@
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

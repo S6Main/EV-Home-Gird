@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
 import 'profile_pic.dart';
 import 'package:ev_homegrid/components/custom_profilepic_button.dart';
 import 'package:ev_homegrid/components/custom_card.dart';
 import 'vehicle/my_vehicle.dart';
+import '../../_v2/componets/globals.dart' as globals;
+
 
 class EditUserProfile extends StatefulWidget {
   const EditUserProfile({Key? key}) : super(key: key);
@@ -13,6 +17,31 @@ class EditUserProfile extends StatefulWidget {
 }
 
 class _EditUserProfileState extends State<EditUserProfile> {
+
+  String _name = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    startTimer();
+  }
+   void startTimer() {
+    print('started timer');
+    Duration sec = Duration(seconds: 5);
+    Timer.periodic(sec, (timer) {
+      if(globals.userProfile != -1){
+        timer.cancel();
+        print('cancelled timer');
+        updateImage();
+      }
+    });
+  }
+  void updateImage() {
+    setState ((){ 
+          _name = globals.userName;
+      });
+  } 
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,7 +71,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * .02,
                     ),
-                    Text('Name', style: kProfileSubtitleStyle),
+                    Text(_name, style: kProfileSubtitleStyle),
                     // SizedBox(
                     //   height: MediaQuery.of(context).size.height * .0095,
                     // ),
@@ -52,14 +81,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
                     // ),
                   ],
                 ),
-                Positioned(
-                  child: CustomProfilePicButton(
-                    iconData: Icons.edit,
-                    onPressed: () {},
-                  ),
-                  bottom: 20, //to move down, decrease the value.
-                  right: 30,
-                )
+                
               ],
             ),
           ),

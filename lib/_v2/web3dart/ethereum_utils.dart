@@ -101,6 +101,7 @@ class EthereumUtils {
     var id = BigInt.from(globals.userId);
     var credentials = EthereumAddress.fromHex(globals.publicKey);
     var name = globals.userName;
+    var profile = BigInt.from(globals.userProfile);
     EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(globals.privateKey);
     DeployedContract contract = await getDeployedContract();
     final etherFunction = contract.function("StoreUserData");
@@ -109,7 +110,7 @@ class EthereumUtils {
         Transaction.callContract(
           contract: contract,
           function: etherFunction,
-          parameters: [id,name,credentials],
+          parameters: [id,name,credentials,profile],
           maxGas: 3000000,
         ),chainId: 3,
         fetchChainIdFromNetworkId: false);

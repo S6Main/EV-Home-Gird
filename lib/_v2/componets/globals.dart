@@ -53,6 +53,7 @@ bool letUserKnow = true;
 
 String userName = '';
 int userId = 0;
+int userProfile = -1;
 
 //manual editings
 bool canExit = false;

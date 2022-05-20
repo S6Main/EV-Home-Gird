@@ -92,6 +92,7 @@ flutter:
     - assets/.env
     - assets/web3dart/
     - assets/images/
+    - assets/images/profiles_V2/
     - assets/images/login/
     # - assets/icons/
     - assets/light.json
