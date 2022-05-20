@@ -364,6 +364,7 @@ class _NotificationCardState extends State<NotificationCard> {
   
   void _onTap(){
     setState(() {
+      
     });
   }
 
@@ -593,6 +594,7 @@ class _FavouriteCardState extends State<FavouriteCard> {
    
   void _onTap(){
     setState(() {
+      
     });
   }
 

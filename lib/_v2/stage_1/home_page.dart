@@ -1951,8 +1951,7 @@ class _HomePageState extends State<HomePage> {
                                                 setState(() {
                                                   _restaurant = value;
                                                 });
-                                                print(
-                                                    'new value: $_restaurant');
+                                                // print('new value: $_restaurant');
                                               },
                                             ),
                                           ),

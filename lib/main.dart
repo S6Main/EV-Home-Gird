@@ -1,4 +1,5 @@
 import 'package:ev_homegrid/_v2/stage_0/wallet_page.dart';
+import 'package:ev_homegrid/_v2/stage_3/confirmation_page.dart';
 import 'package:ev_homegrid/_v2/web3dart/test_page.dart';
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/_v2/stage_1/home_page.dart';
@@ -7,6 +8,7 @@ import '_v2/others/temp.dart';
 import '_v2/stage_0/credentials_page.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '_v2/stage_3/payments_page.dart';
 import 'constants.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
 
@@ -57,10 +59,12 @@ class MyApp extends StatelessWidget {
       //home: MyHomePage(),
       //home: MainPage(), // screen
       //home: mainApp()
-      home: WelcomePage(), //v2 version
+      // home: WelcomePage(), //v2 version
       //home: WalletPage(),
       //home: CredentialsPage(),
       // home: TestPage(), // web3dart
+      home: PaymentsPage(),
+      // home: ConfirmationPage(),
     );
   }
 }

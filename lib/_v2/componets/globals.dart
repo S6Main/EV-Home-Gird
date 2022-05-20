@@ -56,6 +56,6 @@ int userId = 0;
 
 //manual editings
 bool canExit = false;
-bool accessPermision = true;
+bool accessPermision = false;
 bool askRange = true;
 bool needToUplocadLocations = true;
