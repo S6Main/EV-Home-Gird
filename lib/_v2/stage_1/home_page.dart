@@ -8,6 +8,7 @@ import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ev_homegrid/_v2/stage_1/search_page.dart';
+import 'package:ev_homegrid/_v2/stage_3/payments_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -133,12 +134,12 @@ class _HomePageState extends State<HomePage> {
     networkCheck();
     gatherArrivals();
     if (globals.isLoggedIn) createUser();
+    // ethUtils.sentMoney();
   }
 
   void createUser() {
     bool _status = checkUserExist();
   }
-
   bool checkUserExist() {
     //recieve max(userid) from web3
     //receive exist or not from web3
@@ -760,7 +761,12 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-
+  void makePayment(){
+    //code to redirect to payment page
+    Navigator.of(context)
+      .push(CustomPageRoute(PaymentsPage(
+  )));
+  }
   void animateCamera(Set<Polyline> polylines) {
     if (_polylines != null) {
       double minLat = polylines.first.points.first.latitude;
@@ -1145,7 +1151,21 @@ class _HomePageState extends State<HomePage> {
                         _canShowButton = false;
                       } else if (_buttonText == 'Connect Charger') {
                         ConnectNearbyChargerInRoute();
+                      } else if(_buttonText == 'Reached'){
+                        if(globals.isAutherized){
+                          _buttonText = 'Payment';
+                        }
+                        else{
+                          _buttonText = 'Done';
+                        }
+                        
+                      } else if(_buttonText == 'Payment'){
+                        _canShowButton = false;
+                        makePayment();
                       }
+                      setState(() {
+                        
+                      });
                     },
                   ),
                 ),

@@ -46,7 +46,7 @@ class _ProfilePicState extends State<ProfilePic> {
           shape: BoxShape.circle,
         ),
         child: CircleAvatar(
-          backgroundImage: _imageToShow,
+          backgroundImage: globals.isAutherized ? _imageToShow : null,
           // backgroundImage: AssetImage('assets/images/profiles_V2/Sample-0.png'),
           backgroundColor: Color.fromARGB(255, 233, 233, 233),
           // radius: 60.0,

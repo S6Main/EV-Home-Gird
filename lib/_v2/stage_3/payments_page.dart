@@ -1,8 +1,15 @@
+import 'dart:async';
+
+import 'package:ev_homegrid/_v2/stage_3/confirmation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import '../componets/FadeRoute.dart';
+import '../componets/globals.dart' as globals;
+import '..//componets/CoinPrice.dart';
+import '../web3dart/ethereum_utils.dart';
+import '../componets/FadeRoute.dart';
 
 class PaymentsPage extends StatefulWidget {
 
@@ -13,6 +20,111 @@ class PaymentsPage extends StatefulWidget {
 }
 
 class _PaymentsPageState extends State<PaymentsPage> {
+
+  late AssetImage _imageToShow;
+  late String _receiverName;
+  late String _receiverAddress;
+  late double _totalAmount;
+
+  int _ethRate = 0;
+  double _amountInEth = 0; //tranfromed amount
+  bool _isLoading = true;
+
+  bool _buttonEnabled = true;
+
+  CoinData coinData = CoinData();
+  
+  EthereumUtils ethUtils = EthereumUtils(); //web3dart
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ethUtils.initial();
+
+    _imageToShow = AssetImage('assets/images/profiles_V2/Sample-${globals.receiver_profile}.png');
+    _receiverName = globals.receiver_name;
+    _receiverAddress = globals.receiver_address.substring(0,5) + '...' + globals.receiver_address.substring(globals.receiver_address.length-5);
+    _totalAmount = globals.amount;
+
+     coinData.getCoinData('INR').then((value) {
+      //  print('val is ${value.toString().substring(6,value.toString().length - 1)}');
+       _ethRate = int.parse( value.toString().substring(6,value.toString().length - 1));
+       _amountInEth = (globals.amount / _ethRate);
+       print('amount is $_amountInEth');
+      setState(() {
+      });
+     });
+
+     startTimerGatherEthRate();
+  }
+
+  void makePayment(){
+    if(globals.mimicPayment){
+      initateMockTransaction();
+    }
+    else{
+      print('initiated transaction');
+      setState(() {
+        _buttonEnabled = false;
+      });
+      print('amount in eth $_amountInEth');
+      globals.amount_in_wei = (_amountInEth * 1000000000000000000).round();
+      // print('amount is $a');
+      // globals.amount_in_wei = int.parse(((_amountInEth * 1000000000000000000.round())).toString());
+      print('converted amount is ${globals.amount_in_wei.toString()}');
+      ethUtils.sentMoney();
+      startTimerGatherTransactionInfo();
+    }
+  }
+  void checkTransaction(){
+    
+  }
+  void startTimerGatherTransactionInfo() {
+
+    print('started transaction info timer');
+    Duration sec = Duration(seconds: 2);
+    Timer.periodic(sec, (timer) {
+      if(globals.txHash != ''){
+        ethUtils.getTranactionReceipt(globals.txHash);
+
+        if(globals.transactionStatus == true){
+          print('its true');
+          timer.cancel();
+          print('transaction completed');
+          globals.transactionStatus = false;
+           Navigator.of(context).push(CustomPageRoute(ConfirmationPage()));
+        }
+      }
+
+    });
+  }
+  void startTimerGatherEthRate() {
+    print('started timer');
+    Duration sec = Duration(seconds: 2);
+    Timer.periodic(sec, (timer) {
+      if(_amountInEth != 0){
+        timer.cancel();
+        _isLoading = false;
+        setState(() {
+        });
+      }
+    });
+  }
+  void initateMockTransaction() {
+    print('initiated mock transaction');
+    setState(() {
+      _buttonEnabled = false;
+    });
+    Future.delayed(Duration(seconds: 5), () {
+      Navigator.of(context).push(CustomPageRoute(ConfirmationPage(
+                          )));
+    });
+    //convert rupee to ether(wei)
+
+    //request for transfer
+
+    //check for transfer status if success to move to next page, add transaction to history
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -61,9 +173,18 @@ class _PaymentsPageState extends State<PaymentsPage> {
                     color: Colors.transparent,
                     child: Container(
                         alignment: Alignment.center,
-                        width: 70,
-                        height: 70,
-                        color: Colors.amberAccent,
+                        padding: EdgeInsets.all(4),
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          color: Colors.white,
+                        ),
+                        child: CircleAvatar(
+                          backgroundImage: _imageToShow,
+                          backgroundColor: Colors.transparent,
+                          radius: 40,
+                        ),
                       ),
                     ),
                   SizedBox(width: 10,),
@@ -72,9 +193,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Sam Fernandes',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A)),),
+                        Text(_receiverName,style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A)),),
                         SizedBox(height: 5,),
-                        Text('0x65...78',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w300,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
+                        Text(_receiverAddress,style: TextStyle(fontSize: 15,fontWeight: FontWeight.w300,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
                       ],
                     ),
                   )
@@ -109,7 +230,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                               children: [
                                 Text('Total',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500,color: Color(0xFF2A2A2A)),),
                                 SizedBox(height: 5,),
-                                Text('\₹0.00',style: TextStyle(fontSize: 40,fontWeight: FontWeight.w900,color: Color(0xFF2A2A2A)),),
+                                Text('\₹ $_totalAmount',style: TextStyle(fontSize: 40,fontWeight: FontWeight.w900,color: Color(0xFF2A2A2A)),),
                               ],
                             ),
                           ),
@@ -150,9 +271,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
                                           child: Column(
                                             children: [
                                               SizedBox(height: 5,),
-                                              Text('\₹0.99',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),),
+                                              Text('\₹ $_totalAmount',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),),
                                               SizedBox(height: 10,),
-                                              Text('\₹0.00',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
+                                              Text('\₹ 0.00',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
                                             ],
                                           ),
                                         ),
@@ -182,7 +303,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                                           color: Colors.transparent,
                                           child: Column(
                                             children: [
-                                              Text('\₹0.99',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600,color: Color(0xFFFFA61D).withOpacity(0.8)),)
+                                              Text('\₹ $_totalAmount',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600,color: Color(0xFFFFA61D).withOpacity(0.8)),)
                                             ],
                                           ),
                                         ),
@@ -229,26 +350,64 @@ class _PaymentsPageState extends State<PaymentsPage> {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.only(left: 50,right: 50),
-                      height: 100,
-                      color: Colors.transparent,
-                      child: AnimatedButton(
-                        onPress: () {
-                          
-                        },
-                        height: 60,
-                        width: double.infinity,
-                        text: 'Conform and Transfer',
-                        isReverse: true,
-                        selectedTextColor: Colors.black,
-                        transitionType: TransitionType.RIGHT_BOTTOM_ROUNDER,
-                        backgroundColor: Colors.black,
-                        borderColor: Colors.black,
-                        borderRadius: 20,
-                        borderWidth: 2,
-                      ),
+                    child: Stack(
+                      children: [
+                        //loading 
+                        
+                        Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.only(left: 50,right: 50),
+                          height: 100,
+                          color: Colors.transparent,
+                          child: AnimatedButton(
+                            enable: _buttonEnabled,
+                            onPress: () {
+                              if(_buttonEnabled){
+                                makePayment();
+                              }
+                            },
+                            height: 60,
+                            width: double.infinity,
+                            text: _buttonEnabled && !_isLoading ? 'Conform and Transfer' : '',
+                            isReverse: true,
+                            selectedTextColor: Colors.black,
+                            transitionType: TransitionType.RIGHT_BOTTOM_ROUNDER,
+                            backgroundColor: Colors.black,
+                            borderColor: Colors.black.withOpacity(0.5),
+                            borderRadius: 20,
+                            borderWidth: 2,
+
+                          ),
+                        ),
+                        Visibility(
+                          visible: !_buttonEnabled,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: double.infinity,
+                            height: 100,
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2A2A2A)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: _isLoading,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: double.infinity,
+                            height: 100,
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 255, 255, 255)),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],)

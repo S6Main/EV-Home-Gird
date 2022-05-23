@@ -37,6 +37,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   late final _tabController = new TabController(vsync: this, length: 3);
   EthereumUtils ethUtils = EthereumUtils(); //web3dart
   List<Widget> _notifications = [];
+  List<Widget> _transactionHistory = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -44,7 +45,8 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     // _notifications.add(NotificationCard(text: _text2),);
     // addNotifications();
     ethUtils.initial(); //web3dart
-    getNotificationDetails();
+    globals.isAutherized ? getNotificationDetails() :  null;
+    makeTransaction();
   }
 
   void getNotificationDetails(){
@@ -72,6 +74,22 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       
     });
   }
+
+  void makeTransaction(){
+    if(globals.isTransactionAdded){
+      addTransactions(globals.transactionName, globals.transactionAddress, globals.transactionAmount, globals.transactionDate);
+      globals.isTransactionAdded = false;
+    }
+  }
+  void addTransactions(String _name, String _address, String _amount, String _date){
+
+    _address = _address.substring(0, 6) + '...' + _address.substring(_address.length - 4, _address.length);
+    _transactionHistory.add(HistoryCard(text: _text,name: _name, address: _address, amount: _amount, date: _date));
+    setState(() {
+      
+    });
+  }
+
   
   @override
   Widget build(BuildContext context) {
@@ -90,21 +108,31 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  new SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    // child: Text('History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal,color: Colors.black),),
-                    child:Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                  Container(
+                    child: Stack(
                       children: [
-                        HistoryCard(text: _text),
-                        HistoryCard(text: _text),
-                        HistoryCard(text: _text),
-                        HistoryCard(text: _text),
-                        HistoryCard(text: _text),
-                        HistoryCard(text: _text),
-                        HistoryCard(text: _text),
+                        Visibility(
+                          visible: _transactionHistory.length < 1,
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            alignment: Alignment.center,
+                            child: Text('empty', style: TextStyle(fontSize: 25, fontWeight: FontWeight.normal,color: Colors.black.withOpacity(0.1)),)),
+                        ),
+
+                        new SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          // child: Text('History', style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal,color: Colors.black),),
+                          child:Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: _transactionHistory,
+                            // [
+                            //   HistoryCard(text: _text),
+                            // ],
+                          )
+                        ),
                       ],
-                    )
+                    ),
                   ),
                   Container(
                     child: Stack(
@@ -143,8 +171,6 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        FavouriteCard(text3: _text3),
-                        FavouriteCard(text3: _text3),
                         FavouriteCard(text3: _text3),
                       ]
                     ),
@@ -196,9 +222,14 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 }
 
 class HistoryCard extends StatelessWidget {
+
+  final String amount;
+  final String date;
+  final String name;
+  final String address;
   const HistoryCard({
     Key? key,
-    required String text,
+    required String text, required this.amount, required this.date, required this.name, required this.address,
   }) : _text = text, super(key: key);
 
   final String _text;
@@ -238,7 +269,10 @@ class HistoryCard extends StatelessWidget {
                               height: 60,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.black.withOpacity(0.2),
+                                  image: DecorationImage(
+                                      image: AssetImage('assets/images/profiles_V2/Sample-${globals.receiver_profile}.png'),
+                                      fit: BoxFit.cover,
+                                  )
                               ),
                             ),
                         ),
@@ -250,13 +284,13 @@ class HistoryCard extends StatelessWidget {
                                 children: [
                                   Positioned(
                                     top: 15,
-                                    child: Text('0.086 ETH', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,color: Color(0xFF2B2D41)),)),
+                                    child: Text(amount, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,color: Color(0xFF2B2D41)),)),
                                   Positioned(
                                     top: 35,
-                                    child: Text('Omar Torff', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,color: Color(0xFFE5E6EB)),)),
+                                    child: Text(name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,color: Color(0xFFE5E6EB)),)),
                                   Positioned(
                                     bottom: 15,
-                                    child: Text('0xB.00000..b8', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,color: Color(0xFFE5E6EB)),),
+                                    child: Text(address, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,color: Color(0xFFE5E6EB)),),
                                   ),
                                 ],
                             ),
@@ -264,7 +298,7 @@ class HistoryCard extends StatelessWidget {
                         Container(
                           alignment: Alignment.bottomRight,
                           padding: EdgeInsets.only(right: 35,bottom: 15),
-                          child: Text('07:30 am', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,color: Color(0xFFE5E6EB)),),
+                          child: Text(date, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,color: Color(0xFFE5E6EB)),),
                         )
                       ]),
                       )
@@ -647,9 +681,14 @@ class _FavouriteCardState extends State<FavouriteCard> {
                                               width: 120,
                                               height: 120,
                                               decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                  image: AssetImage('assets/images/restaurant.png'),
+                                                  fit: BoxFit.fitHeight,
+                                                ),
                                                 borderRadius: BorderRadius.circular(16),
                                                 color: Colors.black12,
                                               ),
+                                              
                                             ),
                                             )
                                             ),

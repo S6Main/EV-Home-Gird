@@ -15,6 +15,41 @@ class EthereumUtils {
     String infuraApi = "https://ropsten.infura.io/v3/64e91f8989da4b26a7851df51c1afb3b";
     web3client = Web3Client(infuraApi, httpClient);
   }
+  
+  void getTranactionReceipt(String txHash) async {
+    TransactionReceipt? receipt = await web3client.getTransactionReceipt(txHash);
+    // return receipt;
+    // return receipt?.status;
+    globals.transactionStatus = receipt?.status;
+    
+  }
+
+  Future sentMoney() async{  
+    // EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(globals.privateKey);
+    print('globals privateKey: ${globals.privateKey}');
+    print('env privateKey: ${dotenv.env['METAMASK_PRIVATE_KEY']}');
+
+    EthPrivateKey privateKeyCred = EthPrivateKey.fromHex(dotenv.env['METAMASK_PRIVATE_KEY']!);
+
+    final address = privateKeyCred.address;
+    print(address.hexEip55);
+    print(await web3client.getBalance(address));
+
+    final result = await web3client.sendTransaction(
+      privateKeyCred,
+      Transaction(
+        to: EthereumAddress.fromHex(globals.sender_address),
+        gasPrice: EtherAmount.inWei(BigInt.from(2000000000)),
+        maxGas: 3000000,
+        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(globals.amount_in_wei)),
+      ),
+
+      chainId: 3,
+      fetchChainIdFromNetworkId: false
+    );
+    globals.txHash = result.toString();
+    print('trasaction result is ${globals.txHash}');
+  }
 
   Future getBalance() async {
     final contract = await getDeployedContract();
@@ -111,6 +146,7 @@ class EthereumUtils {
           contract: contract,
           function: etherFunction,
           parameters: [id,name,credentials,profile],
+          gasPrice: EtherAmount.inWei(BigInt.from(2000000000)),
           maxGas: 3000000,
         ),chainId: 3,
         fetchChainIdFromNetworkId: false);

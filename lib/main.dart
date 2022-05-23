@@ -3,6 +3,7 @@ import 'package:ev_homegrid/_v2/stage_3/confirmation_page.dart';
 import 'package:ev_homegrid/_v2/web3dart/test_page.dart';
 import 'package:ev_homegrid/icons/custom_icon.dart';
 import 'package:ev_homegrid/_v2/stage_1/home_page.dart';
+import 'package:ev_homegrid/navigation%20pages/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import '_v2/others/temp.dart';
 import '_v2/stage_0/credentials_page.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
       //home: MyHomePage(),
       //home: FrontScreen(),
       //home: MyHomePage(),
+      // home: ProfilePage(),
       //home: MainPage(), // screen
       //home: mainApp()
       home: WelcomePage(), //v2 version

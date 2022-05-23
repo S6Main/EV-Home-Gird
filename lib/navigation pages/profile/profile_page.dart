@@ -20,7 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0.0,
         centerTitle: true,
         title: Text(
-          'Profile',
+          '',
           style: kProfileTitleStyle,
         ),
       ),

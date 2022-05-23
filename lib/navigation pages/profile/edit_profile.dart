@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'profile_pic.dart';
 import 'package:ev_homegrid/components/custom_profilepic_button.dart';
 import 'package:ev_homegrid/components/custom_card.dart';
@@ -18,7 +19,7 @@ class EditUserProfile extends StatefulWidget {
 
 class _EditUserProfileState extends State<EditUserProfile> {
 
-  String _name = '';
+  String _name = '    ';
 
   @override
   void initState() {
@@ -97,7 +98,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomCard(
-                  leadingIconData: Icons.electric_moped,
+                  leadingIconData: LineAwesomeIcons.biking,
                   cardTitle: 'My Vehicle',
                   onPressed: () {
                     Navigator.push(context,
@@ -105,8 +106,8 @@ class _EditUserProfileState extends State<EditUserProfile> {
                   },
                 ),
                 CustomCard(
-                  leadingIconData: Icons.favorite_rounded,
-                  cardTitle: 'My Favorites',
+                  leadingIconData: LineAwesomeIcons.handshake_1,
+                  cardTitle: 'Share Your Charger',
                   onPressed: () {},
                 ),
                 CustomCard(
@@ -130,10 +131,10 @@ class _EditUserProfileState extends State<EditUserProfile> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    elevation: 1.0,
+                    elevation: 0,
                     color: Color(0xFFF5F6F9),
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 50.0),
                       // leading:
                       title: Text(
                         'Connect With Us',
@@ -144,13 +145,20 @@ class _EditUserProfileState extends State<EditUserProfile> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.facebook_rounded,
+                            LineAwesomeIcons.instagram,
                             size: 28.0,
                           ),
+                          SizedBox(width: 10.0),
                           Icon(
-                            Icons.facebook_rounded,
+                            LineAwesomeIcons.twitter,
                             size: 28.0,
                           ),
+                          SizedBox(width: 10.0),
+                          Icon(
+                            LineAwesomeIcons.facebook,
+                            size: 28.0,
+                          ),
+                          SizedBox(width: 20,)
                         ],
                       ),
                     ),
@@ -162,39 +170,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
           // SizedBox(
           //   height: MediaQuery.of(context).size.height * .02,
           // ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
-                // color: Colors.red,
-                height: MediaQuery.of(context).size.height * 0.05,
-                // width: MediaQuery.of(context).size.width,
-                width: double.infinity,
-
-                child: Align(
-                  // alignment: Alignment.bottomCenter,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 55.0,
-                      width: 220.0,
-                      decoration: BoxDecoration(
-                        color: kThemeColor,
-                        borderRadius:
-                            BorderRadius.circular(kBorderCircleRadius),
-                      ),
-                      child: Text(
-                        'Log out',
-                        style: kButtonTextStyle,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // 
         ],
       ),
     );

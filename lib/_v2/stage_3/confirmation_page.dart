@@ -1,8 +1,15 @@
+import 'dart:math';
+
+import 'package:ev_homegrid/_v2/stage_1/home_page.dart';
+import 'package:ev_homegrid/navigation%20pages/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_homegrid/constants.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import '../componets/FadeRoute.dart';
+import '../componets/globals.dart' as globals;
 
 
 class ConfirmationPage extends StatefulWidget {
@@ -14,7 +21,36 @@ class ConfirmationPage extends StatefulWidget {
 }
 
 class _ConfirmationPageState extends State<ConfirmationPage> {
+
+  late String _receiverAddress = '';
+  late String _senderAddress = '';
+  late String _date;
+  late double _amount = 0.0;
+  late double _tax = 0.0;
   
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    DateTime date = new DateTime.now();
+    _date = DateFormat('d MMMM y').format(date);
+    //'31 October 2021'
+
+    _receiverAddress = globals.receiver_address.substring(0,5) + '...' + globals.receiver_address.substring(globals.receiver_address.length-5);
+    _senderAddress = globals.sender_address.substring(0,5) + '...' + globals.sender_address.substring(globals.sender_address.length-5);
+
+    _amount = globals.amount;
+  }
+
+  void addTransaction(){
+    globals.transactionName = globals.receiver_name;
+    globals.transactionAddress = globals.receiver_address;
+    globals.transactionAmount = globals.amount.toString();
+    globals.transactionDate = _date;
+    globals.isTransactionAdded = true;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +121,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text('Date',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
-                                      Text('31 October 2021',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
+                                      Text(_date,style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
                                     ],
                                   ),
                                 ),
@@ -101,14 +137,14 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text('Sender',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
-                                          Text('x052...63',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
+                                          Text(_senderAddress,style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
                                         ],
                                       ),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text('Receiver',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
-                                          Text('x067...89',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
+                                          Text(_receiverAddress,style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
                                         ],
                                       ),
                                     ],
@@ -126,14 +162,14 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text('Total Tranfer',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
-                                          Text('\$0.99',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
+                                          Text('₹' + _amount.toString(),style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
                                         ],
                                       ),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text('Admin fee',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
-                                          Text('\$0.00',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
+                                          Text('₹' + _tax.toString(),style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Color(0xFF2A2A2A).withOpacity(0.8)),)
                                         ],
                                       ),
                                       Divider(),
@@ -141,7 +177,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text('Total',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500,color: Color(0xFF2A2A2A).withOpacity(0.5)),),
-                                          Text('\$0.99',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500,color: Color(0xFFFFA61D).withOpacity(0.8)),)
+                                          Text('₹' + (_amount + _tax).toString(),style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500,color: Color(0xFFFFA61D).withOpacity(0.8)),)
                                         ],
                                       ),
                                     ],
@@ -167,7 +203,9 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                       color: Colors.transparent,
                       child: AnimatedButton(
                         onPress: () {
-                          
+                          addTransaction();
+                          Navigator.of(context).push(CustomPageRoute(MainPage(
+                          )));
                         },
                         height: 60,
                         width: double.infinity,
