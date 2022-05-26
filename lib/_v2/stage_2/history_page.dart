@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:ev_homegrid/constants.dart';
@@ -45,10 +46,19 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     // _notifications.add(NotificationCard(text: _text2),);
     // addNotifications();
     ethUtils.initial(); //web3dart
-    globals.isAutherized ? getNotificationDetails() :  null;
+    globals.isLoggedIn ? startTimer() :  null;
     makeTransaction();
   }
 
+  void startTimer(){
+    Duration sec = Duration(seconds: 5);
+    Timer.periodic(sec, (timer) {
+      if(globals.isAutherized){
+        getNotificationDetails(); //web3dart
+         timer.cancel();
+      }
+    });
+  }
   void getNotificationDetails(){
     String title = '';
     String address = '';
@@ -270,7 +280,7 @@ class HistoryCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   image: DecorationImage(
-                                      image: AssetImage('assets/images/profiles_V2/Sample-${globals.receiver_profile}.png'),
+                                      image: AssetImage('assets/images/profiles_V2/Sample-${globals.receiverProfile}.png'),
                                       fit: BoxFit.cover,
                                   )
                               ),
@@ -284,7 +294,7 @@ class HistoryCard extends StatelessWidget {
                                 children: [
                                   Positioned(
                                     top: 15,
-                                    child: Text(amount, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,color: Color(0xFF2B2D41)),)),
+                                    child: Text(amount+ ' Rs', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700,color: Color(0xFF2B2D41)),)),
                                   Positioned(
                                     top: 35,
                                     child: Text(name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700,color: Color(0xFFE5E6EB)),)),

@@ -140,9 +140,19 @@ class _WelcomePageState extends State<WelcomePage> {
   void addQuotes(){
     
     _quotesList.add(QuotesPanel(
-      text_1: 'Publish Your App',
-      text_2: 'Passion in Own Way',
-      text_3: 'It’s Free',
+      text_1: 'Blockchain',
+      text_2: 'is an awesome',
+      text_3: 'technology',
+    ));
+    _quotesList.add(QuotesPanel(
+      text_1: 'Blockchain',
+      text_2: 'has ',
+      text_3: 'disruptive power',
+    ));
+    _quotesList.add(QuotesPanel(
+      text_1: 'Blockchain',
+      text_2: 'still has ',
+      text_3: 'a long way to go',
     ));
     
   }
@@ -259,6 +269,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
+                        getChargerData();
                         checkNetwork();
                         Future.delayed(Duration(milliseconds: 200), () => globals.isOnline ? {
                           Navigator.push(context, SlideRightRoute(page: WalletPage())),

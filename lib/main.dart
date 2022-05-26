@@ -46,27 +46,7 @@ class MyApp extends StatelessWidget {
             ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // theme: ThemeData().copyWith(
-      //   textTheme: GoogleFonts.comfortaaTextTheme(
-      //     Theme.of(context).textTheme,
-      //   ),
-      // ),
-
-      // theme: ThemeData(
-      //   primaryColor: Colors.white,
-      // ),
-      //home: MyHomePage(),
-      //home: FrontScreen(),
-      //home: MyHomePage(),
-      // home: ProfilePage(),
-      //home: MainPage(), // screen
-      //home: mainApp()
       home: WelcomePage(), //v2 version
-      //home: WalletPage(),
-      //home: CredentialsPage(),
-      // home: TestPage(), // web3dart
-      // home: PaymentsPage(),
-      // home: ConfirmationPage(),
     );
   }
 }
@@ -77,8 +57,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //MyHomePage({Key key, this.title}) : super(key: key);
-  //final String title;
 
   @override
   Widget build(BuildContext context) {

@@ -147,6 +147,7 @@ class _HomePageState extends State<HomePage> {
     ethUtils.getUserDetails(globals.publicKey).then((value) {
       if (value != null) {
         if (value[0] == true) {
+          globals.senderAddress = globals.publicKey;
           globals.userName = value[2];
           globals.userProfile = int.parse(value[3].toString());
           print('user profile: ' + globals.userProfile.toString());
@@ -762,6 +763,13 @@ class _HomePageState extends State<HomePage> {
     }
   }
   void makePayment(){
+    //code to find the nearest charger address
+    for(int i  = 0; i < _locations.locations.length; i++){
+      if(_locations.locations[i].coordinates == _intermediateCharger){
+        globals.receiverName = _locations.locations[i].name;
+        globals.receiverAddress = _locations.locations[i].address;
+      }
+    }
     //code to redirect to payment page
     Navigator.of(context)
       .push(CustomPageRoute(PaymentsPage(
@@ -2483,6 +2491,7 @@ class _HomePageState extends State<HomePage> {
 
   void CustomDialogDetails() {
     TextEditingController _nameController = new TextEditingController();
+    String chargerAddress = globals.chargerAddress.substring(0, 6) + '...' + globals.chargerAddress.substring(globals.chargerAddress.length - 4, globals.chargerAddress.length);
     String _text =
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Volutpat eu, consectetur sed in tincidunt turpis volutpat, nunc. Purus suspendisse purus nibh nam nisl egestas sed. Facilisis enim urna morbi.';
     showDialog(
@@ -2662,7 +2671,7 @@ class _HomePageState extends State<HomePage> {
                                   width: double.infinity,
                                   color: Colors.transparent,
                                   child: Text(
-                                    globals.chargerAddress,
+                                    chargerAddress,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,

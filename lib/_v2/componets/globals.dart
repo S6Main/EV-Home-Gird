@@ -56,14 +56,14 @@ int userId = 0;
 int userProfile = -1;
 
 //transfer
-int receiver_profile = 4;
-int sender_profile = -1;
-String receiver_name = 'Sam Fernandes';
-String sender_name = '';
-String receiver_address = '0xB2Ec0f100dE53325Be78F4eBDDA52E1277B02bb8';
-String sender_address = '0x2Cd4613C1Dd6bbBDf593c94Ec3D85cd231739f49';
+int receiverProfile = 4;
+int senderProfile = -1;
+String receiverName = 'Sam Fernandes';
+String senderName = '';
+String receiverAddress = '0xB2Ec0f100dE53325Be78F4eBDDA52E1277B02bb8';
+String senderAddress = '0x2Cd4613C1Dd6bbBDf593c94Ec3D85cd231739f49';
 double amount  = 15.0;
-int amount_in_wei = 0;
+int amountInWei = 0;
 String txHash = '';
 
   //history session
@@ -76,7 +76,7 @@ String txHash = '';
 
 //manual editings
 bool canExit = false;
-bool accessPermision = false;
+bool accessPermision = true;
 bool askRange = true;
 bool needToUplocadLocations = true;
 bool mimicPayment = false;

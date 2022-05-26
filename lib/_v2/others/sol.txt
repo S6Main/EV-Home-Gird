@@ -4,35 +4,51 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract basicDapp{
 
-	 uint balance;
-
-    constructor(){
-        balance = 0;
-    }
-
 struct ChargerData{ 
 	uint charger_id;
 	string charger_name;
 	string charger_coordinates;
-	uint charger_status; 	//[1,2,3]
-	uint charger_rp;	//[1,2,3] 1, 1+2, 2
+	uint charger_status; 	
+	uint charger_rp;	
 	address charger_address;
 }
 struct UserData{
 	uint user_id;
 	string user_name;
 	address user_address;
+	uint user_profile;
+}
+struct Notifications{
+	string title;
+	address to_address;
+	string from_address;
+	string text;
 }
 
+Notifications[] notifications;
 UserData [] users;
 ChargerData []datas;
 
+	//function to check balance
+	function balanceOf() external view returns(uint){
+		return address(this).balance;
+	}
+	//function to store notifications
+	function StoreNotifications(
+		string memory _title,
+		address _to_address,
+		string memory _from_address,
+		string memory _text)public{
+			Notifications memory n = Notifications(_title,_to_address,_from_address,_text);
+			notifications.push(n);
+		}
 	//function to store user data
 	function StoreUserData(
 		uint id,
 		string memory name,
-		address u_address)public{
-		UserData memory u  = UserData(id,name,u_address);
+		address u_address,
+		uint profile)public{
+		UserData memory u  = UserData(id,name,u_address,profile);
 		users.push(u);
 	}
 
@@ -49,17 +65,34 @@ ChargerData []datas;
 	}
 
 	//function to check user data
-	function getUserData(address _address) public view returns(bool,uint,string memory){
+	function getUserData(address _address) public view returns(bool,uint,string memory,uint){
 		for(uint i  = 0; i < users.length; i++){
 			UserData memory _u = users[i];
 			if(_u.user_address == _address){
 				string memory name  = _u.user_name;
-				return(true,users.length,name);
+				uint profile = _u.user_profile;
+				return(true,users.length,name,profile);
 			}
 		}
-		return (false,users.length,'');
+		return (false,users.length,'',0);
 	}
-
+	//function to Retrieve notifications
+	function getNotifications(address to_address) public view returns(string[] memory, string[] memory,string[] memory){
+		string[] memory _title = new string[](notifications.length);
+		string[] memory _address = new string[](notifications.length);
+		string[] memory _text = new string[](notifications.length);
+		uint j =0;
+		for(uint i = 0; i < notifications.length; i++){
+			Notifications memory _n = notifications[i];
+			if(_n.to_address == to_address){
+				_title[j] = notifications[i].title;
+				_address[j] = notifications[i].from_address;
+				_text[j] = notifications[i].text;
+				j = j + 1;
+			}
+		}
+		return (_title,_address,_text);
+	}
 	// Function to Retrieve charger data
 	function getData() public view returns(uint[] memory,string[] memory,string[] memory,uint[] memory,uint[] memory,address[] memory){
 		
@@ -81,16 +114,4 @@ ChargerData []datas;
 		}
 		return(_id,_name,_coordinates,_status,_rp,_address);
 	}
-	function sentBalance(uint amount) public{
-        balance += amount;
-    }
-
-    function withdrawBalance(uint amount) public{
-        require(balance > amount, "Not Enough Balance");
-        balance -= amount; 
-    }
-
-    function getBalance() public view returns(uint) {
-        return balance;
-    }
 }

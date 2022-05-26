@@ -12,7 +12,8 @@ class EthereumUtils {
 
   void initial() {
     httpClient = http.Client();
-    String infuraApi = "https://ropsten.infura.io/v3/64e91f8989da4b26a7851df51c1afb3b";
+    // String infuraApi = "https://ropsten.infura.io/v3/64e91f8989da4b26a7851df51c1afb3b";
+    String infuraApi = "https://rinkeby.infura.io/v3/64e91f8989da4b26a7851df51c1afb3b";
     web3client = Web3Client(infuraApi, httpClient);
   }
   
@@ -38,13 +39,13 @@ class EthereumUtils {
     final result = await web3client.sendTransaction(
       privateKeyCred,
       Transaction(
-        to: EthereumAddress.fromHex(globals.sender_address),
+        to: EthereumAddress.fromHex(globals.senderAddress),
         gasPrice: EtherAmount.inWei(BigInt.from(2000000000)),
         maxGas: 3000000,
-        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(globals.amount_in_wei)),
+        value: EtherAmount.fromUnitAndValue(EtherUnit.wei, BigInt.from(globals.amountInWei)),
       ),
 
-      chainId: 3,
+      chainId: 4,
       fetchChainIdFromNetworkId: false
     );
     globals.txHash = result.toString();
@@ -72,7 +73,7 @@ class EthereumUtils {
           function: etherFunction,
           parameters: [bigAmount],
           maxGas: 100000,
-        ),chainId: 3,
+        ),chainId: 4,
         fetchChainIdFromNetworkId: false);
         print('result is $result');
     return result;
@@ -90,7 +91,7 @@ class EthereumUtils {
           function: etherFunction,
           parameters: [bigAmount],
           maxGas: 100000,
-        ),chainId: 3,
+        ),chainId: 4,
         fetchChainIdFromNetworkId: false);
         print('result is $result');
     return result;
@@ -119,7 +120,7 @@ class EthereumUtils {
           function: etherFunction,
           parameters: [id,'b'],
           maxGas: 100000,
-        ),chainId: 3,
+        ),chainId: 4,
         fetchChainIdFromNetworkId: false);
     return result;
 
@@ -146,11 +147,11 @@ class EthereumUtils {
           contract: contract,
           function: etherFunction,
           parameters: [id,name,credentials,profile],
-          gasPrice: EtherAmount.inWei(BigInt.from(2000000000)),
+          // gasPrice: EtherAmount.inWei(BigInt.from(2000000000)),
           maxGas: 3000000,
-        ),chainId: 3,
+        ),chainId: 4,
         fetchChainIdFromNetworkId: false);
-        print('transaction key is  $result');
+        print('transaction key for user registration is  $result');
     return result;
 
   }

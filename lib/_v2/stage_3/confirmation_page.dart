@@ -38,15 +38,15 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
     _date = DateFormat('d MMMM y').format(date);
     //'31 October 2021'
 
-    _receiverAddress = globals.receiver_address.substring(0,5) + '...' + globals.receiver_address.substring(globals.receiver_address.length-5);
-    _senderAddress = globals.sender_address.substring(0,5) + '...' + globals.sender_address.substring(globals.sender_address.length-5);
+    _receiverAddress = globals.receiverAddress.substring(0,5) + '...' + globals.receiverAddress.substring(globals.receiverAddress.length-5);
+    _senderAddress = globals.senderAddress.substring(0,5) + '...' + globals.senderAddress.substring(globals.senderAddress.length-5);
 
     _amount = globals.amount;
   }
 
   void addTransaction(){
-    globals.transactionName = globals.receiver_name;
-    globals.transactionAddress = globals.receiver_address;
+    globals.transactionName = globals.receiverName;
+    globals.transactionAddress = globals.receiverAddress;
     globals.transactionAmount = globals.amount.toString();
     globals.transactionDate = _date;
     globals.isTransactionAdded = true;

@@ -41,9 +41,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
     super.initState();
     ethUtils.initial();
 
-    _imageToShow = AssetImage('assets/images/profiles_V2/Sample-${globals.receiver_profile}.png');
-    _receiverName = globals.receiver_name;
-    _receiverAddress = globals.receiver_address.substring(0,5) + '...' + globals.receiver_address.substring(globals.receiver_address.length-5);
+    _imageToShow = AssetImage('assets/images/profiles_V2/Sample-${globals.receiverProfile}.png');
+    _receiverName = globals.receiverName;
+    _receiverAddress = globals.receiverAddress.substring(0,5) + '...' + globals.receiverAddress.substring(globals.receiverAddress.length-5);
     _totalAmount = globals.amount;
 
      coinData.getCoinData('INR').then((value) {
@@ -68,10 +68,10 @@ class _PaymentsPageState extends State<PaymentsPage> {
         _buttonEnabled = false;
       });
       print('amount in eth $_amountInEth');
-      globals.amount_in_wei = (_amountInEth * 1000000000000000000).round();
+      globals.amountInWei = (_amountInEth * 1000000000000000000).round();
       // print('amount is $a');
       // globals.amount_in_wei = int.parse(((_amountInEth * 1000000000000000000.round())).toString());
-      print('converted amount is ${globals.amount_in_wei.toString()}');
+      print('converted amount is ${globals.amountInWei.toString()}');
       ethUtils.sentMoney();
       startTimerGatherTransactionInfo();
     }
